@@ -1,5 +1,5 @@
 /*
- * org.openmicroscopy.omero.dao.utils.FeatureUtils
+ * org.openmicroscopy.omero.dao.utils.SemanticElementUtils
  *
  *------------------------------------------------------------------------------
  *
@@ -41,7 +41,7 @@ import org.hibernate.Hibernate;
 
 //Application-internal dependencies
 import org.openmicroscopy.omero.BaseModelUtils;
-import org.openmicroscopy.omero.model.Feature;
+import org.openmicroscopy.omero.model.SemanticElement;
 
 /**
  *  
@@ -53,9 +53,9 @@ import org.openmicroscopy.omero.model.Feature;
  * @since 1.0
  */
 
-public class FeatureUtils  extends BaseModelUtils {
+public class SemanticElementUtils  extends BaseModelUtils {
 
-  private static Log log = LogFactory.getLog(FeatureUtils.class);
+  private static Log log = LogFactory.getLog(SemanticElementUtils.class);
 
 
   public void clean(Object o){
@@ -70,44 +70,17 @@ public class FeatureUtils  extends BaseModelUtils {
     }
     done.add(o);
   
-    Feature self = (Feature) o;
-    // Cleaning org.openmicroscopy.omero.model.Image::image field
-    if (null==self.getImage()){
+    SemanticElement self = (SemanticElement) o;
+    // Cleaning org.openmicroscopy.omero.model.SemanticType::semanticType field
+    if (null==self.getSemanticType()){
       // Do nothing
-    } else if (!Hibernate.isInitialized(self.getImage())){
-      self.setImage(null);
+    } else if (!Hibernate.isInitialized(self.getSemanticType())){
+      self.setSemanticType(null);
          if (log.isDebugEnabled()){
-             log.debug("Set Feature.image to null");
+             log.debug("Set SemanticElement.semanticType to null");
          }
     } else {
-      (new org.openmicroscopy.omero.model.Image()).getUtils().clean(self.getImage(),done);
-    }
-	// Type: org.hibernate.type.SetType(org.openmicroscopy.omero.model.Feature.features)
-    // Cleaning java.util.Set::features set (Role: org.openmicroscopy.omero.model.Feature.features)
-    if (null==self.getFeatures()){
-      // Do nothing
-    } else if (!Hibernate.isInitialized(self.getFeatures())){
-      self.setFeatures(null);
-         if (log.isDebugEnabled()){
-             log.debug("Set Feature.features to null");
-         }
-    } else {
-      for (Iterator it = self.getFeatures().iterator(); it.hasNext();){
-      	 //org.hibernate.type.ManyToOneType(org.openmicroscopy.omero.model.Feature)
-      	 //org.openmicroscopy.omero.model.Feature
-         (new org.openmicroscopy.omero.model.Feature()).getUtils().clean(it.next(),done);
-      }
-    }
-    // Cleaning org.openmicroscopy.omero.model.Feature::feature field
-    if (null==self.getFeature()){
-      // Do nothing
-    } else if (!Hibernate.isInitialized(self.getFeature())){
-      self.setFeature(null);
-         if (log.isDebugEnabled()){
-             log.debug("Set Feature.feature to null");
-         }
-    } else {
-      (new org.openmicroscopy.omero.model.Feature()).getUtils().clean(self.getFeature(),done);
+      (new org.openmicroscopy.omero.model.SemanticType()).getUtils().clean(self.getSemanticType(),done);
     }
   }
 

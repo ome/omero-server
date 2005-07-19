@@ -1,5 +1,5 @@
 /*
- * org.openmicroscopy.omero.dao.utils.RepositoryUtils
+ * org.openmicroscopy.omero.dao.utils.RenderingSettingUtils
  *
  *------------------------------------------------------------------------------
  *
@@ -41,7 +41,7 @@ import org.hibernate.Hibernate;
 
 //Application-internal dependencies
 import org.openmicroscopy.omero.BaseModelUtils;
-import org.openmicroscopy.omero.model.Repository;
+import org.openmicroscopy.omero.model.RenderingSetting;
 
 /**
  *  
@@ -53,9 +53,9 @@ import org.openmicroscopy.omero.model.Repository;
  * @since 1.0
  */
 
-public class RepositoryUtils  extends BaseModelUtils {
+public class RenderingSettingUtils  extends BaseModelUtils {
 
-  private static Log log = LogFactory.getLog(RepositoryUtils.class);
+  private static Log log = LogFactory.getLog(RenderingSettingUtils.class);
 
 
   public void clean(Object o){
@@ -70,38 +70,28 @@ public class RepositoryUtils  extends BaseModelUtils {
     }
     done.add(o);
   
-    Repository self = (Repository) o;
-	// Type: org.hibernate.type.SetType(org.openmicroscopy.omero.model.Repository.thumbnails)
-    // Cleaning java.util.Set::thumbnails set (Role: org.openmicroscopy.omero.model.Repository.thumbnails)
-    if (null==self.getThumbnails()){
+    RenderingSetting self = (RenderingSetting) o;
+    // Cleaning org.openmicroscopy.omero.model.Experimenter::experimenter field
+    if (null==self.getExperimenter()){
       // Do nothing
-    } else if (!Hibernate.isInitialized(self.getThumbnails())){
-      self.setThumbnails(null);
+    } else if (!Hibernate.isInitialized(self.getExperimenter())){
+      self.setExperimenter(null);
          if (log.isDebugEnabled()){
-             log.debug("Set Repository.thumbnails to null");
+             log.debug("Set RenderingSetting.experimenter to null");
          }
     } else {
-      for (Iterator it = self.getThumbnails().iterator(); it.hasNext();){
-      	 //org.hibernate.type.ManyToOneType(org.openmicroscopy.omero.model.Thumbnail)
-      	 //org.openmicroscopy.omero.model.Thumbnail
-         (new org.openmicroscopy.omero.model.Thumbnail()).getUtils().clean(it.next(),done);
-      }
+      (new org.openmicroscopy.omero.model.Experimenter()).getUtils().clean(self.getExperimenter(),done);
     }
-	// Type: org.hibernate.type.SetType(org.openmicroscopy.omero.model.Repository.imagePixels)
-    // Cleaning java.util.Set::imagePixels set (Role: org.openmicroscopy.omero.model.Repository.imagePixels)
-    if (null==self.getImagePixels()){
+    // Cleaning org.openmicroscopy.omero.model.Image::image field
+    if (null==self.getImage()){
       // Do nothing
-    } else if (!Hibernate.isInitialized(self.getImagePixels())){
-      self.setImagePixels(null);
+    } else if (!Hibernate.isInitialized(self.getImage())){
+      self.setImage(null);
          if (log.isDebugEnabled()){
-             log.debug("Set Repository.imagePixels to null");
+             log.debug("Set RenderingSetting.image to null");
          }
     } else {
-      for (Iterator it = self.getImagePixels().iterator(); it.hasNext();){
-      	 //org.hibernate.type.ManyToOneType(org.openmicroscopy.omero.model.ImagePixel)
-      	 //org.openmicroscopy.omero.model.ImagePixel
-         (new org.openmicroscopy.omero.model.ImagePixel()).getUtils().clean(it.next(),done);
-      }
+      (new org.openmicroscopy.omero.model.Image()).getUtils().clean(self.getImage(),done);
     }
     // Cleaning org.openmicroscopy.omero.model.ModuleExecution::moduleExecution field
     if (null==self.getModuleExecution()){
@@ -109,7 +99,7 @@ public class RepositoryUtils  extends BaseModelUtils {
     } else if (!Hibernate.isInitialized(self.getModuleExecution())){
       self.setModuleExecution(null);
          if (log.isDebugEnabled()){
-             log.debug("Set Repository.moduleExecution to null");
+             log.debug("Set RenderingSetting.moduleExecution to null");
          }
     } else {
       (new org.openmicroscopy.omero.model.ModuleExecution()).getUtils().clean(self.getModuleExecution(),done);
