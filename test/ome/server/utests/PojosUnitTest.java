@@ -1,5 +1,5 @@
 /*
- * ome.api.ReturnLogger
+ * ome.server.utests.PojosUnitTest
  *
  *------------------------------------------------------------------------------
  *
@@ -26,64 +26,64 @@
  *
  *------------------------------------------------------------------------------
  */
-package ome.aop;
+package ome.server.utests;
 
 //Java imports
-import java.io.ByteArrayOutputStream;
-import java.io.OutputStream;
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 //Third-party libraries
-import org.aopalliance.intercept.MethodInterceptor;
-import org.aopalliance.intercept.MethodInvocation;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
-import com.caucho.burlap.io.BurlapOutput;
+import org.jmock.Mock;
+import org.jmock.MockObjectTestCase;
 
 //Application-internal dependencies
+import ome.dao.AnnotationDao;
+import ome.dao.ContainerDao;
+import ome.dao.DaoFactory;
+import ome.logic.HierarchyBrowsingImpl;
+import ome.logic.PojosImpl;
+import ome.model.Category;
+import ome.model.CategoryGroup;
+import ome.model.Classification;
+import ome.model.Dataset;
+import ome.model.Image;
+import ome.model.ImageAnnotation;
+import ome.model.Project;
 
-
-/** 
- * method interceptor to log all result objects. 
+/**
  * @author  Josh Moore &nbsp;&nbsp;&nbsp;&nbsp;
  * 				<a href="mailto:josh.moore@gmx.de">josh.moore@gmx.de</a>
  * @version 1.0 
  * <small>
  * (<b>Internal version:</b> $Rev$ $Date$)
  * </small>
- * @since 1.0
+ * @since Omero 2.0
  */
-public class ReturnLogger implements MethodInterceptor {
-
-	private static Log log = LogFactory.getLog(ReturnLogger.class);
-	private boolean printXML = false;
-
-	public void setPrintXML(boolean value){
-		this.printXML = value;
-	}
-	
-	/**
-     * @see org.aopalliance.intercept.MethodInterceptor#invoke(org.aopalliance.intercept.MethodInvocation)
-     */
-    public Object invoke(MethodInvocation arg0) throws Throwable {
-        Object o = arg0.proceed();
-        log.info("Meth:\t"+arg0.getMethod().getName());
-        log.info("Args:\t"+Arrays.asList(arg0.getArguments()));
-        log.info("Rslt:\t"+o);
-        log(o);
-        return o;
+public class PojosUnitTest extends MockObjectTestCase {
+    protected PojosImpl manager;
+    protected Mock annotationDao,containerDao;
+    
+    protected void setUp() throws Exception {
+        super.setUp();
+        
+        annotationDao = new Mock(AnnotationDao.class);
+        containerDao = new Mock(ContainerDao.class);
+        DaoFactory factory = new DaoFactory(null,(AnnotationDao) annotationDao.proxy(), (ContainerDao) containerDao.proxy(),null,null);
+        manager = new PojosImpl(factory);
     }
     
-    public void log(Object o) throws Throwable{
-    	if (printXML){
-    		OutputStream os = new ByteArrayOutputStream();
-    		BurlapOutput out = new BurlapOutput(os);
-    		out.writeObject(o);
-    		byte[] b = ((ByteArrayOutputStream)os).toByteArray();
-    		os.close();
-    		log.info(new String(b));
-    	}
+    protected void tearDown() throws Exception {
+        manager = null;
+        annotationDao = null;
+        containerDao = null;
+    }
+    
+    public void testEmpty(){
+    	//
     }
     
 }
