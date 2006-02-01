@@ -1,5 +1,5 @@
 /*
- * ome.server.itests.GenericDaoTest
+ * ome.server.itests.query.QueryTest
  *
  *------------------------------------------------------------------------------
  *
@@ -26,7 +26,7 @@
  *
  *------------------------------------------------------------------------------
  */
-package ome.server.itests;
+package ome.server.itests.query;
 
 //Java imports
 import java.util.HashMap;
@@ -39,9 +39,10 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.test.AbstractDependencyInjectionSpringContextTests;
 
 //Application-internal dependencies
-import ome.dao.GenericDao;
-import ome.model.Dataset;
-import ome.model.Project;
+import ome.api.IQuery;
+import ome.model.containers.Dataset;
+import ome.model.containers.Project;
+import ome.server.itests.ConfigHelper;
 
 /** 
  * tests for a generic data access
@@ -54,18 +55,19 @@ import ome.model.Project;
  * </small>
  * @since 1.0
  */
-public class GenericDaoTest
+public class QueryTest
         extends
             AbstractDependencyInjectionSpringContextTests {
 
-    private static Log log = LogFactory.getLog(GenericDaoTest.class);
-    GenericDao gdao;
+    private static Log log = LogFactory.getLog(QueryTest.class);
 
+    IQuery _q;
+    
     /**
      * @see org.springframework.test.AbstractDependencyInjectionSpringContextTests#onSetUp()
      */
     protected void onSetUp() throws Exception {
-        gdao = (GenericDao) applicationContext.getBean("genericDao");
+        _q = (IQuery) applicationContext.getBean("genericDao");
     }
     
     /**
@@ -90,20 +92,20 @@ public class GenericDaoTest
 		//Project by id
 		Map projectById = new HashMap();
 		projectById.put("projectId",1);
-		List l1 = gdao.getListByMap(Project.class, projectById );
+		List l1 = _q.getListByMap(Project.class, projectById );
 		assertTrue("Can only be one",l1.size()==1);
 		
 		//Dataset by locked
 		Map unlockedDatasets = new HashMap();
 		unlockedDatasets.put("locked",Boolean.FALSE);
-		List l2 = gdao.getListByMap(Dataset.class, unlockedDatasets);
+		List l2 = _q.getListByMap(Dataset.class, unlockedDatasets);
 		assertTrue("At least one unlocked D", l2.size()>0);
 		
 		//Sending wrong parameter
 		Map stringRatherThanBoolean = new HashMap();
 		stringRatherThanBoolean.put("locked","f");
 		try {
-			List l3 = gdao.getListByMap(Dataset.class, stringRatherThanBoolean);
+			List l3 = _q.getListByMap(Dataset.class, stringRatherThanBoolean);
 			fail("Shouldn't suceed");
 		} catch (ClassCastException cce){
 			// good

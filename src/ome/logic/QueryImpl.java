@@ -1,5 +1,5 @@
 /*
- * ome.logic.GenericDaoHibernate
+ * ome.logic.QueryImpl
  *
  *------------------------------------------------------------------------------
  *
@@ -27,7 +27,7 @@
  *------------------------------------------------------------------------------
  */
 
-package ome.dao.hibernate;
+package ome.logic;
 
 //Java imports
 import java.util.Collection;
@@ -36,8 +36,10 @@ import java.util.Map;
 
 //Third-party libraries
 import org.springframework.orm.hibernate3.HibernateCallback;
-import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
+import org.springframework.orm.hibernate3.HibernateTemplate;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.hibernate.Criteria;
 import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
@@ -48,22 +50,24 @@ import org.hibernate.criterion.Expression;
 import org.hibernate.criterion.MatchMode;
 
 //Application-internal dependencies
-import ome.api.OMEModel;
-import ome.dao.GenericDao;
+import ome.api.IQuery;
+import ome.model.IObject;
 
-/** uses Hibernate to fulfill basic/generic needs.
+/**  Provides methods for directly querying object graphs.
  * 
  * @author  Josh Moore &nbsp;&nbsp;&nbsp;&nbsp;
  * 				<a href="mailto:josh.moore@gmx.de">josh.moore@gmx.de</a>
- * @version 1.0 
+ * @version 3.0 
  * <small>
  * (<b>Internal version:</b> $Rev$ $Date$)
  * </small>
- * @since 1.0
+ * @since 3.0
  * 
  */
-public class GenericDaoHibernate extends HibernateDaoSupport implements GenericDao {
-//TODO can use generics here!
+public class QueryImpl extends AbstractLevel1Service implements IQuery {
+
+    private static Log log = LogFactory.getLog(QueryImpl.class);
+
 	public Object getUniqueByExample(final Object example) {
         return getHibernateTemplate().execute(new HibernateCallback() {
             public Object doInHibernate(Session session)
@@ -144,15 +148,15 @@ public class GenericDaoHibernate extends HibernateDaoSupport implements GenericD
 	}	
 	
 	/*
-	 * @see ome.logic.GenericDao#getById(java.lang.Class, int)
+	 * @see ome.api.IQuery#getById(java.lang.Class, long)
 	 * @DEV.TODO weirdness here; learn more about CGLIB initialization.
 	 */
-	public Object getById(final Class klazz, final int id) {
+	public Object getById(final Class klazz, final long id) {
         return getHibernateTemplate().execute(new HibernateCallback() {
             public Object doInHibernate(Session session)
                     throws HibernateException {
 
-                OMEModel o = (OMEModel) session.load(klazz,id);
+                IObject o = (IObject) session.load(klazz,id);
                 Hibernate.initialize(o);
                 return o;
                 

@@ -1,5 +1,5 @@
 /*
- * ome.server.itests.JmsTest
+ * ome.logic.AbstractLevel2Service
  *
  *------------------------------------------------------------------------------
  *
@@ -26,61 +26,52 @@
  *
  *------------------------------------------------------------------------------
  */
-package ome.server.itests;
+
+/*------------------------------------------------------------------------------
+ *
+ * Written by:    Josh Moore <josh.moore@gmx.de>
+ *
+ *------------------------------------------------------------------------------
+ */
+
+package ome.logic;
 
 //Java imports
 
 //Third-party libraries
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.test.AbstractDependencyInjectionSpringContextTests;
 
 //Application-internal dependencies
-import ome.api.Write;
-import ome.security.Utils;
+import ome.api.IQuery;
+import ome.api.IUpdate;
 
-
-/** 
- * tests for a HQL join bug.
- *  
- * @author  Josh Moore &nbsp;&nbsp;&nbsp;&nbsp;
- * 				<a href="mailto:josh.moore@gmx.de">josh.moore@gmx.de</a>
- * @version 1.0 
+/**
+ * service level 2
+ * 
+ * @author Josh Moore, <a href="mailto:josh.moore@gmx.de">josh.moore@gmx.de</a>
+ * @version 1.0
  * <small>
  * (<b>Internal version:</b> $Rev$ $Date$)
  * </small>
- * @since 1.0
+ * @since OMERO 3.0
  */
-public class WriteTest
-        extends
-            AbstractDependencyInjectionSpringContextTests  {
+public class AbstractLevel2Service {
 
-	//TODO add transient to fields?
-    private static Log log = LogFactory.getLog(WriteTest.class);
+    private static Log log = LogFactory.getLog(AbstractLevel2Service.class);
+    
+    protected IUpdate _update;
+    
+    protected IQuery _query;
 
-    Write w;
-    public void setWrite(Write w){
-    	this.w=w;
+    public void setUpdateService(IUpdate update)
+    {
+        this._update = update;
     }
     
-    /**
-     * @see org.springframework.test.AbstractDependencyInjectionSpringContextTests#onSetUp()
-     */
-    protected void onSetUp() throws Exception {
-    	Utils.setUserAuth();
+    public void setQueryService(IQuery query)
+    {
+        this._query = query;
     }
-    
-    /**
-     * @see org.springframework.test.AbstractDependencyInjectionSpringContextTests#getConfigLocations()
-     */
-    protected String[] getConfigLocations() {
-        return ConfigHelper.getConfigLocations();//TODO omit data.
-    }
-
-    public void testCreateDataset(){
-    	w.createDatasetAnnotation(new Integer(1),"TestFromJava");
-    }
-    
-
 }
 

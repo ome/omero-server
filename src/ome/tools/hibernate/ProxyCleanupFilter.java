@@ -1,5 +1,5 @@
 /*
- * org.openmicroscopy.omero.logic.GenericDao
+ * ome.tools.hibernate.ProxyCleanupFilter
  *
  *------------------------------------------------------------------------------
  *
@@ -27,20 +27,29 @@
  *------------------------------------------------------------------------------
  */
 
-package ome.dao;
-
-import java.util.List;
-import java.util.Map;
+package ome.tools.hibernate;
 
 //Java imports
+import java.util.Collection;
+
 
 //Third-party libraries
+import ome.util.ContextFilter;
+import ome.util.Filterable;
+
+import org.aopalliance.intercept.MethodInterceptor;
+import org.aopalliance.intercept.MethodInvocation;
+import org.hibernate.Hibernate;
+
 
 //Application-internal dependencies
 
 
-/** data access object for basic objects.
- * 
+
+/** removes all proxies from a return graph to prevent ClassCastExceptions and Session Closed exceptions.
+ *  you need to be careful with printing. calling toString() on an unitialized object will break before filtering
+ *  is complete.
+ *   
  * @author  Josh Moore &nbsp;&nbsp;&nbsp;&nbsp;
  * 				<a href="mailto:josh.moore@gmx.de">josh.moore@gmx.de</a>
  * @version 1.0 
@@ -48,25 +57,28 @@ import java.util.Map;
  * (<b>Internal version:</b> $Rev$ $Date$)
  * </small>
  * @since 1.0
+ * 
  */
-public interface GenericDao {
-    
-	public Object getUniqueByExample(Object example);
-	public List getListByExample(Object example);
-	public Object getUniqueByFieldILike(Class klazz, String field, String value);
-	public List getListByFieldILike(Class klazz, String field, String value);
-	public Object getUniqueByFieldEq(Class klazz, String field, Object value);
-	public List getListByFieldEq(Class klazz, String field, Object value);
-	public Object getById(Class klazz, int id);
-	public void persist(Object[] objects);
-	public Object getUniqueByMap(Class klazz, Map constraints);
-	public List getListByMap(Class klazz, Map constraints);
-	@Deprecated
-	public Object queryUnique(String query, Object[] params);
-	@Deprecated
-	public List queryList(String query, Object[] params);
-	@Deprecated
-	public Object queryUniqueMap(String query, Map params);
-	@Deprecated
-	public List queryListMap(String query, Map params);
+public class ProxyCleanupFilter extends ContextFilter implements MethodInterceptor {
+
+	@Override
+	public Filterable filter(String fieldId, Filterable f) {
+	    if (null==f || !Hibernate.isInitialized(f)){
+	    	return null;
+	    }
+	    return super.filter(fieldId, f);
+	}
+	
+	@Override
+	public Collection filter(String fieldId, Collection c) {
+	    if (null==c || !Hibernate.isInitialized(c)){
+	    	return null;
+	    }
+	    return super.filter(fieldId, c);
+	}
+
+	public Object invoke(MethodInvocation arg0) throws Throwable {
+		return filter(null,arg0.proceed());
+	}
+	
 }

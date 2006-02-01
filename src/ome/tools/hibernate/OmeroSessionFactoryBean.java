@@ -1,5 +1,5 @@
 /*
- * ome.logic.OmeroSessionFactoryBean
+ * ome.tools.hibernate.OmeroSessionFactoryBean
  *
  *------------------------------------------------------------------------------
  *
@@ -27,7 +27,7 @@
  *------------------------------------------------------------------------------
  */
 
-package ome.dao.hibernate;
+package ome.tools.hibernate;
 
 //Java imports
 
