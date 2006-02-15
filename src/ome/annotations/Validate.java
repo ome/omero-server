@@ -1,5 +1,5 @@
 /*
- * ome.server.itests.ConfigHelper
+ * ome.annotations.Validate
  *
  *------------------------------------------------------------------------------
  *
@@ -26,20 +26,22 @@
  *
  *------------------------------------------------------------------------------
  */
-package ome.server.itests;
+package ome.annotations;
+
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 //Java imports
 
-
 //Third-party libraries
-
 
 //Application-internal dependencies
 
 
 /** 
- * tests for a HQL join bug.
- *  
+ * annotation used for determining the types of a Set 
  * @author  Josh Moore &nbsp;&nbsp;&nbsp;&nbsp;
  * 				<a href="mailto:josh.moore@gmx.de">josh.moore@gmx.de</a>
  * @version 1.0 
@@ -48,42 +50,9 @@ package ome.server.itests;
  * </small>
  * @since 1.0
  */
-public class ConfigHelper {
-
-    /**
-     * @see org.springframework.test.AbstractDependencyInjectionSpringContextTests#getConfigLocations()
-     */
-    public static String[] getConfigLocations() {
-
-        return new String[] { 
-        		"ome/services/aop.xml",
-                "ome/services/services.xml",
-                "ome/services/security.xml",
-                "ome/services/hibernate.xml",
-                "ome/services/dbcp.xml", 
-                "ome/services/config-local.xml",
-                "ome/services/test/test.xml"};
-    }
-
-    public static String[] getDaoConfigLocations() {
-
-        return new String[] { 
-        		"ome/services/aop.xml",
-                "ome/services/hibernate.xml",
-                "ome/services/dbcp.xml", 
-                "ome/services/config-local.xml",
-                "ome/services/test/test.xml"};
-    }
-
-    public static String[] getDbUnitConfigLocations() {
-
-        return new String[] { 
-        		"ome/services/aop.xml",
-                "ome/services/hibernate.xml",
-                "ome/services/test/dbcp.xml", 
-                "ome/services/config-local.xml",
-                "ome/services/test/test.xml"};
-    }    
-    
-    
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.PARAMETER)
+public @interface Validate{
+    Class[] value();
 }
+

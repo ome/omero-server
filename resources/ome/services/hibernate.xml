@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
 <!--
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
@@ -39,12 +40,20 @@
  
 -->
 
-<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
 
 <beans>	
 
+  <bean id="eventHandling" class="ome.tools.hibernate.EventHandler">
+    <constructor-arg ref="sessionFactory"/>
+    <constructor-arg ref="internal.query"/>
+  </bean>
+  
 	<bean id="hibernateFilter" class="ome.tools.hibernate.ProxyCleanupFilter"/>
-		
+
+  <bean id="hibernateInterceptor" class="org.springframework.orm.hibernate3.HibernateInterceptor">
+    <property name="sessionFactory" ref="sessionFactory"/>
+  </bean>
+  		
 	<bean id="transactionManager" 
     	class="org.springframework.orm.hibernate3.HibernateTransactionManager">
 		<property name="dataSource" ref="dataSource"/>

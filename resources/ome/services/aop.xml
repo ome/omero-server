@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
 <!--
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
@@ -34,23 +35,32 @@
 
 <!--
 
-	Only data source for all other activities
+	AOP Components, where not defined elsewhere 
+	(security.xml or dao.xml for example)
  
 -->
 
-<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
-
 <beans>	
-
-	<bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
-		<property name="dataSource" ref="dataSource"/>
-	</bean>
 	
-	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
-	    <property name="driverClassName"><value>${hibernate.connection.driver_class}</value></property>
-    	<property name="url"><value>${hibernate.connection.url}</value></property>
-	    <property name="username"><value>${hibernate.connection.username}</value></property>
-	    <property name="password"><value>${hibernate.connection.password}</value></property>
-	</bean>
+	<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+	<!-- INTERCEPTORS -->	
+	<bean 
+		       id="serviceTracing" 
+		    class="org.springframework.aop.interceptor.JamonPerformanceMonitorInterceptor" 
+		lazy-init="true"
+	/>
+
+	<bean 
+		       id="logging" 
+		    class="ome.aop.ReturnLogger" 
+		lazy-init="true"
+	/>
+
+	<bean
+		       id="exceptionHandling"
+	    	    class="ome.aop.ExceptionHandler"
+		lazy-init="true"
+	/>
+	<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 
 </beans>
