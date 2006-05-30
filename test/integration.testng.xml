@@ -1,8 +1,8 @@
 <!DOCTYPE suite SYSTEM "http://beust.com/testng/testng-1.0.dtd" >
   
-<suite name="server" >
+<suite name="server.integration" >
   
-  <test name="server.active">
+  <test name="server.integration.active">
     <groups>
       <run>
         <exclude name="broken"/>
@@ -11,6 +11,7 @@
     </groups>
     <packages>
       <package name="ome.*"/>
+      <package name="omeis.*"/>
     </packages>
   </test>
 
