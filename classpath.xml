@@ -48,9 +48,9 @@ importing this file.
 	<file name="lucene/lucene/1.4.3/lucene-1.4.3.jar"/>
 	<file name="omero/common/3.0-TRUNK/common-3.0-TRUNK.jar"/>
 	<file name="omero/dsl/3.0-TRUNK/dsl-3.0-TRUNK.jar"/>
-	<file name="omero/omeio-nio/3.0-TRUNK/omeio-nio-3.0-TRUNK.jar"/>
 	<file name="omero/postgresql/8.1-405.jdbc3/postgresql-8.1-405.jdbc3.jar"/>
 	<file name="omero/rendering/3.0-TRUNK/rendering-3.0-TRUNK.jar"/>
+	<file name="omero/romio/3.0-TRUNK/romio-3.0-TRUNK.jar"/>
 	<file name="org/acegisecurity/acegi-security/1.0.0-RC1/acegi-security-1.0.0-RC1.jar"/>
 	<file name="org/hibernate/hibernate/3.1.2/hibernate-3.1.2.jar"/>
 	<file name="org/springframework/spring-hibernate3/2.0-m3/spring-hibernate3-2.0-m3.jar"/>
@@ -85,9 +85,9 @@ importing this file.
 	<include name="lucene/lucene/1.4.3/lucene-1.4.3.jar"/>
 	<include name="omero/common/3.0-TRUNK/common-3.0-TRUNK.jar"/>
 	<include name="omero/dsl/3.0-TRUNK/dsl-3.0-TRUNK.jar"/>
-	<include name="omero/omeio-nio/3.0-TRUNK/omeio-nio-3.0-TRUNK.jar"/>
 	<include name="omero/postgresql/8.1-405.jdbc3/postgresql-8.1-405.jdbc3.jar"/>
 	<include name="omero/rendering/3.0-TRUNK/rendering-3.0-TRUNK.jar"/>
+	<include name="omero/romio/3.0-TRUNK/romio-3.0-TRUNK.jar"/>
 	<include name="org/acegisecurity/acegi-security/1.0.0-RC1/acegi-security-1.0.0-RC1.jar"/>
 	<include name="org/hibernate/hibernate/3.1.2/hibernate-3.1.2.jar"/>
 	<include name="org/springframework/spring-hibernate3/2.0-m3/spring-hibernate3-2.0-m3.jar"/>
@@ -125,9 +125,9 @@ importing this file.
 	<file name="lucene/lucene/1.4.3/lucene-1.4.3.jar"/>
 	<file name="omero/common/3.0-TRUNK/common-3.0-TRUNK.jar"/>
 	<file name="omero/dsl/3.0-TRUNK/dsl-3.0-TRUNK.jar"/>
-	<file name="omero/omeio-nio/3.0-TRUNK/omeio-nio-3.0-TRUNK.jar"/>
 	<file name="omero/postgresql/8.1-405.jdbc3/postgresql-8.1-405.jdbc3.jar"/>
 	<file name="omero/rendering/3.0-TRUNK/rendering-3.0-TRUNK.jar"/>
+	<file name="omero/romio/3.0-TRUNK/romio-3.0-TRUNK.jar"/>
 	<file name="org/acegisecurity/acegi-security/1.0.0-RC1/acegi-security-1.0.0-RC1.jar"/>
 	<file name="org/hibernate/hibernate/3.1.2/hibernate-3.1.2.jar"/>
 	<file name="org/springframework/spring-hibernate3/2.0-m3/spring-hibernate3-2.0-m3.jar"/>
@@ -167,9 +167,9 @@ importing this file.
 	<include name="lucene/lucene/1.4.3/lucene-1.4.3.jar"/>
 	<include name="omero/common/3.0-TRUNK/common-3.0-TRUNK.jar"/>
 	<include name="omero/dsl/3.0-TRUNK/dsl-3.0-TRUNK.jar"/>
-	<include name="omero/omeio-nio/3.0-TRUNK/omeio-nio-3.0-TRUNK.jar"/>
 	<include name="omero/postgresql/8.1-405.jdbc3/postgresql-8.1-405.jdbc3.jar"/>
 	<include name="omero/rendering/3.0-TRUNK/rendering-3.0-TRUNK.jar"/>
+	<include name="omero/romio/3.0-TRUNK/romio-3.0-TRUNK.jar"/>
 	<include name="org/acegisecurity/acegi-security/1.0.0-RC1/acegi-security-1.0.0-RC1.jar"/>
 	<include name="org/hibernate/hibernate/3.1.2/hibernate-3.1.2.jar"/>
 	<include name="org/springframework/spring-hibernate3/2.0-m3/spring-hibernate3-2.0-m3.jar"/>
