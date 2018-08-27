@@ -30,7 +30,7 @@ import org.testng.annotations.Test;
  * @author Josh Moore, josh at glencoesoftware.com
  * @since 3.0-Beta2
  */
-@Test(groups = "sharing")
+@Test(groups = "ome/services/sharing")
 public class BlobShareStoreIntegrationTest extends AbstractManagedContextTest {
 
     OmeroContext ctx;

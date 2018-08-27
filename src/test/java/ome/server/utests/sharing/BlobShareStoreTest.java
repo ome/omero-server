@@ -25,7 +25,7 @@ import org.testng.annotations.Test;
  * @author Josh Moore, josh at glencoesoftware.com
  * @since 4.4.0
  */
-@Test(groups = "sharing")
+@Test(groups = "ome/services/sharing")
 public class BlobShareStoreTest extends TestCase {
 
     BlobShareStore store = new BlobShareStore();

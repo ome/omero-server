@@ -1,0 +1,117 @@
+plugins {
+    id "java"
+    id "maven-publish"
+    id "com.zeroc.gradle.ice-builder.slice" version "1.4.5"
+}
+
+group = 'org.openmicroscopy'
+version = '1.0-SNAPSHOT'
+sourceCompatibility = JavaVersion.VERSION_1_8
+targetCompatibility = JavaVersion.VERSION_1_8
+
+def springVersion = '4.3.14.RELEASE'
+
+repositories {
+    mavenCentral()
+    mavenLocal()
+
+    /**
+     * Used by bio-formats and jpeg2k dependency
+     */
+    maven { url 'http://repo.boundlessgeo.com/main/' }
+}
+
+dependencies {
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+    testCompile group: 'org.testng', name: 'testng', version: '6.14.2'
+    testCompile group: 'jmock', name: 'jmock', version: '1.+'
+    testCompile group: 'org.apache.directory.server', name: 'apacheds-all', version: '1.5.7'
+    testCompile group: 'log4j', name: 'log4j', version: '1.2.17'
+
+    // https://mvnrepository.com/artifact/org.apache.directory.shared/shared-ldap
+    // testCompile group: 'org.apache.directory.shared', name: 'shared-ldap-constants', version: '1.0.0-M1'
+    // testCompile group: 'org.apache.directory.shared', name: 'shared-ldap', version: '0.9.15'
+
+    compile 'org.openmicroscopy:omero-renderer:1.0-SNAPSHOT'
+
+    // Spring framework stuff
+    compile "org.springframework:spring-context-support:${springVersion}"
+    compile "org.springframework:spring-jms:${springVersion}"
+    compile "org.springframework.security:spring-security-ldap:4.2.4.RELEASE"
+
+    // Postgres connect driver for java
+    compile 'org.postgresql:postgresql:42.2.1'
+
+    // Used by hibernate, see: https://stackoverflow.com/a/14365438
+    compile 'org.javassist:javassist:3.22.0-GA'
+
+    // API monitoring thing: http://jamonapi.sourceforge.net
+    compile 'com.jamonapi:jamon:2.81'
+
+    // Some jpeg2k library
+    compile 'edu.ucar:jj2000:5.3'
+
+    compile 'com.github.marcus-nl.btm:btm:3.0.0-mk1'
+
+    compile 'org.apache.pdfbox:pdfbox:2.0.8'
+    compile 'org.apache.commons:commons-collections4:4.1'
+    compile 'org.apache.xmlgraphics:batik-all:1.9.1'
+
+    compile 'commons-beanutils:commons-beanutils:1.9.3'
+
+    compile 'com.sun.mail:javax.mail:1.6.1'
+
+    compile 'com.mortennobel:java-image-scaling:0.8.6'
+
+    compile 'org.quartz-scheduler:quartz:2.2.1'
+
+    compile 'org.subethamail:subethasmtp:3.1.7'
+
+    compile 'net.sf.ehcache:ehcache:2.10.4'
+
+    compile 'edu.ucar:grib:4.5.5'
+    compile 'edu.ucar:bufr:3.0'
+}
+
+test {
+    // enable TestNG support (default is JUnit)
+    useTestNG() {
+        suites "src/test/resources" // project.fileTree(dir: "src/test/resources", include: '**/*.xml')
+    }
+}
+
+/**
+ * This task will resolve to find the current ICE version installed
+ * on your system PATH. It will choose the appropriate ice dependency for you
+ * and set the a source dir for the build to look at.
+ */
+task processIce {
+    if (slice.iceVersion.contains('3.7')) {
+        dependencies.add('compile', 'com.zeroc:ice:3.7.+')
+        sourceSets.main.java {
+            srcDirs 'src/main/ice37', 'src/generated/ice37'
+        }
+        slice.output = file('src/generated/ice37')
+    } else if (slice.iceVersion.contains('3.6')) {
+        dependencies.add('compile', 'com.zeroc:ice:3.6.+')
+        sourceSets.main.java {
+            srcDirs 'src/main/ice36', 'src/generated/ice36'
+        }
+        slice.output = file('src/generated/ice36')
+    }
+}
+
+task sourceJar(type: Jar) {
+    from sourceSets.main.allJava
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+            artifact sourceJar {
+                classifier "sources"
+            }
+        }
+    }
+}
