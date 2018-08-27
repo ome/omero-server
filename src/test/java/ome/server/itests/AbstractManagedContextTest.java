@@ -40,7 +40,7 @@ import ome.security.basic.PrincipalHolder;
 import ome.services.fulltext.FullTextThread;
 import ome.services.sessions.SessionManager;
 import ome.services.util.Executor;
-import ome.system.EventContext;
+import ome.api.IEventContext;
 import ome.system.OmeroContext;
 import ome.system.Principal;
 import ome.system.Roles;
@@ -265,7 +265,7 @@ public class AbstractManagedContextTest extends TestCase {
         login(omeName, groupName, "Test");
     }
 
-    protected Principal login(EventContext ec) {
+    protected Principal login(IEventContext ec) {
         return login(ec.getCurrentUserName(), ec.getCurrentGroupName(),
                 ec.getCurrentEventType());
     }
@@ -279,7 +279,7 @@ public class AbstractManagedContextTest extends TestCase {
     }
 
     protected void indexObject(IObject obj) {
-        EventContext ec = iAdmin.getEventContext();
+        IEventContext ec = iAdmin.getEventContext();
         loginRootKeepGroup();
         iUpdate.indexObject(obj);
         login(ec);

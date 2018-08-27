@@ -11,7 +11,7 @@ import javax.naming.directory.ModificationItem;
 
 import ome.conditions.SecurityViolation;
 import ome.services.ldap.LdapTest.Fixture;
-import ome.system.EventContext;
+import ome.api.IEventContext;
 
 
 /**
@@ -48,7 +48,7 @@ userPassword: password
         Set<String> members = as.getAll("member");
         */
 
-        EventContext before = fixture.login("test1", "grp", "password");
+        IEventContext before = fixture.login("test1", "grp", "password");
         if (2 != before.getMemberOfGroupsList().size()) {
             throw new RuntimeException("Not 2 groups!");
         }
@@ -59,7 +59,7 @@ userPassword: password
         fixture.template.modifyAttributes("cn=grp", mods);
 
         try {
-            EventContext after = fixture.login("test1", "grp", "password");
+            IEventContext after = fixture.login("test1", "grp", "password");
             throw new RuntimeException("Expecting a sec. violation!");
         } catch (SecurityViolation sv) {
             // good!

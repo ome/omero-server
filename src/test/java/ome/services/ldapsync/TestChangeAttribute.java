@@ -23,6 +23,7 @@ import javax.naming.directory.BasicAttribute;
 import javax.naming.directory.DirContext;
 import javax.naming.directory.ModificationItem;
 
+import ome.api.IEventContext;
 import org.hibernate.Session;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,7 +33,6 @@ import ome.model.meta.ExperimenterGroup;
 import ome.security.auth.RoleProvider;
 import ome.services.ldap.LdapTest.Fixture;
 import ome.services.util.Executor;
-import ome.system.EventContext;
 import ome.system.ServiceFactory;
 
 
@@ -60,7 +60,7 @@ public class TestChangeAttribute implements Modification {
         final RoleProvider simpleRP = fixture.applicationContext.getBean(
             "roleProvider", RoleProvider.class);
 
-        final EventContext ec1 = fixture.login("test1", "grp1", "password");
+        final IEventContext ec1 = fixture.login("test1", "grp1", "password");
         final long grp1 = ec1.getCurrentGroupId();
 
 
@@ -78,7 +78,7 @@ public class TestChangeAttribute implements Modification {
                     new ExperimenterGroup(grp3, false));
                 return grp3;
             }});
-        EventContext ec2 = fixture.login("test1", "grp1", "password");
+        IEventContext ec2 = fixture.login("test1", "grp1", "password");
         assertMember(ec2, grp1, true);
         assertMember(ec2, grp3, true);
 
@@ -91,13 +91,13 @@ public class TestChangeAttribute implements Modification {
 
 
         // Check that the user is no longer in grp1, but is still in grp3
-        final EventContext ec3 = fixture.login("test1", "grp3", "password");
+        final IEventContext ec3 = fixture.login("test1", "grp3", "password");
         assertMember(ec3, grp1, false);
         assertMember(ec3, grp3, true);
 
     }
 
-    void assertMember(EventContext ec, long groupID, boolean isMember) {
+    void assertMember(IEventContext ec, long groupID, boolean isMember) {
         boolean member = ec.getMemberOfGroupsList().contains(groupID);
         if (member != isMember) {
             String msg = String.format(

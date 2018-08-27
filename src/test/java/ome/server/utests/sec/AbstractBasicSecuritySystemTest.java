@@ -41,7 +41,7 @@ import ome.services.sessions.SessionProvider;
 import ome.services.sessions.SessionProviderInDb;
 import ome.services.sessions.stats.NullSessionStats;
 import ome.services.util.Executor;
-import ome.system.EventContext;
+import ome.api.IEventContext;
 import ome.system.Principal;
 import ome.system.Roles;
 import ome.testing.MockServiceFactory;
@@ -65,7 +65,7 @@ public abstract class AbstractBasicSecuritySystemTest extends
 
     Mock mockMgr, mockEc;
 
-    EventContext ec;
+    IEventContext ec;
 
     SessionManager mgr;
 
@@ -100,7 +100,7 @@ public abstract class AbstractBasicSecuritySystemTest extends
         sf.mockQuery = mock(LocalQuery.class);
         sf.mockUpdate = mock(LocalUpdate.class);
 
-        mockEc = mock(EventContext.class);
+        mockEc = mock(IEventContext.class);
         mockMgr = mock(SessionManager.class);
         mgr = (SessionManager) mockMgr.proxy();
 
@@ -183,7 +183,7 @@ public abstract class AbstractBasicSecuritySystemTest extends
                 returnValue(memberOfGroups));
         mockEc.expects(atLeastOnce()).method("getLeaderOfGroupsList").will(
                 returnValue(leaderOfGroups));
-        ec = (EventContext) mockEc.proxy();
+        ec = (IEventContext) mockEc.proxy();
         mockMgr.expects(atLeastOnce()).method("getEventContext").will(
                 returnValue(ec));
 
@@ -244,7 +244,7 @@ public abstract class AbstractBasicSecuritySystemTest extends
                 returnValue(memberOfGroups));
         mockEc.expects(atLeastOnce()).method("getLeaderOfGroupsList").will(
                 returnValue(leaderOfGroups));
-        ec = (EventContext) mockEc.proxy();
+        ec = (IEventContext) mockEc.proxy();
         mockMgr.expects(atLeastOnce()).method("getEventContext").will(
                 returnValue(ec));
 

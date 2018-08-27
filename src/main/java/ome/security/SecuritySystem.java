@@ -20,7 +20,7 @@ import ome.model.internal.Permissions;
 import ome.model.internal.Token;
 import ome.model.meta.ExperimenterGroup;
 import ome.security.policy.Policy;
-import ome.system.EventContext;
+import ome.api.IEventContext;
 import ome.system.Principal;
 import ome.system.Roles;
 
@@ -70,7 +70,7 @@ public interface SecuritySystem {
      *
      * @return the event context
      */
-    EventContext getEventContext();
+    IEventContext getEventContext();
 
     /**
      * Returns UID based on whether a share is active, etc. This is the UID
@@ -106,7 +106,7 @@ public interface SecuritySystem {
     Long getEffectiveUID();
 
     /**
-     * If refresh is false, returns the current {@link EventContext} stored
+     * If refresh is false, returns the current {@link IEventContext} stored
      * in the session. Otherwise, reloads the context to have the most
      * up-to-date information.
      * @see <a href="https://trac.openmicroscopy.org/ome/ticket/4011">Trac ticket #4011</a>
@@ -114,10 +114,10 @@ public interface SecuritySystem {
      * @param refresh if the event context should first be reloaded
      * @return the event context
      */
-    EventContext getEventContext(boolean refresh);
+    IEventContext getEventContext(boolean refresh);
 
     /**
-     * Prepares the current {@link EventContext} instance with the current
+     * Prepares the current {@link IEventContext} instance with the current
      * {@link Principal}. An exception is thrown if there is none.
      * 
      * @param isReadOnly
@@ -125,7 +125,7 @@ public interface SecuritySystem {
     void loadEventContext(boolean isReadOnly);
 
     /**
-     * Clears the content of the {@link EventContext}so that the
+     * Clears the content of the {@link IEventContext}so that the
      * {@link SecuritySystem} will no longer return true for {@link #isReady()}.
      * The {@link Principal} set during {@link #login(Principal)} is retained.
      */
@@ -301,9 +301,9 @@ public interface SecuritySystem {
     // =========================================================================
     /**
      * Allows actions to be performed with the
-     * {@link EventContext#isCurrentUserAdmin()} flag enabled but
+     * {@link IEventContext#isCurrentUserAdmin()} flag enabled but
      * <em>without</em> changing the value of
-     * {@link EventContext#getCurrentUserId()}, so that ownerships are properly
+     * {@link IEventContext#getCurrentUserId()}, so that ownerships are properly
      * handled. The merging of detached entity graphs should be disabled for the
      * extent of the execution.
      * 

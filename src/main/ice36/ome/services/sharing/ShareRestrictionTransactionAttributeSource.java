@@ -13,7 +13,7 @@ import java.util.NoSuchElementException;
 import ome.conditions.SessionException;
 import ome.security.basic.CurrentDetails;
 import ome.services.sessions.state.SessionCache;
-import ome.system.EventContext;
+import ome.api.IEventContext;
 import ome.system.Principal;
 
 import org.slf4j.Logger;
@@ -46,7 +46,7 @@ public class ShareRestrictionTransactionAttributeSource implements
         try {
             Principal principal = current.getLast();
             String uuid = principal.getName();
-            EventContext ec = cache.getSessionContext(uuid);
+            IEventContext ec = cache.getSessionContext(uuid);
             Long shareId = ec.getCurrentShareId();
             if (ec.getCurrentShareId() != null) {
                 log.debug("Returning readOnly tx for shared " + shareId);

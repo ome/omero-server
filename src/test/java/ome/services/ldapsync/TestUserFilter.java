@@ -11,7 +11,7 @@ import javax.naming.directory.ModificationItem;
 
 import ome.conditions.SecurityViolation;
 import ome.services.ldap.LdapTest.Fixture;
-import ome.system.EventContext;
+import ome.api.IEventContext;
 
 
 /**
@@ -25,7 +25,7 @@ public class TestUserFilter implements Modification {
 
     public void modify(Fixture fixture) {
 
-        EventContext before = fixture.login("test1attr", "Group1", "password");
+        IEventContext before = fixture.login("test1attr", "Group1", "password");
 
         ModificationItem[] mods = new ModificationItem[1];
         mods[0] = new ModificationItem(DirContext.REMOVE_ATTRIBUTE,
@@ -33,7 +33,7 @@ public class TestUserFilter implements Modification {
         fixture.template.modifyAttributes("cn=test1attr", mods);
 
         try {
-            EventContext after = fixture.login("test1attr", "Group1", "password");
+            IEventContext after = fixture.login("test1attr", "Group1", "password");
             throw new RuntimeException("Expecting a sec. violation!");
         } catch (SecurityViolation sv) {
             // good!

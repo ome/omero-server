@@ -15,7 +15,7 @@ import ome.model.meta.Experimenter;
 import ome.model.meta.ExperimenterGroup;
 import ome.parameters.Parameters;
 import ome.server.itests.AbstractManagedContextTest;
-import ome.system.EventContext;
+import ome.api.IEventContext;
 import ome.system.Principal;
 
 import org.hibernate.HibernateException;
@@ -144,7 +144,7 @@ public class GroupLeaderTest extends AbstractManagedContextTest {
         Principal p = new Principal(member.getOmeName());
         ome.model.meta.Session s = iSession.createSessionWithTimeouts(p, 10000, 0);
         p = login(s.getUuid(), "user", "Test");
-        EventContext ec = iAdmin.getEventContext();
+        IEventContext ec = iAdmin.getEventContext();
         assertEquals(member.getOmeName(), ec.getCurrentUserName());
         assertEquals(ownGroup.getId(), ec.getCurrentGroupId());
         sessionManager.setSecurityContext(p, anotherGroup);

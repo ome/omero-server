@@ -27,7 +27,7 @@ import ome.model.meta.Experimenter;
 import ome.model.meta.ExperimenterGroup;
 import ome.security.AdminAction;
 import ome.security.SecuritySystem;
-import ome.system.EventContext;
+import ome.api.IEventContext;
 import ome.system.Roles;
 import ome.testing.ObjectFactory;
 import ome.tools.hibernate.HibernateUtils;
@@ -56,7 +56,7 @@ public class DeleteUnitTest extends MockObjectTestCase {
     LocalAdmin a;
     LocalQuery q;
     LocalUpdate u;
-    EventContext ec;
+    IEventContext ec;
     SecuritySystem s;
     Session hibernate;
     Query query;
@@ -103,8 +103,8 @@ public class DeleteUnitTest extends MockObjectTestCase {
                 returnValue(new Roles()));
         bean.setSecuritySystem(s);
 
-        ecm = mock(EventContext.class);
-        ec = (EventContext) ecm.proxy();
+        ecm = mock(IEventContext.class);
+        ec = (IEventContext) ecm.proxy();
 
     }
 

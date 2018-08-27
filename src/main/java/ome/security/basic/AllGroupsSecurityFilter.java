@@ -17,7 +17,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 
 import ome.model.internal.Details;
 import ome.model.internal.Permissions;
@@ -25,7 +24,7 @@ import ome.model.internal.Permissions.Right;
 import ome.model.internal.Permissions.Role;
 import ome.model.meta.ExperimenterGroup;
 import ome.security.SecurityFilter;
-import ome.system.EventContext;
+import ome.api.IEventContext;
 import ome.system.Roles;
 import ome.util.SqlAction;
 
@@ -68,9 +67,9 @@ public class AllGroupsSecurityFilter extends AbstractSecurityFilter {
      * Default constructor which calls all the necessary setters for this
      * {@link FactoryBean}. Also calls {@link #setDefaultFilterCondition(String)}.
      * This query clause must be kept in sync with
-     * {@link #passesFilter(Session, Details, EventContext)}.
+     * {@link #passesFilter(Session, Details, IEventContext)}.
      *
-     * @see #passesFilter(Session, Details, EventContext)
+     * @see #passesFilter(Session, Details, IEventContext)
      * @see FilterDefinitionFactoryBean#setFilterName(String)
      * @see FilterDefinitionFactoryBean#setParameterTypes(java.util.Map)
      * @see FilterDefinitionFactoryBean#setDefaultFilterCondition(String)
@@ -127,7 +126,7 @@ public class AllGroupsSecurityFilter extends AbstractSecurityFilter {
      *            null all {@link Right rights} will be assumed.
      * @return true if the object to which this
      */
-    public boolean passesFilter(Session session, Details d, EventContext c) {
+    public boolean passesFilter(Session session, Details d, IEventContext c) {
 
         final Long currentUserId = c.getCurrentUserId();
         final boolean admin = c.isCurrentUserAdmin();
@@ -180,7 +179,7 @@ public class AllGroupsSecurityFilter extends AbstractSecurityFilter {
      * Since we assume that the group is "-1" for this method, we have to pass
      * in lists of all groups as we did before group permissions (~4.2).
      */
-    public void enable(Session sess, EventContext ec) {
+    public void enable(Session sess, IEventContext ec) {
         final Filter filter = sess.enableFilter(getName());
 
         final int share01 = isShare(ec) ? 1 : 0;
@@ -199,7 +198,7 @@ public class AllGroupsSecurityFilter extends AbstractSecurityFilter {
     // ~ Helpers
     // =========================================================================
 
-    protected Collection<Long> configGroup(EventContext ec, List<Long> list) {
+    protected Collection<Long> configGroup(IEventContext ec, List<Long> list) {
         Collection<Long> rv = null;
 
         if (ec.isCurrentUserAdmin()) {

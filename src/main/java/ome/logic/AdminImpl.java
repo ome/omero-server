@@ -24,6 +24,8 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Sets;
 
+import ome.api.IEventContext;
+import ome.api.IRoles;
 import org.apache.commons.collections.CollectionUtils;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
@@ -81,7 +83,6 @@ import ome.services.query.Definitions;
 import ome.services.query.Query;
 import ome.services.query.QueryParameterDef;
 import ome.services.sessions.events.UserGroupUpdateEvent;
-import ome.system.EventContext;
 import ome.system.OmeroContext;
 import ome.system.Roles;
 import ome.system.SimpleEventContext;
@@ -442,7 +443,7 @@ public class AdminImpl extends AbstractLevel2Service implements LocalAdmin,
     @Transactional(readOnly = false)
     public void updateSelf(@NotNull
     Experimenter e) {
-        EventContext ec = getSecuritySystem().getEventContext();
+        IEventContext ec = getSecuritySystem().getEventContext();
         final Experimenter self = getExperimenter(ec.getCurrentUserId());
         self.setFirstName(e.getFirstName());
         self.setMiddleName(e.getMiddleName());
@@ -773,14 +774,20 @@ public class AdminImpl extends AbstractLevel2Service implements LocalAdmin,
 
         adminOrPiOfGroups(adminPrivileges.getPrivilege(AdminPrivilege.VALUE_MODIFY_GROUP_MEMBERSHIP), groups);
 
-        final Roles roles = getSecurityRoles();
+        final IRoles roles = getSecurityRoles();
         final boolean removeSystemOrUser =
-                Iterators.any(Iterators.forArray(groups),Predicates.or(roles.IS_SYSTEM_GROUP, roles.IS_USER_GROUP));
-        if (removeSystemOrUser && roles.isRootUser(user)) {
+                Iterators.any(
+                        Iterators.forArray(groups),
+                        Predicates.or(
+                                i -> IRoles.isSystemGroup(i, roles.getRootId()),
+                                i -> IRoles.isUserGroup(i, roles.getGuestGroupId()))
+                );
+
+        if (removeSystemOrUser && IRoles.isRootUser(user, roles.getRootId())) {
             throw new ValidationException("experimenter '" + roles.getRootName() + "' may not be removed from the '" +
                 roles.getSystemGroupName() + "' or '" + roles.getUserGroupName() + "' group");
         }
-        final EventContext eventContext = getEventContext();
+        final IEventContext eventContext = getEventContext();
         final boolean userOperatingOnThemself = eventContext.getCurrentUserId().equals(user.getId());
         if (removeSystemOrUser && userOperatingOnThemself) {
             throw new ValidationException("experimenters may not remove themselves from the '" +
@@ -824,7 +831,7 @@ public class AdminImpl extends AbstractLevel2Service implements LocalAdmin,
                     + "must be managed (i.e. have an id)");
         }
 
-        EventContext ec = getSecuritySystem().getEventContext();
+        IEventContext ec = getSecuritySystem().getEventContext();
         if (!(isAdmin() && getCurrentAdminPrivilegesForSession().contains(
                 adminPrivileges.getPrivilege(AdminPrivilege.VALUE_MODIFY_USER)) ||
                 ec.getCurrentUserId().equals(user.getId()))) {
@@ -1003,7 +1010,7 @@ public class AdminImpl extends AbstractLevel2Service implements LocalAdmin,
         final ExperimenterGroup group = groupProxy(groupName);
 
         // Check object
-        final EventContext ec = getSecuritySystem().getEventContext();
+        final IEventContext ec = getSecuritySystem().getEventContext();
         if (!ec.getCurrentUserId().equals(copy.getDetails().getOwner().getId())
                 && !ec.isCurrentUserAdmin()) {
             throw new SecurityViolation("Cannot change group for:" + iObject);
@@ -1386,11 +1393,11 @@ public class AdminImpl extends AbstractLevel2Service implements LocalAdmin,
     }
 
     @PermitAll
-    public EventContext getEventContext() {
+    public IEventContext getEventContext() {
         return new SimpleEventContext(getSecuritySystem().getEventContext(true));
     }
 
-    public EventContext getEventContextQuiet() {
+    public IEventContext getEventContextQuiet() {
         return new SimpleEventContext(getSecuritySystem().getEventContext(false));
     }
 
@@ -1558,7 +1565,7 @@ public class AdminImpl extends AbstractLevel2Service implements LocalAdmin,
             return true;
         }
 
-        EventContext ec = getEventContext();
+        IEventContext ec = getEventContext();
         List<Long> piOf = ec.getLeaderOfGroupsList();
         return piOf.contains(group.getId());
     }

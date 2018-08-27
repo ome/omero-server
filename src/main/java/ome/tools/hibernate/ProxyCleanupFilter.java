@@ -22,7 +22,7 @@ import ome.model.meta.Session;
 import ome.model.meta.Share;
 import ome.security.ACLVoter;
 import ome.security.basic.CurrentDetails;
-import ome.system.EventContext;
+import ome.api.IEventContext;
 import ome.util.ContextFilter;
 import ome.util.Filterable;
 import ome.util.Utils;
@@ -142,7 +142,7 @@ public class ProxyCleanupFilter extends ContextFilter {
                 } else if (acl == null) {
                     return new Session(session.getId(), false);
                 } else {
-                    EventContext ec = current.getCurrentEventContext();
+                    IEventContext ec = current.getCurrentEventContext();
                     if (!ec.isCurrentUserAdmin()) {
                         Long uid = session.getOwner().getId();
                         if (!ec.getCurrentUserId().equals(uid)) {

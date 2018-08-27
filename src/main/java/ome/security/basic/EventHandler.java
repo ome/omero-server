@@ -16,7 +16,7 @@ import ome.model.meta.Event;
 import ome.model.meta.EventLog;
 import ome.services.messages.ContextMessage;
 import ome.services.util.ReadOnlyStatus;
-import ome.system.EventContext;
+import ome.api.IEventContext;
 import ome.tools.hibernate.SessionFactory;
 import ome.util.SqlAction;
 
@@ -103,7 +103,7 @@ public class EventHandler implements MethodInterceptor, ApplicationListener<Cont
            secSys.enableReadFilter(session); // With old context
        } else if (msg instanceof ContextMessage.Push) {
            // We assume don't close and use the current readOnly setting
-           final EventContext curr = cd.getCurrentEventContext();
+           final IEventContext curr = cd.getCurrentEventContext();
            final boolean readOnly = curr.isReadOnly();
            final boolean isClose = false;
            // here we try to reproduce what's done in invoke
@@ -223,7 +223,7 @@ public class EventHandler implements MethodInterceptor, ApplicationListener<Cont
         }
 
         // now the user can be considered to be logged in.
-        EventContext ec = secSys.getEventContext();
+        IEventContext ec = secSys.getEventContext();
         if (!readOnly) {
             sql.prepareSession(
                     ec.getCurrentEventId(),

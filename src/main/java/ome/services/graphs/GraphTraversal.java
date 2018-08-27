@@ -62,7 +62,7 @@ import ome.services.graphs.GraphPolicy.Ability;
 import ome.services.graphs.GraphPolicy.Action;
 import ome.services.graphs.GraphPolicy.Details;
 import ome.services.graphs.GraphPolicy.Orphan;
-import ome.system.EventContext;
+import ome.api.IEventContext;
 
 /**
  * An alternative implementation of model object graph traversal, relying on SELECTing in advance for making decisions,
@@ -462,7 +462,7 @@ public class GraphTraversal {
     }
 
     private final Session session;
-    private final EventContext eventContext;
+    private final IEventContext eventContext;
     private final boolean isCheckUserPermissions;
     private final ACLVoter aclVoter;
     private final GraphPathBean model;
@@ -482,8 +482,8 @@ public class GraphTraversal {
      * @param policy how to determine which related objects to include in the operation
      * @param processor how to operate on the resulting target object graph
      */
-    public GraphTraversal(Session session, EventContext eventContext, ACLVoter aclVoter, GraphPathBean graphPathBean,
-            SetMultimap<String, String> unnullable, GraphPolicy policy, Processor processor) {
+    public GraphTraversal(Session session, IEventContext eventContext, ACLVoter aclVoter, GraphPathBean graphPathBean,
+                          SetMultimap<String, String> unnullable, GraphPolicy policy, Processor processor) {
         this.session = session;
         this.eventContext = eventContext;
         this.aclVoter = aclVoter;

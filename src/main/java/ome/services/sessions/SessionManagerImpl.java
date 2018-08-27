@@ -53,7 +53,7 @@ import ome.services.sessions.stats.SessionStats;
 import ome.services.util.Executor;
 import ome.services.util.Executor.Priority;
 import ome.services.util.ReadOnlyStatus;
-import ome.system.EventContext;
+import ome.api.IEventContext;
 import ome.system.OmeroContext;
 import ome.system.Principal;
 import ome.system.Roles;
@@ -850,7 +850,7 @@ public class SessionManagerImpl implements SessionManager, SessionCache.StaleCac
     // ~ Security methods
     // =========================================================================
 
-    public EventContext getEventContext(Principal principal) {
+    public IEventContext getEventContext(Principal principal) {
         final SessionContext ctx = cache.getSessionContext(principal.getName());
         if (ctx == null) {
             throw new RemovedSessionException("No session with uuid:"
@@ -859,7 +859,7 @@ public class SessionManagerImpl implements SessionManager, SessionCache.StaleCac
         return ctx;
     }
 
-    public EventContext reload(final String uuid) {
+    public IEventContext reload(final String uuid) {
         final SessionContext ctx = cache.getSessionContext(uuid);
         if (ctx == null) {
             throw new RemovedSessionException("No session with uuid:"
@@ -1229,7 +1229,7 @@ public class SessionManagerImpl implements SessionManager, SessionCache.StaleCac
      * @see ticket:1434
      */
     private void setGroupSecurityContext(final Principal principal, final Long id) {
-        final ome.system.EventContext ec = getEventContext(principal);
+        final IEventContext ec = getEventContext(principal);
         final ExperimenterGroup[] group = new ExperimenterGroup[1];
 
         final Session s = (Session) executor.execute(principal,

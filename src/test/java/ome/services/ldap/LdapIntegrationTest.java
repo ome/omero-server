@@ -24,7 +24,7 @@ import ome.security.auth.RoleProvider;
 import ome.services.sessions.SessionManager;
 import ome.services.util.Executor;
 import ome.services.util.Executor.Work;
-import ome.system.EventContext;
+import ome.api.IEventContext;
 import ome.system.OmeroContext;
 import ome.system.Principal;
 import ome.system.Roles;
@@ -203,10 +203,10 @@ public class LdapIntegrationTest extends LdapTest {
             }
 
             @Override
-            public EventContext login(String username, String group,
-                    String password) {
+            public IEventContext login(String username, String group,
+                                       String password) {
                 Principal user = newSession(this, username, group, password);
-                EventContext ec = (EventContext) executor.execute(user,
+                IEventContext ec = (IEventContext) executor.execute(user,
                         new Executor.SimpleWork(this, "simpleCall") {
                             @Transactional(readOnly = false)
                             public Object doWork(org.hibernate.Session session,

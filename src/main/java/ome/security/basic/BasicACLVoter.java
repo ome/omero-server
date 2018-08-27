@@ -37,7 +37,7 @@ import ome.security.policy.DefaultPolicyService;
 import ome.security.policy.PolicyService;
 import ome.services.sessions.SessionProvider;
 import ome.services.util.ReadOnlyStatus;
-import ome.system.EventContext;
+import ome.api.IEventContext;
 import ome.system.Roles;
 import ome.tools.hibernate.HibernateUtils;
 import ome.util.PermDetails;
@@ -182,7 +182,7 @@ public class BasicACLVoter implements ACLVoter {
         } else {
             groupId = HibernateUtils.nullSafeGroupId(iObject);
         }
-        final EventContext ec = currentUser.getCurrentEventContext();
+        final IEventContext ec = currentUser.getCurrentEventContext();
         if (ec.getCurrentUserId().equals(ownerId) || ec.getLeaderOfGroupsList().contains(groupId)) {
             return true;   // object owner or group owner
         } else if (!ec.isCurrentUserAdmin()) {
@@ -316,7 +316,7 @@ public class BasicACLVoter implements ACLVoter {
         // OmeroInterceptor checks whether or not objects are only
         // LINKED to one's own objects which is the actual intent.
 
-        final EventContext ec = currentUser.getCurrentEventContext();
+        final IEventContext ec = currentUser.getCurrentEventContext();
 
         if (tokenHolder.hasPrivilegedToken(iObject)) {
             return true;
@@ -401,29 +401,29 @@ public class BasicACLVoter implements ACLVoter {
         throw new SecurityViolation("Deleting " + iObject + " not allowed.");
     }
 
-    boolean owner(Long o, EventContext c) {
+    boolean owner(Long o, IEventContext c) {
         return (o != null && o.equals(c.getCurrentUserId()));
     }
 
-    boolean owner(Details d, EventContext c) {
+    boolean owner(Details d, IEventContext c) {
         Long o = d.getOwner() == null ? null : d.getOwner().getId();
         return (o != null && o.equals(c.getCurrentUserId()));
     }
 
-    boolean member(Long g, EventContext c) {
+    boolean member(Long g, IEventContext c) {
         return (g != null && c.getMemberOfGroupsList().contains(g));
     }
 
-    boolean member(Details d, EventContext c) {
+    boolean member(Details d, IEventContext c) {
         Long g = d.getGroup() == null ? null : d.getGroup().getId();
         return member(g, c);
     }
 
-    boolean leader(Long g, EventContext c) {
+    boolean leader(Long g, IEventContext c) {
         return (g != null && c.getLeaderOfGroupsList().contains(g));
     }
 
-    boolean leader(Details d, EventContext c) {
+    boolean leader(Details d, IEventContext c) {
         Long g = d.getGroup() == null ? null : d.getGroup().getId();
         return leader(g, c);
     }
@@ -648,7 +648,7 @@ public class BasicACLVoter implements ACLVoter {
         if (isReadOnlyDb) {
             return allow;
         }
-        final EventContext ec = currentUser.getCurrentEventContext();
+        final IEventContext ec = currentUser.getCurrentEventContext();
         final Set<AdminPrivilege> privileges = ec.getCurrentAdminPrivileges();
         final boolean isChgrpPrivilege = privileges.contains(adminPrivileges.getPrivilege(AdminPrivilege.VALUE_CHGRP));
         final boolean isChownPrivilege = privileges.contains(adminPrivileges.getPrivilege(AdminPrivilege.VALUE_CHOWN));

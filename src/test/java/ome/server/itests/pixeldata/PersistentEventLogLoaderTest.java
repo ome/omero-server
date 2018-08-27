@@ -11,7 +11,6 @@ import java.util.concurrent.Callable;
 
 import ome.model.core.Image;
 import ome.model.core.Pixels;
-import ome.model.enums.ChecksumAlgorithm;
 import ome.model.enums.DimensionOrder;
 import ome.model.enums.EventType;
 import ome.model.enums.PixelsType;
@@ -24,7 +23,7 @@ import ome.services.eventlogs.EventLogQueue;
 import ome.services.eventlogs.PersistentEventLogLoader;
 import ome.services.sessions.SessionManager;
 import ome.services.util.Executor;
-import ome.system.EventContext;
+import ome.api.IEventContext;
 import ome.system.Principal;
 import ome.system.ServiceFactory;
 
@@ -121,9 +120,9 @@ public class PersistentEventLogLoaderTest extends AbstractManagedContextTest {
 
     public void testMultipleEventLogs() throws Throwable {
         final Experimenter u1 = loginNewUser();
-        final EventContext ec1 = iAdmin.getEventContext();
+        final IEventContext ec1 = iAdmin.getEventContext();
         final Experimenter u2 = loginNewUserInOtherUsersGroup(u1);
-        final EventContext ec2 = iAdmin.getEventContext();
+        final IEventContext ec2 = iAdmin.getEventContext();
 
         loginRoot();
         final Event e1 = event(ec1);
@@ -155,11 +154,11 @@ public class PersistentEventLogLoaderTest extends AbstractManagedContextTest {
      */
     public void testMoreMultipleEventLogs() throws Throwable {
         final Experimenter u1 = loginNewUser();
-        final EventContext ec1 = iAdmin.getEventContext();
+        final IEventContext ec1 = iAdmin.getEventContext();
         loginNewUserInOtherUsersGroup(u1);
-        final EventContext ec2 = iAdmin.getEventContext();
+        final IEventContext ec2 = iAdmin.getEventContext();
         loginNewUserInOtherUsersGroup(u1);
-        final EventContext ec3 = iAdmin.getEventContext();
+        final IEventContext ec3 = iAdmin.getEventContext();
 
         loginRoot();
         final Event e1 = event(ec1);
@@ -237,7 +236,7 @@ public class PersistentEventLogLoaderTest extends AbstractManagedContextTest {
         el.setEvent(e);
         e.addEventLog(el);
 
-        EventContext ec = iAdmin.getEventContext();
+        IEventContext ec = iAdmin.getEventContext();
         loginRootKeepGroup();
         try {
             return iUpdate.saveAndReturnObject(el);
@@ -247,7 +246,7 @@ public class PersistentEventLogLoaderTest extends AbstractManagedContextTest {
 
     }
 
-    protected Event event(EventContext ec) {
+    protected Event event(IEventContext ec) {
         return event(ec.getCurrentUserId(), ec.getCurrentGroupId());
     }
 

@@ -19,7 +19,7 @@ import ome.services.sessions.stats.ObjectsReadCounter;
 import ome.services.sessions.stats.SessionStats;
 import ome.services.sessions.stats.SimpleSessionStats;
 import ome.services.sessions.stats.PerSessionStats;
-import ome.system.EventContext;
+import ome.api.IEventContext;
 import ome.system.OmeroContext;
 import ome.system.Principal;
 
@@ -139,10 +139,10 @@ public class SessionStatsTest extends MockObjectTestCase {
         return called;
     }
     
-    private EventContext ec() {
-        Mock mock = new Mock(EventContext.class);
+    private IEventContext ec() {
+        Mock mock = new Mock(IEventContext.class);
         mock.setDefaultStub(new DefaultResultStub());
-        return (EventContext) mock.proxy();
+        return (IEventContext) mock.proxy();
     }
     
 

@@ -14,7 +14,7 @@ import ome.security.basic.AllGroupsSecurityFilter;
 import ome.security.basic.CurrentDetails;
 import ome.security.basic.OneGroupSecurityFilter;
 import ome.security.basic.SharingSecurityFilter;
-import ome.system.EventContext;
+import ome.api.IEventContext;
 
 /**
  * Security dispatcher holding each currently active {@link SecurityFilter}
@@ -52,7 +52,7 @@ public class SecurityFilterHolder implements SecurityFilter {
     }
 
     public SecurityFilter choose() {
-        final EventContext ec = cd.getCurrentEventContext();
+        final IEventContext ec = cd.getCurrentEventContext();
         final Long groupId = ec.getCurrentGroupId();
         final Long shareId = ec.getCurrentShareId();
         if (shareId != null && shareId >= 0) {
@@ -79,7 +79,7 @@ public class SecurityFilterHolder implements SecurityFilter {
         return choose().getParameterTypes();
     }
 
-    public void enable(Session sess, EventContext ec) {
+    public void enable(Session sess, IEventContext ec) {
         choose().enable(sess, ec);
     }
 
@@ -87,7 +87,7 @@ public class SecurityFilterHolder implements SecurityFilter {
         choose().disable(sess);
     }
 
-    public boolean passesFilter(Session s, Details d, EventContext c) {
+    public boolean passesFilter(Session s, Details d, IEventContext c) {
         return choose().passesFilter(s, d, c);
     }
 

@@ -19,7 +19,7 @@ import ome.security.AdminAction;
 import ome.security.SecureAction;
 import ome.security.SecuritySystem;
 import ome.security.basic.BasicSecuritySystem;
-import ome.system.EventContext;
+import ome.api.IEventContext;
 import ome.system.Principal;
 import ome.system.Roles;
 
@@ -66,12 +66,12 @@ public class SharingSecuritySystem implements SecuritySystem {
 
     }
 
-    public EventContext getEventContext() {
+    public IEventContext getEventContext() {
         // TODO Auto-generated method stub
         return null;
     }
 
-    public EventContext getEventContext(boolean refresh) {
+    public IEventContext getEventContext(boolean refresh) {
         // TODO Auto-generated method stub
         return null;
     }

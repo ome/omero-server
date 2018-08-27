@@ -19,6 +19,7 @@ package ome.services.messages;
 
 import java.util.Map;
 
+import ome.api.IEventContext;
 import ome.util.messages.InternalMessage;
 
 public class ContextMessage extends InternalMessage {
@@ -34,7 +35,7 @@ public class ContextMessage extends InternalMessage {
 
     /**
      * Published when an internal service would like to
-     * modify the current {@link ome.system.EventContext}.
+     * modify the current {@link IEventContext}.
      * A {@link ContextMessage.Pop PopContextMessage} should be used once
      * the temporary login is complete.
      */

@@ -48,7 +48,7 @@ import ome.model.enums.RenderingModel;
 import ome.parameters.Parameters;
 import ome.services.ThumbnailCtx.NoThumbnail;
 import ome.services.messages.ContextMessage;
-import ome.system.EventContext;
+import ome.api.IEventContext;
 import ome.system.OmeroContext;
 import ome.system.SimpleEventContext;
 import ome.util.ImageUtil;
@@ -268,7 +268,7 @@ public class ThumbnailBean extends AbstractLevel2Service
      *
      * @see ome.api.StatefulServiceInterface#getCurrentEventContext()
      */
-    public EventContext getCurrentEventContext() {
+    public IEventContext getCurrentEventContext() {
         return new SimpleEventContext(getSecuritySystem().getEventContext());
     }
 

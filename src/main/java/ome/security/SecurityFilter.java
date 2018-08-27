@@ -5,7 +5,6 @@
 
 package ome.security;
 
-import java.util.List;
 import java.util.Map;
 
 import org.hibernate.Session;
@@ -14,7 +13,7 @@ import ome.model.internal.Details;
 import ome.model.internal.Permissions;
 import ome.model.internal.Permissions.Right;
 import ome.security.basic.OmeroInterceptor;
-import ome.system.EventContext;
+import ome.api.IEventContext;
 
 /**
  * Base filter interface ...
@@ -68,21 +67,21 @@ public interface SecurityFilter {
      *            null all {@link Right rights} will be assumed.
      * @return true if the object to which this
      */
-    public boolean passesFilter(Session session, Details d, EventContext c);
+    public boolean passesFilter(Session session, Details d, IEventContext c);
 
     /**
      * Enables this filter with the settings from this filter. The intent is
      * that after this call, no Hibernate queries will return any objects that
      * would fail a call to
-     * {@link #passesFilter(Session, Details, EventContext)}.
+     * {@link #passesFilter(Session, Details, IEventContext)}.
      *
      * @param sess Non-null.
      * @param ec Non-null.
      */
-    public void enable(Session sess, EventContext ec);
+    public void enable(Session sess, IEventContext ec);
 
     /**
-     * Reverts the call to {@link #enable(Session, EventContext)}.
+     * Reverts the call to {@link #enable(Session, IEventContext)}.
      */
     public void disable(Session sess);
 

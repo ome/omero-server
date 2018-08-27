@@ -28,12 +28,12 @@ import ome.services.messages.RegisterServiceCleanupMessage;
 import ome.services.sessions.stats.SessionStats;
 import ome.services.sharing.ShareStore;
 import ome.services.sharing.data.ShareData;
-import ome.system.EventContext;
+import ome.api.IEventContext;
 import ome.system.Principal;
 import ome.system.SimpleEventContext;
 
 /**
- * {@link EventContext} implementation for use within the security system. Holds
+ * {@link IEventContext} implementation for use within the security system. Holds
  * various other information needed for proper functioning of a {@link Thread}.
  * 
  * Not-thread-safe. Intended to be held by a {@link ThreadLocal}
@@ -82,11 +82,11 @@ public class BasicEventContext extends SimpleEventContext {
     }
 
     /**
-     * Copy-constructor to not have to allow the mutator {@link #copy(EventContext)}
-     * or {@code copyContext(EventContext)} out of the {@link EventContext}
+     * Copy-constructor to not have to allow the mutator {@link #copy(IEventContext)}
+     * or {@code copyContext(IEventContext)} out of the {@link IEventContext}
      * hierarchy.
      */
-    public BasicEventContext(Principal p, SessionStats stats, EventContext ec) {
+    public BasicEventContext(Principal p, SessionStats stats, IEventContext ec) {
         this(p, stats);
         copyContext(ec);
     }
@@ -99,14 +99,14 @@ public class BasicEventContext extends SimpleEventContext {
     }
 
     /**
-     * Making {@link SimpleEventContext#copy(EventContext)} available to
+     * Making {@link SimpleEventContext#copy(IEventContext)} available to
      * package-private classes.
      */
-    void copyContext(EventContext ec) {
+    void copyContext(IEventContext ec) {
         super.copy(ec);
     }
 
-    void checkAndInitialize(EventContext ec, LocalAdmin admin, ShareStore store) {
+    void checkAndInitialize(IEventContext ec, LocalAdmin admin, ShareStore store) {
         this.copyContext(ec);
 
         // Now re-apply values.

@@ -12,7 +12,7 @@ import ome.model.internal.Details;
 import ome.model.meta.ExperimenterGroup;
 import ome.security.basic.BasicSecuritySystem;
 import ome.security.sharing.SharingSecuritySystem;
-import ome.system.EventContext;
+import ome.api.IEventContext;
 import ome.system.Principal;
 import ome.system.Roles;
 
@@ -78,11 +78,11 @@ public class SecuritySystemHolder implements SecuritySystem {
         choose().enable(ids);
     }
 
-    public EventContext getEventContext() {
+    public IEventContext getEventContext() {
         return choose().getEventContext();
     }
 
-    public EventContext getEventContext(boolean refresh) {
+    public IEventContext getEventContext(boolean refresh) {
         return choose().getEventContext(refresh);
     }
 

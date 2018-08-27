@@ -22,7 +22,7 @@ import ome.security.SecureAction;
 import ome.services.procs.IProcessManager;
 import ome.services.procs.Process;
 import ome.services.procs.ProcessCallback;
-import ome.system.EventContext;
+import ome.api.IEventContext;
 import ome.util.ShallowCopy;
 
 import org.slf4j.Logger;
@@ -118,7 +118,7 @@ public class JobBean extends AbstractStatefulBean implements JobHandle,
         reset(); // TODO or do we want to just checkState
         // and throw an exception if this is a stale handle.
 
-        EventContext ec = getCurrentEventContext();
+        IEventContext ec = getCurrentEventContext();
         long ms = System.currentTimeMillis();
         Timestamp now = new Timestamp(ms);
 

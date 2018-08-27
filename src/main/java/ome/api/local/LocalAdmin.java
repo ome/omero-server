@@ -12,7 +12,7 @@ import ome.model.IObject;
 import ome.model.internal.Details;
 import ome.model.meta.Experimenter;
 import ome.model.meta.ExperimenterGroup;
-import ome.system.EventContext;
+import ome.api.IEventContext;
 
 /**
  * Provides local (internal) extensions for administration
@@ -103,7 +103,7 @@ public interface LocalAdmin extends ome.api.IAdmin {
      * will be applied as simply the session context.
      * @return the current event context
      */
-    EventContext getEventContextQuiet();
+    IEventContext getEventContextQuiet();
 
     /**
      * Companion to {@link ome.api.IAdmin#canUpdate(IObject)} but not yet remotely

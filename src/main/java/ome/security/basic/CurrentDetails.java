@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import ome.api.IEventContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
@@ -44,7 +45,6 @@ import ome.services.sessions.state.SessionCache;
 import ome.services.sessions.stats.SessionStats;
 import ome.services.sharing.ShareStore;
 import ome.services.util.ServiceHandler;
-import ome.system.EventContext;
 import ome.system.Principal;
 import ome.system.Roles;
 import ome.tools.hibernate.HibernateUtils;
@@ -209,7 +209,7 @@ public class CurrentDetails implements PrincipalHolder {
     }
 
     public boolean isGraphCritical(Details details) {
-        EventContext ec = getCurrentEventContext();
+        IEventContext ec = getCurrentEventContext();
         long gid = ec.getCurrentGroupId();
         Permissions perms = ec.getCurrentGroupPermissions();
         if (gid < 0) {
@@ -255,7 +255,7 @@ public class CurrentDetails implements PrincipalHolder {
             g = HibernateUtils.nullSafeGroupId(object);
         }
 
-        final EventContext ec = getCurrentEventContext();
+        final IEventContext ec = getCurrentEventContext();
 
         if (ec.getLeaderOfGroupsList().contains(g)) {
             /* is group leader */
@@ -314,7 +314,7 @@ public class CurrentDetails implements PrincipalHolder {
      * Replaces all the simple-valued fields in the {@link BasicEventContext}.
      * This method
      */
-    void checkAndInitialize(EventContext ec, LocalAdmin admin, ShareStore store) {
+    void checkAndInitialize(IEventContext ec, LocalAdmin admin, ShareStore store) {
         current().checkAndInitialize(ec, admin, store);
     }
 
@@ -330,7 +330,7 @@ public class CurrentDetails implements PrincipalHolder {
     /**
      * @return the current event context
      */
-    public EventContext getCurrentEventContext() {
+    public IEventContext getCurrentEventContext() {
         return current();
     }
 

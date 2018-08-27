@@ -21,7 +21,7 @@ import ome.conditions.InternalException;
 import ome.security.SecuritySystem;
 import ome.security.basic.CurrentDetails;
 import ome.services.scheduler.ThreadPool;
-import ome.system.EventContext;
+import ome.api.IEventContext;
 import ome.system.OmeroContext;
 import ome.system.Principal;
 import ome.system.ServiceFactory;
@@ -382,7 +382,7 @@ public interface Executor extends ApplicationContextAware {
             if (principalHolder.size() == 0) {
                 return null;
             } else {
-                EventContext ec = principalHolder.getCurrentEventContext();
+                IEventContext ec = principalHolder.getCurrentEventContext();
                 String session = ec.getCurrentSessionUuid();
                 return new Principal(session);
             }

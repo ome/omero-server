@@ -27,7 +27,7 @@ import ome.security.basic.CurrentDetails;
 import ome.security.basic.LightAdminPrivileges;
 import ome.services.sessions.SessionManager.CreationRequest;
 import ome.services.util.Executor;
-import ome.system.EventContext;
+import ome.api.IEventContext;
 import ome.system.Principal;
 
 import org.slf4j.Logger;
@@ -81,7 +81,7 @@ public class SessionBean implements ISession {
             throw new SecurityViolation("No current user");
         }
 
-        final EventContext context = currentContext();
+        final IEventContext context = currentContext();
         final Session currentSession;
         if (context instanceof SessionContext) {
             currentSession = ((SessionContext) context).getSession();
@@ -124,7 +124,7 @@ public class SessionBean implements ISession {
     public Session createSessionWithTimeouts(@NotNull final Principal principal,
             final long timeToLiveMilliseconds, final long timeToIdleMilliseconds) {
 
-        final EventContext context = currentContext();
+        final IEventContext context = currentContext();
         final Session currentSession;
         if (context instanceof SessionContext) {
             currentSession = ((SessionContext) context).getSession();
@@ -291,7 +291,7 @@ public class SessionBean implements ISession {
     // ~ Helpers
     // =========================================================================
 
-    EventContext currentContext() {
+    IEventContext currentContext() {
         String user = cd.getLast().getName();
         return mgr.getEventContext(new Principal(user));
     }
