@@ -12,9 +12,7 @@ import java.util.Map;
 
 import ome.tools.spring.OnContextRefreshedEventListener;
 
-import org.quartz.JobDetail;
 import org.quartz.Scheduler;
-import org.quartz.SchedulerException;
 import org.quartz.Trigger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,12 +21,11 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.scheduling.SchedulingException;
-import org.springframework.scheduling.quartz.JobDetailAwareTrigger;
 
 /**
  * Produces a <a href="http://www.opensymphony.com/quartz/Quartz</a>
  * {@link Scheduler} which automatically loads all the triggers it can find.
- * 
+ *
  * @author Josh Moore, josh at glencoesoftware.com
  * @since 3.0-Beta3
  */
@@ -47,7 +44,7 @@ public class SchedulerFactoryBean extends
      * in a somewhat awkward to re-use the code.
      */
     private final OnContextRefreshedEventListener handler =
-        new OnContextRefreshedEventListener(true, Integer.MAX_VALUE) {
+            new OnContextRefreshedEventListener(true, Integer.MAX_VALUE) {
 
             @Override
             public void handleContextRefreshedEvent(ContextRefreshedEvent event) {
@@ -66,6 +63,8 @@ public class SchedulerFactoryBean extends
     private void handle(ContextRefreshedEvent cre) {
         String[] names = cre.getApplicationContext().getBeanNamesForType(
                 Trigger.class);
+
+        final int prevSize = triggers.size();
         for (String name : names) {
             if (triggers.containsKey(name)) {
                 log.error("Scheduler already has trigger named: " + name);
@@ -73,27 +72,17 @@ public class SchedulerFactoryBean extends
             }
             Trigger trigger = (Trigger) cre.getApplicationContext()
                     .getBean(name);
-            registerTrigger(name, trigger);
+            triggers.put(name, trigger);
         }
-        restartIfNeeded();
-    }
 
-    /**
-     * Registers a {@link JobDetailAwareTrigger}. A method like this should
-     * really have protected visibility in the superclass.
-     */
-    protected void registerTrigger(String beanName, Trigger trigger) {
-        try {
-            Scheduler scheduler = (Scheduler) getObject();
-            triggers.put(beanName, trigger);
-            JobDetailAwareTrigger jdat = (JobDetailAwareTrigger) trigger;
-            JobDetail job = jdat.getJobDetail();
-            scheduler.addJob(job, false);
-            scheduler.scheduleJob(trigger);
-            log.debug(String.format("Registered trigger \"%s\": %s", beanName, trigger));
-        } catch (SchedulerException se) {
-            throw new RuntimeException(se);
+        final int currentSize = triggers.size();
+        if (prevSize != currentSize) {
+            // Convert trigger map to list
+            Trigger[] tArray = triggers.values().toArray(new Trigger[currentSize]);
+            setTriggers(tArray);
         }
+
+        restartIfNeeded();
     }
 
     /**

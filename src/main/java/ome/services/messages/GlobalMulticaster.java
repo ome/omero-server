@@ -16,6 +16,7 @@ import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ApplicationEventMulticaster;
 import org.springframework.context.event.SimpleApplicationEventMulticaster;
+import org.springframework.core.ResolvableType;
 
 /**
  * Global {@link ApplicationEventMulticaster} which can be used to integrate
@@ -40,10 +41,12 @@ public class GlobalMulticaster implements ApplicationEventMulticaster, BeanFacto
     }
 
 
+    @Override
     public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
         _em.setBeanFactory(beanFactory);
     }
 
+    @Override
     public void addApplicationListener(ApplicationListener arg0) {
         _em.addApplicationListener(arg0);
     }
@@ -51,24 +54,34 @@ public class GlobalMulticaster implements ApplicationEventMulticaster, BeanFacto
     /**
      * Multicast only if this instance was the first created.
      */
-    public void multicastEvent(ApplicationEvent arg0) { 
+    @Override
+    public void multicastEvent(ApplicationEvent arg0) {
         _em.multicastEvent(arg0);
     }
 
+    @Override
+    public void multicastEvent(ApplicationEvent event, ResolvableType eventType) {
+
+    }
+
+    @Override
     public void removeAllListeners() {
         _em.removeAllListeners();
     }
 
+    @Override
     public void removeApplicationListener(ApplicationListener arg0) {
         _em.removeApplicationListener(arg0);
     }
 
+    @Override
     public void addApplicationListenerBean(String arg0) {
         // Disabling since our use of the context causes
         // duplicate entries now with 3.0
         //_em.addApplicationListenerBean(arg0);
     }
 
+    @Override
     public void removeApplicationListenerBean(String arg0) {
         // Disabling since our use of the context causes
         // duplicate entries now with 3.0

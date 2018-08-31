@@ -10,6 +10,7 @@ package ome.services.sharing;
 import java.lang.reflect.Method;
 import java.util.NoSuchElementException;
 
+import ome.api.IPrincipal;
 import ome.conditions.SessionException;
 import ome.security.basic.CurrentDetails;
 import ome.services.sessions.state.SessionCache;
@@ -44,7 +45,7 @@ public class ShareRestrictionTransactionAttributeSource implements
     public TransactionAttribute getTransactionAttribute(Method method,
             Class targetClass) {
         try {
-            Principal principal = current.getLast();
+            IPrincipal principal = current.getLast();
             String uuid = principal.getName();
             IEventContext ec = cache.getSessionContext(uuid);
             Long shareId = ec.getCurrentShareId();

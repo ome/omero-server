@@ -32,6 +32,7 @@ import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.search.Query;
+import org.apache.lucene.util.Version;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.criterion.Order;
@@ -157,7 +158,7 @@ public class FullText extends SearchAction {
         
         try {
             final Analyzer a = analyzer.newInstance();
-            final QueryParser parser = new /*Analyzing*/QueryParser("combined_fields", a);
+            final QueryParser parser = new /*Analyzing*/QueryParser(Version.LUCENE_31, "combined_fields", a);
             parser.setAllowLeadingWildcard(values.leadingWildcard);
             q = parser.parse(queryStr);
         } catch (ParseException pe) {
@@ -216,7 +217,7 @@ public class FullText extends SearchAction {
         this.queryStr = query;
         try {
             final Analyzer a = analyzer.newInstance();
-            final QueryParser parser = new /*Analyzing*/QueryParser("combined_fields", a);
+            final QueryParser parser = new /*Analyzing*/QueryParser(Version.LUCENE_31, "combined_fields", a);
             parser.setAllowLeadingWildcard(values.leadingWildcard);
             q = parser.parse(queryStr);
         } catch (ParseException pe) {

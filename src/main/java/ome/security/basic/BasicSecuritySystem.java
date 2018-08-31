@@ -12,6 +12,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import ome.api.IPrincipal;
 import ome.api.local.LocalAdmin;
 import ome.api.local.LocalQuery;
 import ome.conditions.ApiUsageException;
@@ -353,7 +354,7 @@ public class BasicSecuritySystem implements SecuritySystem,
         final LocalAdmin admin = (LocalAdmin) sf.getAdminService();
 
         // Call to session manager throws an exception on failure
-        final Principal p = clearAndCheckPrincipal();
+        final IPrincipal p = clearAndCheckPrincipal();
 
         // ticket:6639 - Rather than catch the RemoveSessionException
         // we are going to check the type of the context and if it
@@ -488,7 +489,7 @@ public class BasicSecuritySystem implements SecuritySystem,
         }
     }
 
-    private Principal clearAndCheckPrincipal() {
+    private IPrincipal clearAndCheckPrincipal() {
 
         // clear even if this fails. (make SecuritySystem unusable)
         invalidateEventContext();
@@ -498,7 +499,7 @@ public class BasicSecuritySystem implements SecuritySystem,
                     "Principal is null. Not logged in to SecuritySystem.");
         }
 
-        final Principal p = cd.getLast();
+        final IPrincipal p = cd.getLast();
 
         if (p.getName() == null) {
             throw new InternalException(

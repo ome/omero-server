@@ -16,6 +16,7 @@ import java.util.Map;
 import java.util.Set;
 
 import ome.api.IEventContext;
+import ome.api.IPrincipal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
@@ -45,7 +46,6 @@ import ome.services.sessions.state.SessionCache;
 import ome.services.sessions.stats.SessionStats;
 import ome.services.sharing.ShareStore;
 import ome.services.util.ServiceHandler;
-import ome.system.Principal;
 import ome.system.Roles;
 import ome.tools.hibernate.HibernateUtils;
 
@@ -154,11 +154,11 @@ public class CurrentDetails implements PrincipalHolder {
         return list().size();
     }
 
-    public Principal getLast() {
+    public IPrincipal getLast() {
         return list().getLast().getPrincipal();
     }
 
-    public void login(Principal principal) {
+    public void login(IPrincipal principal) {
         // Can't use the method in SessionManager since that leads to a
         // circular reference in Spring.
         final String uuid = principal.getName();

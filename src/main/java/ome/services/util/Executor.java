@@ -17,6 +17,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 
+import ome.api.IPrincipal;
 import ome.conditions.InternalException;
 import ome.security.SecuritySystem;
 import ome.security.basic.CurrentDetails;
@@ -48,7 +49,7 @@ import org.springframework.transaction.support.TransactionCallback;
 /**
  * Simple execution/work interface which can be used for <em>internal</em> tasks
  * which need to have a full working implementation. The
- * {@link Executor#execute(Principal, ome.services.util.Executor.Work)} method
+ * {@link Executor#execute(IPrincipal, Work)} method
  * ensures that {@link SecuritySystem#login(Principal)} is called before the
  * task, that a {@link TransactionCallback} and a {@link HibernateCallback}
  * surround the call, and that subsequently {@link SecuritySystem#logout()} is
@@ -92,10 +93,10 @@ public interface Executor extends ApplicationContextAware {
     public Principal principal();
 
     /**
-     * Call {@link #execute(Map, Principal, Work)} with
+     * Call {@link #execute(Map, IPrincipal, Work)} with
      * a null call context.
      */
-    public Object execute(final Principal p, final Work work);
+    <T> T execute(final IPrincipal p, final Work<T> work);
 
     /**
      * Executes a {@link Work} instance wrapped in two layers of AOP. The first
@@ -122,8 +123,7 @@ public interface Executor extends ApplicationContextAware {
      *            Not null.
      * @return See above.
      */
-    public Object execute(final Map<String, String> callContext,
-            final Principal p, final Work work);
+    <T> T execute(final Map<String, String> callContext, final IPrincipal p, final Work<T> work);
 
     /**
      * Call {@link #submit(Map, Callable)} with a null callContext.
@@ -134,7 +134,7 @@ public interface Executor extends ApplicationContextAware {
 
     /**
      * Simple submission method which can be used in conjunction with a call to
-     * {@link #execute(Principal, Work)} to overcome the no-multiple-login rule.
+     * {@link #execute(IPrincipal, Work)} to overcome the no-multiple-login rule.
      * 
      * @param <T>
      * @param callContext Possibly null. See {@link CurrentDetails#setContext(Map)}
@@ -187,7 +187,7 @@ public interface Executor extends ApplicationContextAware {
      * about returned values, but this method <em>completely</em> overrides
      * OMERO security, and should be used <b>very</em> carefully.
      *
-     * As with {@link #execute(Principal, Work)} the {@link SqlWork}
+     * As with {@link #execute(IPrincipal, Work)} the {@link SqlWork}
      * instance must be properly marked with an {@link Transactional}
      * annotation.
      *
@@ -223,7 +223,14 @@ public interface Executor extends ApplicationContextAware {
          * @return Any results which will be used by non-wrapped code.
          */
         X doWork(Session session, ServiceFactory sf);
+    }
 
+    interface LoggedWork<X> extends Work<X> {
+        /**
+         * Returns a description of what this work will be doing for logging
+         * purposes.
+         */
+        String description();
     }
 
     /**
@@ -291,7 +298,7 @@ public interface Executor extends ApplicationContextAware {
     /**
      * Simple adapter which takes a String for {@link #description}
      */
-    public abstract class SimpleWork extends Descriptive implements Work {
+    abstract class SimpleWork<T> extends Descriptive implements LoggedWork<T> {
 
         /**
          * Member field set by the {@link Executor} instance before
@@ -389,10 +396,10 @@ public interface Executor extends ApplicationContextAware {
         }
 
         /**
-         * Call {@link #execute(Map, Principal, Work)}
+         * Call {@link #execute(Map, IPrincipal, Work)}
          * with a null call context.
          */
-        public Object execute(final Principal p, final Work work) {
+        public <T> T execute(final IPrincipal p, final Work<T> work) {
             return execute(null, p, work);
         }
 
@@ -410,8 +417,8 @@ public interface Executor extends ApplicationContextAware {
          * @param p
          * @param work
          */
-        public Object execute(final Map<String, String> callContext,
-                final Principal p, final Work work) {
+        public <T> T execute(final Map<String, String> callContext,
+                final IPrincipal p, final Work<T> work) {
 
             if (work instanceof SimpleWork) {
                 ((SimpleWork) work).setSqlAction(sqlAction);
@@ -420,7 +427,7 @@ public interface Executor extends ApplicationContextAware {
             Interceptor i = new Interceptor(factory);
             ProxyFactory factory = new ProxyFactory();
             factory.setTarget(work);
-            factory.setInterfaces(new Class[] { Work.class });
+            factory.setInterfaces(Work.class);
 
             for (Advice advice : advices) {
                 factory.addAdvice(advice);
@@ -449,7 +456,7 @@ public interface Executor extends ApplicationContextAware {
 
             try {
                 // Arguments will be replaced after hibernate is in effect
-                return wrapper.doWork(null, isf);
+                return (T) wrapper.doWork(null, isf);
             } finally {
                 if (callContext != null) {
                     this.principalHolder.setContext(null);
@@ -548,7 +555,7 @@ public interface Executor extends ApplicationContextAware {
 
             ProxyFactory factory = new ProxyFactory();
             factory.setTarget(work);
-            factory.setInterfaces(new Class[] { SqlWork.class });
+            factory.setInterfaces(SqlWork.class);
             factory.addAdvice(advices.get(2)); // TX FIXME
             SqlWork wrapper = (SqlWork) factory.getProxy();
             return wrapper.doWork(this.sqlAction);
@@ -557,7 +564,7 @@ public interface Executor extends ApplicationContextAware {
         /**
          * Interceptor class which properly lookups and injects the session
          * objects in the
-         * {@link Work#doWork(TransactionStatus, Session, ServiceFactory)}
+         * {@link Work#doWork(Session, ServiceFactory)}
          * method.
          */
         static class Interceptor implements MethodInterceptor {

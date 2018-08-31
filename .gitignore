@@ -36,3 +36,6 @@ gradle-local.properties
 
 # Gradle cache
 .gradle
+
+# Ignore generated source code
+/src/generated/*

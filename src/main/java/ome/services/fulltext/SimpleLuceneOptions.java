@@ -7,6 +7,7 @@
 
 package ome.services.fulltext;
 
+import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.Field.Index;
 import org.apache.lucene.document.Field.Store;
@@ -51,6 +52,7 @@ public class SimpleLuceneOptions implements LuceneOptions {
         this.index = index;
     }
 
+    @Override
     public Float getBoost() {
         if (boost != null) {
             return boost;
@@ -58,6 +60,12 @@ public class SimpleLuceneOptions implements LuceneOptions {
         return delegate.getBoost();
     }
 
+    @Override
+    public String indexNullAs() {
+        return null;
+    }
+
+    @Override
     public Index getIndex() {
         if (index != null) {
             return index;
@@ -65,6 +73,7 @@ public class SimpleLuceneOptions implements LuceneOptions {
         return delegate.getIndex();
     }
 
+    @Override
     public Store getStore() {
         if (store != null) {
             return store;
@@ -72,8 +81,26 @@ public class SimpleLuceneOptions implements LuceneOptions {
         return delegate.getStore();
     }
 
+    @Override
     public TermVector getTermVector() {
         return delegate.getTermVector();
     }
+
+
+    @Override
+    public void addFieldToDocument(String fieldName, String indexedString, Document document) {
+
+    }
+
+    @Override
+    public void addNumericFieldToDocument(String fieldName, Object numericValue, Document document) {
+
+    }
+
+    @Override
+    public boolean isCompressed() {
+        return false;
+    }
+
 
 }

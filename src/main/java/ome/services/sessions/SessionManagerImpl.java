@@ -21,6 +21,7 @@ import java.util.concurrent.Future;
 import net.sf.ehcache.Ehcache;
 import net.sf.ehcache.Element;
 
+import ome.api.IPrincipal;
 import ome.api.local.LocalAdmin;
 import ome.conditions.ApiUsageException;
 import ome.conditions.AuthenticationException;
@@ -138,6 +139,7 @@ public class SessionManagerImpl implements SessionManager, SessionCache.StaleCac
     // ~ Injectors
     // =========================================================================
 
+    @Override
     public void setApplicationContext(ApplicationContext applicationContext)
             throws BeansException {
         this.context = (OmeroContext) applicationContext;
@@ -264,6 +266,7 @@ public class SessionManagerImpl implements SessionManager, SessionCache.StaleCac
     // ~ Session management
     // =========================================================================
 
+    @Override
     public Session createFromRequest(CreationRequest request) {
 
         // If credentials exist as session, then return that
@@ -299,7 +302,8 @@ public class SessionManagerImpl implements SessionManager, SessionCache.StaleCac
     /*k
      * Is given trustable values by the {@link SessionBean}
      */
-    public Session createWithAgent(final Principal _principal, final String credentials, String agent, String ip) {
+    @Override
+    public Session createWithAgent(IPrincipal _principal, final String credentials, String agent, String ip) {
         final CreationRequest req = new CreationRequest();
         req.principal = _principal;
         req.credentials = credentials;
@@ -308,7 +312,8 @@ public class SessionManagerImpl implements SessionManager, SessionCache.StaleCac
         return createFromRequest(req);
     }
 
-    public Session createWithAgent(Principal principal, String agent, String ip) {
+    @Override
+    public Session createWithAgent(IPrincipal principal, String agent, String ip) {
         final CreationRequest req = new CreationRequest();
         req.principal = principal;
         req.agent = agent;
@@ -316,7 +321,8 @@ public class SessionManagerImpl implements SessionManager, SessionCache.StaleCac
         return createFromRequest(req);
     }
 
-    public Share createShare(Principal principal, boolean enabled,
+    @Override
+    public Share createShare(IPrincipal principal, boolean enabled,
             long timeToLive, String eventType, String description,
             long groupId) {
         Share share = newShare();
@@ -336,7 +342,7 @@ public class SessionManagerImpl implements SessionManager, SessionCache.StaleCac
     private Session createSession(final CreationRequest req,
             final Session oldsession) {
 
-        final Principal principal = req.principal;
+        final IPrincipal principal = req.principal;
 
         if (internal_uuid != null && internal_uuid.equals(principal.getName())) {
             /* 2018-SV2 */
@@ -416,10 +422,12 @@ public class SessionManagerImpl implements SessionManager, SessionCache.StaleCac
         return newctx.getSession();
     }
 
+    @Override
     public Session update(Session session) {
         return update(session, false);
     }
 
+    @Override
     public Session update(final Session session, final boolean trusted) {
 
         if (session == null || !session.isLoaded() || session.getUuid() == null) {
@@ -504,9 +512,9 @@ public class SessionManagerImpl implements SessionManager, SessionCache.StaleCac
 
         final SessionContext newctx = createSessionContext(list, ctx);
         final Session copy = copy(orig);
-        executor.execute(asroot, new Executor.SimpleWork(this, "update") {
+        executor.execute(asroot, new Executor.SimpleWork<Session>(this, "update") {
             @Transactional(readOnly = false)
-            public Object doWork(org.hibernate.Session __s, ServiceFactory sf) {
+            public Session doWork(org.hibernate.Session __s, ServiceFactory sf) {
                 final Long sudoerId;
                 if (orig.getSudoer() == null) {
                     sudoerId = null;
@@ -552,6 +560,7 @@ public class SessionManagerImpl implements SessionManager, SessionCache.StaleCac
         return sessionContext;
     }
 
+    @Override
     public Session find(String uuid) {
         SessionContext sessionContext = cache.getSessionContext(uuid);
         checkIfShare(sessionContext);
@@ -602,6 +611,7 @@ public class SessionManagerImpl implements SessionManager, SessionCache.StaleCac
         return rv;
     }
 
+    @Override
     public List<Session> findSameUser(String uuid, String... agents) {
         /* determine the light administrator privileges associated with the given session */
         final Session session = find(uuid);
@@ -658,16 +668,19 @@ public class SessionManagerImpl implements SessionManager, SessionCache.StaleCac
         return findByQuery(sessionQuery.toString(), params);
     }
 
+    @Override
     public int getReferenceCount(String uuid) {
         SessionContext ctx = cache.getSessionContext(uuid);
         return ctx.count().get();
     }
 
+    @Override
     public int detach(String uuid) {
         SessionContext ctx = cache.getSessionContext(uuid);
         return ctx.count().decrement();
     }
 
+    @Override
     public SessionStats getSessionStats(String uuid) {
         SessionContext ctx = cache.getSessionContext(uuid);
         return ctx.stats();
@@ -675,6 +688,7 @@ public class SessionManagerImpl implements SessionManager, SessionCache.StaleCac
 
     /*
      */
+    @Override
     public int close(String uuid) {
         SessionContext ctx;
         try {
@@ -696,6 +710,7 @@ public class SessionManagerImpl implements SessionManager, SessionCache.StaleCac
         }
     }
 
+    @Override
     public Map<String, Map<String, Object>> getSessionData() {
         final Collection<String> ids = cache.getIds();
         final Map<String, Map<String, Object>> rv
@@ -719,6 +734,7 @@ public class SessionManagerImpl implements SessionManager, SessionCache.StaleCac
         return rv;
     }
 
+    @Override
     public int closeAll() {
         Collection<String> ids = cache.getIds();
         for (String id : ids) {
@@ -740,6 +756,7 @@ public class SessionManagerImpl implements SessionManager, SessionCache.StaleCac
         return ids.size();
     }
 
+    @Override
     public List<String> getUserRoles(String uuid) {
         SessionContext ctx = cache.getSessionContext(uuid);
         if (ctx == null) {
@@ -751,10 +768,12 @@ public class SessionManagerImpl implements SessionManager, SessionCache.StaleCac
     // ~ State attached to session
     // =========================================================================
 
+    @Override
     public Ehcache inMemoryCache(String uuid) {
         return cache.inMemoryCache(uuid);
     }
 
+    @Override
     public Ehcache onDiskCache(String uuid) {
         return cache.onDiskCache(uuid);
     }
@@ -762,20 +781,24 @@ public class SessionManagerImpl implements SessionManager, SessionCache.StaleCac
     static String INPUT_ENVIRONMENT = "InputEnvironment";
     static String OUTPUT_ENVIRONMENT = "OutputEnvironment";
 
+    @Override
     public Object getInput(String session, String key)
             throws RemovedSessionException {
         return getEnvironmentVariable(session, key, INPUT_ENVIRONMENT);
     }
 
+    @Override
     public Object getOutput(String session, String key)
             throws RemovedSessionException {
         return getEnvironmentVariable(session, key, OUTPUT_ENVIRONMENT);
     }
 
+    @Override
     public Map<String, Object> inputEnvironment(String session) {
         return environment(session, INPUT_ENVIRONMENT);
     }
 
+    @Override
     public Map<String, Object> outputEnvironment(String session) {
         return environment(session, OUTPUT_ENVIRONMENT);
     }
@@ -801,11 +824,13 @@ public class SessionManagerImpl implements SessionManager, SessionCache.StaleCac
         return rv;
     }
 
+    @Override
     public void setInput(String session, String key, Object object)
             throws RemovedSessionException {
         setEnvironmentVariable(session, key, object, INPUT_ENVIRONMENT);
     }
 
+    @Override
     public void setOutput(String session, String key, Object object)
             throws RemovedSessionException {
         setEnvironmentVariable(session, key, object, OUTPUT_ENVIRONMENT);
@@ -850,7 +875,8 @@ public class SessionManagerImpl implements SessionManager, SessionCache.StaleCac
     // ~ Security methods
     // =========================================================================
 
-    public IEventContext getEventContext(Principal principal) {
+    @Override
+    public IEventContext getEventContext(IPrincipal principal) {
         final SessionContext ctx = cache.getSessionContext(principal.getName());
         if (ctx == null) {
             throw new RemovedSessionException("No session with uuid:"
@@ -859,6 +885,7 @@ public class SessionManagerImpl implements SessionManager, SessionCache.StaleCac
         return ctx;
     }
 
+    @Override
     public IEventContext reload(final String uuid) {
         final SessionContext ctx = cache.getSessionContext(uuid);
         if (ctx == null) {
@@ -887,6 +914,7 @@ public class SessionManagerImpl implements SessionManager, SessionCache.StaleCac
 
     /**
      */
+    @Override
     public void onApplicationEvent(ApplicationEvent event) {
         if (event instanceof UserGroupUpdateEvent) {
             cache.updateEvent((UserGroupUpdateEvent) event);
@@ -917,7 +945,7 @@ public class SessionManagerImpl implements SessionManager, SessionCache.StaleCac
             final ServiceFactory sf,
             final CreationRequest req) {
 
-        final Principal p = req.principal;
+        final IPrincipal p = req.principal;
         if (p == null || p.getName() == null) {
             throw new ApiUsageException("Null principal name.");
         }
@@ -961,8 +989,7 @@ public class SessionManagerImpl implements SessionManager, SessionCache.StaleCac
         type = sf.getTypesService().getEnumeration(EventType.class, type)
                 .getValue();
 
-        Principal copy = new Principal(p.getName(), group, type);
-        return copy;
+        return new Principal(p.getName(), group, type);
     }
 
     private void parseAndSetDefaultType(String type, Session session) {
@@ -1069,11 +1096,12 @@ public class SessionManagerImpl implements SessionManager, SessionCache.StaleCac
      * to allow for an update.
      */
     @SuppressWarnings({"rawtypes" })
+    @Override
     public SessionContext reload(final SessionContext ctx) {
-        List list = (List) executor.execute(asroot, new Executor.SimpleWork(
+        List list = executor.execute(asroot, new Executor.SimpleWork<List<Object>>(
                 this, "reload", ctx.getSession().getUuid()) {
             @Transactional(readOnly = true)
-            public Object doWork(org.hibernate.Session session,
+            public List<Object> doWork(org.hibernate.Session session,
                     ServiceFactory sf) {
                 /* user and group names may change while the session is open */
                 final LocalAdmin admin = (LocalAdmin) sf.getAdminService();
@@ -1094,15 +1122,16 @@ public class SessionManagerImpl implements SessionManager, SessionCache.StaleCac
 
     @SuppressWarnings("unchecked")
     private List<Object[]> executeProjection(final String projection, final Parameters parameters) {
-        return (List<Object[]>) executor.execute(asroot,
-                new Executor.SimpleWork(this, "executeProjection", projection) {
+        return executor.execute(asroot,
+                new Executor.SimpleWork<List<Object[]>>(this, "executeProjection", projection) {
                     @Transactional(readOnly = true)
-                    public Object doWork(org.hibernate.Session session, ServiceFactory sf) {
+                    public List<Object[]> doWork(org.hibernate.Session session, ServiceFactory sf) {
                         return sf.getQueryService().projection(projection, parameters);
                     }
         });
     }
 
+    @Override
     public boolean executePasswordCheck(final String name,
             final String credentials) {
 
@@ -1112,7 +1141,7 @@ public class SessionManagerImpl implements SessionManager, SessionCache.StaleCac
         return executeCheckPassword(new Principal(name), credentials);
     }
 
-    private boolean executeCheckPassword(final Principal _principal,
+    private boolean executeCheckPassword(final IPrincipal _principal,
             final String credentials) {
 
         Boolean ok = executeCheckPasswordRO(_principal, credentials);
@@ -1122,12 +1151,12 @@ public class SessionManagerImpl implements SessionManager, SessionCache.StaleCac
         return ok;
     }
 
-    private Boolean executeCheckPasswordRO(final Principal _principal,
+    private Boolean executeCheckPasswordRO(final IPrincipal _principal,
             final String credentials) {
-        return (Boolean) executor.execute(asroot, new Executor.SimpleWork(this,
+        return executor.execute(asroot, new Executor.SimpleWork<Boolean>(this,
                 "executeCheckPasswordRO", _principal) {
             @Transactional(readOnly = true)
-            public Object doWork(org.hibernate.Session session,
+            public Boolean doWork(org.hibernate.Session session,
                     ServiceFactory sf) {
                 try {
                     return ((LocalAdmin) sf.getAdminService()).checkPassword(
@@ -1143,12 +1172,12 @@ public class SessionManagerImpl implements SessionManager, SessionCache.StaleCac
         });
     }
 
-    private Boolean executeCheckPasswordRW(final Principal _principal,
+    private Boolean executeCheckPasswordRW(final IPrincipal _principal,
             final String credentials) {
-        return (Boolean) executor.execute(asroot, new Executor.SimpleWork(this,
+        return executor.execute(asroot, new Executor.SimpleWork<Boolean>(this,
                 "executeCheckPasswordRW", _principal) {
             @Transactional(readOnly = false)
-            public Object doWork(org.hibernate.Session session,
+            public Boolean doWork(org.hibernate.Session session,
                     ServiceFactory sf) {
                 return ((LocalAdmin) sf.getAdminService()).checkPassword(
                         _principal.getName(), credentials, false);
@@ -1156,7 +1185,8 @@ public class SessionManagerImpl implements SessionManager, SessionCache.StaleCac
         });
     }
 
-    public ome.model.IObject setSecurityContext(Principal principal, ome.model.IObject obj) {
+    @Override
+    public ome.model.IObject setSecurityContext(IPrincipal principal, ome.model.IObject obj) {
         final Long id = obj == null ? null : obj.getId();
         if (id == null) {
             throw new ApiUsageException("Security context must be managed!");
@@ -1228,14 +1258,14 @@ public class SessionManagerImpl implements SessionManager, SessionCache.StaleCac
      *
      * @see ticket:1434
      */
-    private void setGroupSecurityContext(final Principal principal, final Long id) {
+    private void setGroupSecurityContext(final IPrincipal principal, final Long id) {
         final IEventContext ec = getEventContext(principal);
         final ExperimenterGroup[] group = new ExperimenterGroup[1];
 
-        final Session s = (Session) executor.execute(principal,
-                new Executor.SimpleWork(this, "setGroupSecurityContext", id) {
+        final Session s = executor.execute(principal,
+                new Executor.SimpleWork<Session>(this, "setGroupSecurityContext", id) {
                     @Transactional(readOnly = true)
-                    public Object doWork(org.hibernate.Session session, ServiceFactory sf) {
+                    public Session doWork(org.hibernate.Session session, ServiceFactory sf) {
 
                         if (ec.getCurrentShareId() != null) {
                             sf.getShareService().deactivate();
@@ -1264,9 +1294,9 @@ public class SessionManagerImpl implements SessionManager, SessionCache.StaleCac
 
         // This could also be achieved by filtering out the "check group"
         // logic from BasicSecuritySystem.
-        executor.execute(principal, new Executor.SimpleWork(this, "checkGroupSecurityContext", id) {
+        executor.execute(principal, new Executor.SimpleWork<IEventContext>(this, "checkGroupSecurityContext", id) {
             @Transactional(readOnly = true)
-            public Object doWork(org.hibernate.Session session,
+            public IEventContext doWork(org.hibernate.Session session,
                     ServiceFactory sf) {
                 // ticket:2088 - pre-emptive check
                 try {
@@ -1288,11 +1318,11 @@ public class SessionManagerImpl implements SessionManager, SessionCache.StaleCac
      *
      * @see ticket:1434
      */
-    private void setShareSecurityContext(final Principal principal, final Long id) {
+    private void setShareSecurityContext(final IPrincipal principal, final Long id) {
         executor.execute(principal,
-                new Executor.SimpleWork(this, "setShareSecurityContext", id) {
+                new Executor.SimpleWork<Void>(this, "setShareSecurityContext", id) {
                     @Transactional(readOnly = true)
-                    public Object doWork(org.hibernate.Session session, ServiceFactory sf) {
+                    public Void doWork(org.hibernate.Session session, ServiceFactory sf) {
                         // ticket:2088 - ShareBean does the pre-emptive check
                         sf.getShareService().activate(id);
                         return null;

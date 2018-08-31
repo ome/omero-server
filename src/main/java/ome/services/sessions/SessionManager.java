@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.Map;
 
 import net.sf.ehcache.Ehcache;
+
+import ome.api.IPrincipal;
 import ome.conditions.RemovedSessionException;
 import ome.conditions.SessionTimeoutException;
 import ome.model.IObject;
@@ -17,7 +19,7 @@ import ome.model.meta.Share;
 import ome.services.sessions.stats.SessionStats;
 import ome.services.util.Executor;
 import ome.api.IEventContext;
-import ome.system.Principal;
+
 
 /**
  * Responsible for holding onto {@link Session} instances for optimized login.
@@ -38,7 +40,7 @@ public interface SessionManager {
      * passed.
      */
     public static class CreationRequest {
-        public Principal principal;
+        public IPrincipal principal;
         public String credentials;
         public String agent;
         public String ip;
@@ -58,7 +60,7 @@ public interface SessionManager {
      * @param ip
      * @return Not null. Instead an exception will be thrown.
      */
-    Session createWithAgent(Principal principal, String credentials, String agent, String ip);
+    Session createWithAgent(IPrincipal principal, String credentials, String agent, String ip);
 
     /**
      * 
@@ -67,7 +69,7 @@ public interface SessionManager {
      * @param ip
      * @return Not null. Instead an exception will be thrown.
      */
-    Session createWithAgent(Principal principal, String agent, String ip);
+    Session createWithAgent(IPrincipal principal, String agent, String ip);
 
     /**
      * 
@@ -79,7 +81,7 @@ public interface SessionManager {
      * @param groupId
      * @return Not null. Instead an exception will be thrown.
      */
-    Share createShare(Principal principal, boolean enabled, long timeToLive,
+    Share createShare(IPrincipal principal, boolean enabled, long timeToLive,
             String eventType, String description, long groupId);
 
     /**
@@ -91,11 +93,11 @@ public interface SessionManager {
      * as the initial context. Passing any other object will result in an
      * {@link ome.conditions.ApiUsageException}.
      *
-     * @param principal {@link Principal} for which the context should be set.
+     * @param principal {@link IPrincipal} for which the context should be set.
      * @param obj {@link IObject} which represents the new context.
      * @return See above.
      */
-    IObject setSecurityContext(Principal principal, IObject obj);
+    IObject setSecurityContext(IPrincipal principal, IObject obj);
 
     /**
      * Certain fields from the {@link Session} instance will
@@ -186,13 +188,13 @@ public interface SessionManager {
      *            Non null.
      * @return Never null.
      * @throws RemovedSessionException
-     *             if no session with the given {@link Principal#getName()}
+     *             if no session with the given {@link IPrincipal#getName()}
      */
-    IEventContext getEventContext(Principal principal)
+    IEventContext getEventContext(IPrincipal principal)
             throws RemovedSessionException;
 
     /**
-     * Similar to {@link #getEventContext(Principal)} but uses the internal
+     * Similar to {@link #getEventContext(IPrincipal)} but uses the internal
      * reload logic to get a fresh representation of the context. This queries
      * all of the user management tables (experimenter, experimentergroup, etc)
      * and so should not be used anywhere in a critical path.
