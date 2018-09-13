@@ -202,13 +202,6 @@ public interface Executor extends ApplicationContextAware {
      * properly handled.
      */
     public interface Work<X> {
-
-        /**
-         * Returns a description of what this work will be doing for logging
-         * purposes.
-         */
-        String description();
-
         /**
          * Work method. Must return all results coming from Hibernate via the
          * {@link Object} return method.

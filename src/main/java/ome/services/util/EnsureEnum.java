@@ -139,7 +139,7 @@ public class EnsureEnum {
      * @author m.t.b.carroll@dundee.ac.uk
      * @since 5.4.6
      */
-    private static abstract class FetchEnums<E extends IEnum & IGlobal> implements Executor.Work<List<Long>> {
+    private static abstract class FetchEnums<E extends IEnum & IGlobal> implements Executor.LoggedWork<List<Long>> {
 
         /**
          * Ensure that the given enumerations exist.
