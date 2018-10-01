@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
 <!--
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # 
@@ -15,11 +14,13 @@
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 -->
 
-<beans>	
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-  <bean singleton="false" parent="level2"
-  		id="internal-ome.api.ThumbnailStore"
-  	class="ome.services.ThumbnailBean">
+  <bean parent="level2"
+        id="internal-ome.api.ThumbnailStore"
+        class="ome.services.ThumbnailBean" scope="prototype">
   	<constructor-arg><value>true</value></constructor-arg>
     <property name="ioService" ref="/OMERO/Thumbs"/>
     <property name="IPixels" ref="internal-ome.api.IPixels"/>
@@ -32,7 +33,7 @@
     <property name="lutProvider" ref="internal-ome.api.LutProvider"/>
   </bean>
   
-  <bean id="managed-ome.api.ThumbnailStore" parent="managedStatefulService" singleton="false">
+  <bean id="managed-ome.api.ThumbnailStore" parent="managedStatefulService" scope="prototype">
     <property name="proxyInterfaces" value="ome.api.ThumbnailStore"/>
     <property name="target" ref="internal-ome.api.ThumbnailStore"/>    
   </bean>

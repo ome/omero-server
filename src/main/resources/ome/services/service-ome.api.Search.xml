@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
 <!--
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
@@ -17,17 +16,19 @@
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 -->
 
-<beans>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-  <bean singleton="false" parent="stateful"
+  <bean parent="stateful"
         id="internal-ome.api.Search"
-     class="ome.services.SearchBean">
+        class="ome.services.SearchBean" scope="prototype">
      <property name="executor" ref="executor"/>
      <property name="analyzer" value="${omero.search.analyzer}"/>
      <property name="maxClauseCount" value="${omero.search.maxclause}"/>
   </bean>
 
-  <bean id="managed-ome.api.Search" parent="selfManagingService" singleton="false">
+  <bean id="managed-ome.api.Search" parent="selfManagingService" scope="prototype">
     <property name="proxyInterfaces" value="ome.api.Search"/>
     <property name="target" ref="internal-ome.api.Search"/>
   </bean>

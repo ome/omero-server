@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
 <!--
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # 
@@ -15,11 +14,13 @@
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 -->
 
-<beans>	
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-  <bean singleton="false" parent="stateful"
-        id="internal-ome.api.RawFileStore" 
-     class="ome.services.RawFileBean">
+  <bean parent="stateful"
+        id="internal-ome.api.RawFileStore"
+        class="ome.services.RawFileBean" scope="prototype">
     <constructor-arg><value>true</value></constructor-arg>
     <property name="originalFilesService" ref="/OMERO/Files"/>
     <property name="IRepositoryInfo" ref="internal-ome.api.IRepositoryInfo"/>
@@ -27,7 +28,7 @@
     <property name="checksumProviderFactory" ref="checksumProviderFactory"/>
   </bean>
 
-  <bean id="managed-ome.api.RawFileStore" parent="managedStatefulService" singleton="false">
+  <bean id="managed-ome.api.RawFileStore" parent="managedStatefulService" scope="prototype">
     <property name="proxyInterfaces" value="ome.api.RawFileStore"/>
     <property name="target" ref="internal-ome.api.RawFileStore"/>
   </bean>

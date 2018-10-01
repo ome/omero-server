@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
 <!--
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
@@ -17,7 +16,9 @@
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 -->
 
-<beans>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
   <bean parent="level2" id="internal-ome.api.IDelete"
         class="ome.services.delete.DeleteBean">
@@ -30,7 +31,7 @@
     <property name="target" ref="internal-ome.api.IDelete"/>
   </bean>
 
-  <bean id="ome.services.delete.Deletion" class="ome.services.delete.Deletion$Builder" singleton="false">
+  <bean id="ome.services.delete.Deletion" class="ome.services.delete.Deletion$Builder" scope="prototype">
       <constructor-arg ref="/OMERO/Files"/>
       <constructor-arg ref="extendedMetadata"/>
   </bean>
