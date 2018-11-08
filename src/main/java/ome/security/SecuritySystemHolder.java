@@ -5,6 +5,7 @@
 
 package ome.security;
 
+import ome.api.IRoles;
 import ome.conditions.ApiUsageException;
 import ome.conditions.SecurityViolation;
 import ome.model.IObject;
@@ -90,7 +91,7 @@ public class SecuritySystemHolder implements SecuritySystem {
         return choose().getEffectiveUID();
     }
 
-    public Roles getSecurityRoles() {
+    public IRoles getSecurityRoles() {
         return choose().getSecurityRoles();
     }
 

@@ -12,6 +12,7 @@ package ome.security;
 // Third-party libraries
 
 // Application-internal dependencies
+import ome.api.IRoles;
 import ome.conditions.ApiUsageException;
 import ome.conditions.SecurityViolation;
 import ome.model.IObject;
@@ -335,6 +336,6 @@ public interface SecuritySystem {
 
     // ~ Configured Elements
     // =========================================================================
-    Roles getSecurityRoles();
+    IRoles getSecurityRoles();
 
 }

@@ -569,7 +569,7 @@ public class AdminImpl extends AbstractLevel2Service implements LocalAdmin,
         final String origOmeName = orig.getOmeName();
         final String newOmeName = experimenter.getOmeName();
         if (!origOmeName.equals(newOmeName)) {
-            final Roles roles = getSecurityRoles();
+            final IRoles roles = getSecurityRoles();
             final Set<String> fixedExperimenterNames =
                     ImmutableSet.of(roles.getRootName(), roles.getGuestName());
             if (fixedExperimenterNames.contains(origOmeName)) {
@@ -603,7 +603,7 @@ public class AdminImpl extends AbstractLevel2Service implements LocalAdmin,
         final String origName = orig.getName();
         final String newName = group.getName();
         if (!origName.equals(newName)) {
-            final Roles roles = getSecurityRoles();
+            final IRoles roles = getSecurityRoles();
             final Set<String> fixedGroupNames =
                     ImmutableSet.of(roles.getGuestGroupName(), roles.getSystemGroupName(), roles.getUserGroupName());
             if (fixedGroupNames.contains(origName)) {
@@ -778,12 +778,10 @@ public class AdminImpl extends AbstractLevel2Service implements LocalAdmin,
         final boolean removeSystemOrUser =
                 Iterators.any(
                         Iterators.forArray(groups),
-                        Predicates.or(
-                                i -> IRoles.isSystemGroup(i, roles.getRootId()),
-                                i -> IRoles.isUserGroup(i, roles.getGuestGroupId()))
-                );
+                        Predicates.or(roles::isSystemGroup, roles::isUserGroup
+                ));
 
-        if (removeSystemOrUser && IRoles.isRootUser(user, roles.getRootId())) {
+        if (removeSystemOrUser && roles.isRootUser(user)) {
             throw new ValidationException("experimenter '" + roles.getRootName() + "' may not be removed from the '" +
                 roles.getSystemGroupName() + "' or '" + roles.getUserGroupName() + "' group");
         }
@@ -839,7 +837,7 @@ public class AdminImpl extends AbstractLevel2Service implements LocalAdmin,
                     + " can only set own default group.");
         }
 
-        Roles roles = getSecuritySystem().getSecurityRoles();
+        IRoles roles = getSecuritySystem().getSecurityRoles();
         if (Long.valueOf(roles.getUserGroupId()).equals(group.getId())) {
             throw new ApiUsageException("Cannot set default group to: "
                     + roles.getUserGroupName());
@@ -1388,7 +1386,7 @@ public class AdminImpl extends AbstractLevel2Service implements LocalAdmin,
     // =========================================================================
 
     @PermitAll
-    public Roles getSecurityRoles() {
+    public IRoles getSecurityRoles() {
         return getSecuritySystem().getSecurityRoles();
     }
 
