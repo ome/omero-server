@@ -50,7 +50,7 @@
            See #3253 and #3697 -->
       <bean class="${omero.db.sql_action_class}">
         <constructor-arg>
-          <bean class="org.springframework.jdbc.core.simple.SimpleJdbcTemplate">
+          <bean class="org.springframework.jdbc.core.JdbcTemplate">
             <constructor-arg ref="selfCorrectingDataSource"/>
           </bean>
         </constructor-arg>
@@ -122,7 +122,7 @@
     settings to temporarily run in an autonomous transaction.
     </description>
     <constructor-arg>
-      <bean class="org.springframework.jdbc.core.simple.SimpleJdbcTemplate">
+      <bean class="org.springframework.jdbc.core.JdbcTemplate">
         <constructor-arg ref="dataSource"/>
       </bean>
     </constructor-arg>

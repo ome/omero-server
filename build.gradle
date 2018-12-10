@@ -9,8 +9,6 @@ version = '1.0-SNAPSHOT'
 sourceCompatibility = JavaVersion.VERSION_1_8
 targetCompatibility = JavaVersion.VERSION_1_8
 
-def springVersion = '4.3.14.RELEASE'
-
 repositories {
     mavenCentral()
     mavenLocal()
@@ -35,8 +33,8 @@ dependencies {
     compile 'org.openmicroscopy:omero-renderer:1.0-SNAPSHOT'
 
     // Spring framework stuff
-    compile "org.springframework:spring-context-support:${springVersion}"
-    compile "org.springframework:spring-jms:${springVersion}"
+    compile "org.springframework:spring-context-support:4.3.14.RELEASE"
+    compile "org.springframework:spring-jms:4.3.14.RELEASE"
     compile "org.springframework.security:spring-security-ldap:4.2.4.RELEASE"
 
     // Postgres connect driver for java
