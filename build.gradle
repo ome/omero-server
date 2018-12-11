@@ -1,5 +1,5 @@
 plugins {
-    id "java"
+    id 'java-library'
     id "maven-publish"
     id "com.zeroc.gradle.ice-builder.slice" version "1.4.5"
 }
@@ -30,45 +30,45 @@ dependencies {
     // testCompile group: 'org.apache.directory.shared', name: 'shared-ldap-constants', version: '1.0.0-M1'
     // testCompile group: 'org.apache.directory.shared', name: 'shared-ldap', version: '0.9.15'
 
-    compile 'org.openmicroscopy:omero-renderer:1.0-SNAPSHOT'
+    api 'org.openmicroscopy:omero-renderer:1.0-SNAPSHOT'
 
     // Spring framework stuff
-    compile "org.springframework:spring-context-support:4.3.14.RELEASE"
-    compile "org.springframework:spring-jms:4.3.14.RELEASE"
-    compile "org.springframework.security:spring-security-ldap:4.2.4.RELEASE"
+    implementation "org.springframework:spring-context-support:4.3.14.RELEASE"
+    implementation "org.springframework:spring-jms:4.3.14.RELEASE"
+    implementation "org.springframework.security:spring-security-ldap:4.2.4.RELEASE"
 
     // Postgres connect driver for java
-    compile 'org.postgresql:postgresql:42.2.1'
+    implementation 'org.postgresql:postgresql:42.2.1'
 
     // Used by hibernate, see: https://stackoverflow.com/a/14365438
-    compile 'org.javassist:javassist:3.22.0-GA'
+    implementation 'org.javassist:javassist:3.22.0-GA'
 
     // API monitoring thing: http://jamonapi.sourceforge.net
-    compile 'com.jamonapi:jamon:2.81'
+    implementation 'com.jamonapi:jamon:2.81'
 
     // Some jpeg2k library
-    compile 'edu.ucar:jj2000:5.3'
+    implementation 'edu.ucar:jj2000:5.3'
 
-    compile 'com.github.marcus-nl.btm:btm:3.0.0-mk1'
+    implementation 'com.github.marcus-nl.btm:btm:3.0.0-mk1'
 
-    compile 'org.apache.pdfbox:pdfbox:2.0.8'
-    compile 'org.apache.commons:commons-collections4:4.1'
-    compile 'org.apache.xmlgraphics:batik-all:1.9.1'
+    implementation 'org.apache.pdfbox:pdfbox:2.0.8'
+    implementation 'org.apache.commons:commons-collections4:4.1'
+    implementation 'org.apache.xmlgraphics:batik-all:1.9.1'
 
-    compile 'commons-beanutils:commons-beanutils:1.9.3'
+    implementation 'commons-beanutils:commons-beanutils:1.9.3'
 
-    compile 'com.sun.mail:javax.mail:1.6.1'
+    implementation 'com.sun.mail:javax.mail:1.6.1'
 
-    compile 'com.mortennobel:java-image-scaling:0.8.6'
+    implementation 'com.mortennobel:java-image-scaling:0.8.6'
 
-    compile 'org.quartz-scheduler:quartz:2.2.1'
+    implementation 'org.quartz-scheduler:quartz:2.2.1'
 
-    compile 'org.subethamail:subethasmtp:3.1.7'
+    implementation 'org.subethamail:subethasmtp:3.1.7'
 
-    compile 'net.sf.ehcache:ehcache:2.10.4'
+    implementation 'net.sf.ehcache:ehcache:2.10.4'
 
-    compile 'edu.ucar:grib:4.5.5'
-    compile 'edu.ucar:bufr:3.0'
+    implementation 'edu.ucar:grib:4.5.5'
+    implementation 'edu.ucar:bufr:3.0'
 }
 
 test {
