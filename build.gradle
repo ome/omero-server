@@ -1,8 +1,19 @@
-plugins {
-    id 'java-library'
-    id "maven-publish"
-    id "com.zeroc.gradle.ice-builder.slice" version "1.4.5"
+buildscript {
+    repositories {
+        gradlePluginPortal()
+    }
+    dependencies {
+        classpath "gradle.plugin.com.zeroc.gradle.ice-builder:slice:1.4.5"
+    }
 }
+
+plugins {
+    id "java-library"
+    id 'maven-publish'
+}
+
+// We have to use old plugin syntax in order for slice plugin to work
+apply plugin: "com.zeroc.gradle.ice-builder.slice"
 
 group = 'org.openmicroscopy'
 version = '5.5.0-SNAPSHOT'
