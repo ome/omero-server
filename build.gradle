@@ -9,7 +9,7 @@ buildscript {
 
 plugins {
     id "java-library"
-    id 'maven-publish'
+    id "maven-publish"
 }
 
 // We have to use old plugin syntax in order for slice plugin to work
@@ -110,17 +110,5 @@ task processIce {
     }
 }
 
-task sourceJar(type: Jar) {
-    from sourceSets.main.allJava
-}
-
-publishing {
-    publications {
-        mavenJava(MavenPublication) {
-            from components.java
-            artifact sourceJar {
-                classifier "sources"
-            }
-        }
-    }
-}
+// Add publish functionality
+apply from: 'publish.gradle'
