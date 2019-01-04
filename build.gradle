@@ -9,7 +9,7 @@ buildscript {
 
 plugins {
     id "java-library"
-    id 'maven-publish'
+    id "maven-publish"
 }
 
 // We have to use old plugin syntax in order for slice plugin to work
@@ -23,11 +23,6 @@ targetCompatibility = JavaVersion.VERSION_1_8
 repositories {
     mavenCentral()
     mavenLocal()
-
-    /**
-     * Used by bio-formats and jpeg2k dependency
-     */
-    maven { url 'http://repo.boundlessgeo.com/main/' }
 }
 
 dependencies {
@@ -57,9 +52,6 @@ dependencies {
     // API monitoring thing: http://jamonapi.sourceforge.net
     implementation 'com.jamonapi:jamon:2.81'
 
-    // Some jpeg2k library
-    implementation 'edu.ucar:jj2000:5.3'
-
     implementation 'com.github.marcus-nl.btm:btm:3.0.0-mk1'
 
     implementation 'org.apache.pdfbox:pdfbox:2.0.8'
@@ -77,9 +69,6 @@ dependencies {
     implementation 'org.subethamail:subethasmtp:3.1.7'
 
     implementation 'net.sf.ehcache:ehcache:2.10.4'
-
-    implementation 'edu.ucar:grib:4.5.5'
-    implementation 'edu.ucar:bufr:3.0'
 }
 
 test {
@@ -110,17 +99,5 @@ task processIce {
     }
 }
 
-task sourceJar(type: Jar) {
-    from sourceSets.main.allJava
-}
-
-publishing {
-    publications {
-        mavenJava(MavenPublication) {
-            from components.java
-            artifact sourceJar {
-                classifier "sources"
-            }
-        }
-    }
-}
+// Add publish functionality
+apply from: 'publish.gradle'
