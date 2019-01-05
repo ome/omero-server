@@ -23,6 +23,10 @@ targetCompatibility = JavaVersion.VERSION_1_8
 repositories {
     mavenCentral()
     mavenLocal()
+    maven {
+        name 'unidata-releases'
+        url "https://artifacts.unidata.ucar.edu/content/repositories/unidata-releases"
+    }
 }
 
 dependencies {
