@@ -6,7 +6,6 @@
 package ome.security;
 
 import ome.system.EventContext;
-import ome.api.IRoles;
 import ome.conditions.ApiUsageException;
 import ome.conditions.SecurityViolation;
 import ome.model.IObject;
@@ -15,6 +14,7 @@ import ome.model.meta.ExperimenterGroup;
 import ome.security.basic.BasicSecuritySystem;
 import ome.security.sharing.SharingSecuritySystem;
 import ome.system.Principal;
+import ome.system.Roles;
 
 /**
  * Security dispatcher holding each currently active {@link SecuritySystem}
@@ -90,7 +90,7 @@ public class SecuritySystemHolder implements SecuritySystem {
         return choose().getEffectiveUID();
     }
 
-    public IRoles getSecurityRoles() {
+    public Roles getSecurityRoles() {
         return choose().getSecurityRoles();
     }
 

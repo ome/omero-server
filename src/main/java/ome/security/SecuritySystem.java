@@ -13,7 +13,6 @@ package ome.security;
 
 // Application-internal dependencies
 import ome.system.EventContext;
-import ome.api.IRoles;
 import ome.conditions.ApiUsageException;
 import ome.conditions.SecurityViolation;
 import ome.model.IObject;
@@ -23,6 +22,7 @@ import ome.model.internal.Token;
 import ome.model.meta.ExperimenterGroup;
 import ome.security.policy.Policy;
 import ome.system.Principal;
+import ome.system.Roles;
 
 /**
  * central security interface. All queries and actions that deal with a secure
@@ -335,6 +335,6 @@ public interface SecuritySystem {
 
     // ~ Configured Elements
     // =========================================================================
-    IRoles getSecurityRoles();
+    Roles getSecurityRoles();
 
 }
