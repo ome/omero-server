@@ -37,7 +37,7 @@
     <constructor-arg value="IndexerAdapter"/>
   </bean>
 
-  <bean id="fullTextIndexerTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
+  <bean id="fullTextIndexerTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
     <property name="jobDetail" ref="fullTextThreadRun" />
     <property name="cronExpression" value="${omero.search.cron}" />
   </bean>
