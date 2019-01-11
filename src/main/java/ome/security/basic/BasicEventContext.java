@@ -12,7 +12,7 @@ import java.util.Map;
 import java.util.Set;
 
 import ome.system.EventContext;
-import ome.api.IPrincipal;
+import ome.system.Principal;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,9 +47,9 @@ public class BasicEventContext extends SimpleEventContext {
 
     /**
      * Principal should be set only once (on
-     * {@link PrincipalHolder#login(ome.api.IPrincipal)}.
+     * {@link PrincipalHolder#login(Principal)}.
      */
-    private final IPrincipal p;
+    private final Principal p;
     
     private final SessionStats stats;
 
@@ -73,7 +73,7 @@ public class BasicEventContext extends SimpleEventContext {
 
     private Map<Long, Permissions> groupPermissionsMap;
 
-    public BasicEventContext(IPrincipal p, SessionStats stats) {
+    public BasicEventContext(Principal p, SessionStats stats) {
         if (p == null || stats == null) {
             throw new RuntimeException("Principal and stats canot be null.");
         }
@@ -86,7 +86,7 @@ public class BasicEventContext extends SimpleEventContext {
      * or {@code copyContext(EventContext)} out of the {@link EventContext}
      * hierarchy.
      */
-    public BasicEventContext(IPrincipal p, SessionStats stats, EventContext ec) {
+    public BasicEventContext(Principal p, SessionStats stats, EventContext ec) {
         this(p, stats);
         copyContext(ec);
     }
@@ -225,7 +225,7 @@ public class BasicEventContext extends SimpleEventContext {
     // ~ Accessors for other state
     // =========================================================================
 
-    public IPrincipal getPrincipal() {
+    public Principal getPrincipal() {
         return p;
     }
     

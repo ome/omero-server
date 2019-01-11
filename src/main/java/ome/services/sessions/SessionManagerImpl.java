@@ -21,8 +21,8 @@ import java.util.concurrent.Future;
 import net.sf.ehcache.Ehcache;
 import net.sf.ehcache.Element;
 
+import ome.model.IObject;
 import ome.system.EventContext;
-import ome.api.IPrincipal;
 import ome.api.local.LocalAdmin;
 import ome.conditions.ApiUsageException;
 import ome.conditions.AuthenticationException;
@@ -303,7 +303,7 @@ public class SessionManagerImpl implements SessionManager, SessionCache.StaleCac
      * Is given trustable values by the {@link SessionBean}
      */
     @Override
-    public Session createWithAgent(IPrincipal _principal, final String credentials, String agent, String ip) {
+    public Session createWithAgent(Principal _principal, final String credentials, String agent, String ip) {
         final CreationRequest req = new CreationRequest();
         req.principal = _principal;
         req.credentials = credentials;
@@ -313,7 +313,7 @@ public class SessionManagerImpl implements SessionManager, SessionCache.StaleCac
     }
 
     @Override
-    public Session createWithAgent(IPrincipal principal, String agent, String ip) {
+    public Session createWithAgent(Principal principal, String agent, String ip) {
         final CreationRequest req = new CreationRequest();
         req.principal = principal;
         req.agent = agent;
@@ -322,9 +322,9 @@ public class SessionManagerImpl implements SessionManager, SessionCache.StaleCac
     }
 
     @Override
-    public Share createShare(IPrincipal principal, boolean enabled,
-            long timeToLive, String eventType, String description,
-            long groupId) {
+    public Share createShare(Principal principal, boolean enabled,
+                             long timeToLive, String eventType, String description,
+                             long groupId) {
         Share share = newShare();
         define(share, UUID.randomUUID().toString(), description, System
                 .currentTimeMillis(), defaultTimeToIdle, timeToLive, eventType,
@@ -342,7 +342,7 @@ public class SessionManagerImpl implements SessionManager, SessionCache.StaleCac
     private Session createSession(final CreationRequest req,
             final Session oldsession) {
 
-        final IPrincipal principal = req.principal;
+        final Principal principal = req.principal;
 
         if (internal_uuid != null && internal_uuid.equals(principal.getName())) {
             /* 2018-SV2 */
@@ -876,7 +876,7 @@ public class SessionManagerImpl implements SessionManager, SessionCache.StaleCac
     // =========================================================================
 
     @Override
-    public EventContext getEventContext(IPrincipal principal) {
+    public EventContext getEventContext(Principal principal) {
         final SessionContext ctx = cache.getSessionContext(principal.getName());
         if (ctx == null) {
             throw new RemovedSessionException("No session with uuid:"
@@ -945,7 +945,7 @@ public class SessionManagerImpl implements SessionManager, SessionCache.StaleCac
             final ServiceFactory sf,
             final CreationRequest req) {
 
-        final IPrincipal p = req.principal;
+        final Principal p = req.principal;
         if (p == null || p.getName() == null) {
             throw new ApiUsageException("Null principal name.");
         }
@@ -1141,7 +1141,7 @@ public class SessionManagerImpl implements SessionManager, SessionCache.StaleCac
         return executeCheckPassword(new Principal(name), credentials);
     }
 
-    private boolean executeCheckPassword(final IPrincipal _principal,
+    private boolean executeCheckPassword(final Principal _principal,
             final String credentials) {
 
         Boolean ok = executeCheckPasswordRO(_principal, credentials);
@@ -1151,7 +1151,7 @@ public class SessionManagerImpl implements SessionManager, SessionCache.StaleCac
         return ok;
     }
 
-    private Boolean executeCheckPasswordRO(final IPrincipal _principal,
+    private Boolean executeCheckPasswordRO(final Principal _principal,
             final String credentials) {
         return executor.execute(asroot, new Executor.SimpleWork<Boolean>(this,
                 "executeCheckPasswordRO", _principal) {
@@ -1172,7 +1172,7 @@ public class SessionManagerImpl implements SessionManager, SessionCache.StaleCac
         });
     }
 
-    private Boolean executeCheckPasswordRW(final IPrincipal _principal,
+    private Boolean executeCheckPasswordRW(final Principal _principal,
             final String credentials) {
         return executor.execute(asroot, new Executor.SimpleWork<Boolean>(this,
                 "executeCheckPasswordRW", _principal) {
@@ -1186,7 +1186,7 @@ public class SessionManagerImpl implements SessionManager, SessionCache.StaleCac
     }
 
     @Override
-    public ome.model.IObject setSecurityContext(IPrincipal principal, ome.model.IObject obj) {
+    public ome.model.IObject setSecurityContext(Principal principal, IObject obj) {
         final Long id = obj == null ? null : obj.getId();
         if (id == null) {
             throw new ApiUsageException("Security context must be managed!");
@@ -1258,7 +1258,7 @@ public class SessionManagerImpl implements SessionManager, SessionCache.StaleCac
      *
      * @see ticket:1434
      */
-    private void setGroupSecurityContext(final IPrincipal principal, final Long id) {
+    private void setGroupSecurityContext(final Principal principal, final Long id) {
         final EventContext ec = getEventContext(principal);
         final ExperimenterGroup[] group = new ExperimenterGroup[1];
 
@@ -1318,7 +1318,7 @@ public class SessionManagerImpl implements SessionManager, SessionCache.StaleCac
      *
      * @see ticket:1434
      */
-    private void setShareSecurityContext(final IPrincipal principal, final Long id) {
+    private void setShareSecurityContext(final Principal principal, final Long id) {
         executor.execute(principal,
                 new Executor.SimpleWork<Void>(this, "setShareSecurityContext", id) {
                     @Transactional(readOnly = true)

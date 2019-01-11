@@ -15,7 +15,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-import ome.api.IPrincipal;
 import ome.conditions.InternalException;
 import ome.security.SecuritySystem;
 import ome.security.basic.CurrentDetails;
@@ -46,7 +45,7 @@ import org.springframework.transaction.support.TransactionCallback;
 /**
  * Simple execution/work interface which can be used for <em>internal</em> tasks
  * which need to have a full working implementation. The
- * {@link Executor#execute(IPrincipal, Work)} method
+ * {@link Executor#execute(Principal, Work)} method
  * ensures that {@link SecuritySystem#login(Principal)} is called before the
  * task, that a {@link TransactionCallback} and a {@link HibernateCallback}
  * surround the call, and that subsequently {@link SecuritySystem#logout()} is
@@ -90,10 +89,10 @@ public interface Executor extends ApplicationContextAware {
     public Principal principal();
 
     /**
-     * Call {@link #execute(Map, IPrincipal, Work)} with
+     * Call {@link #execute(Map, Principal, Work)} with
      * a null call context.
      */
-    <T> T execute(final IPrincipal p, final Work<T> work);
+    <T> T execute(final Principal p, final Work<T> work);
 
     /**
      * Executes a {@link Work} instance wrapped in two layers of AOP. The first
@@ -120,7 +119,7 @@ public interface Executor extends ApplicationContextAware {
      *            Not null.
      * @return See above.
      */
-    <T> T execute(final Map<String, String> callContext, final IPrincipal p, final Work<T> work);
+    <T> T execute(final Map<String, String> callContext, final Principal p, final Work<T> work);
 
     /**
      * Call {@link #submit(Map, Callable)} with a null callContext.
@@ -131,7 +130,7 @@ public interface Executor extends ApplicationContextAware {
 
     /**
      * Simple submission method which can be used in conjunction with a call to
-     * {@link #execute(IPrincipal, Work)} to overcome the no-multiple-login rule.
+     * {@link #execute(Principal, Work)} to overcome the no-multiple-login rule.
      * 
      * @param <T>
      * @param callContext Possibly null. See {@link CurrentDetails#setContext(Map)}
@@ -184,7 +183,7 @@ public interface Executor extends ApplicationContextAware {
      * about returned values, but this method <em>completely</em> overrides
      * OMERO security, and should be used <b>very</em> carefully.
      *
-     * As with {@link #execute(IPrincipal, Work)} the {@link SqlWork}
+     * As with {@link #execute(Principal, Work)} the {@link SqlWork}
      * instance must be properly marked with an {@link Transactional}
      * annotation.
      *
@@ -386,10 +385,10 @@ public interface Executor extends ApplicationContextAware {
         }
 
         /**
-         * Call {@link #execute(Map, IPrincipal, Work)}
+         * Call {@link #execute(Map, Principal, Work)}
          * with a null call context.
          */
-        public <T> T execute(final IPrincipal p, final Work<T> work) {
+        public <T> T execute(final Principal p, final Work<T> work) {
             return execute(null, p, work);
         }
 
@@ -402,13 +401,12 @@ public interface Executor extends ApplicationContextAware {
          *
          * If the {@link Principal} argument is not null, then additionally, a
          * login/logout sequence will be performed in a try/finally block.
-         *
-         * @param callContext Possibly null key-value map. See #3529
+         *  @param callContext Possibly null key-value map. See #3529
          * @param p
          * @param work
          */
         public <T> T execute(final Map<String, String> callContext,
-                final IPrincipal p, final Work<T> work) {
+                             final Principal p, final Work<T> work) {
 
             if (work instanceof SimpleWork) {
                 ((SimpleWork) work).setSqlAction(sqlAction);

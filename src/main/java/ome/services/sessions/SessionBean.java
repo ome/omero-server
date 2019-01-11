@@ -15,7 +15,6 @@ import ome.annotations.Hidden;
 import ome.annotations.NotNull;
 import ome.annotations.RolesAllowed;
 import ome.system.EventContext;
-import ome.api.IPrincipal;
 import ome.api.ISession;
 import ome.api.ServiceInterface;
 import ome.conditions.AuthenticationException;
@@ -116,13 +115,13 @@ public class SessionBean implements ISession {
     }
 
     @RolesAllowed("user" /* group owner */)
-    public Session createSessionWithTimeout(@NotNull final IPrincipal principal,
+    public Session createSessionWithTimeout(@NotNull final Principal principal,
                                             final long milliseconds) {
         return createSessionWithTimeouts(principal, milliseconds, 0L);
     }
 
     @RolesAllowed("user" /*group owner*/)
-    public Session createSessionWithTimeouts(@NotNull final IPrincipal principal,
+    public Session createSessionWithTimeouts(@NotNull final Principal principal,
                                              final long timeToLiveMilliseconds, final long timeToIdleMilliseconds) {
 
         final EventContext context = currentContext();
@@ -175,7 +174,7 @@ public class SessionBean implements ISession {
     }
 
     @RolesAllowed( { "user", "guest" })
-    public Session createSession(@NotNull IPrincipal principal,
+    public Session createSession(@NotNull Principal principal,
             @Hidden String credentials) {
 
         Session session = null;
