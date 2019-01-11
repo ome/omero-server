@@ -17,7 +17,7 @@ import ome.model.internal.Permissions.Role;
 import ome.model.meta.Experimenter;
 import ome.model.meta.ExperimenterGroup;
 import ome.server.itests.AbstractManagedContextTest;
-import ome.api.IEventContext;
+import ome.system.EventContext;
 import ome.system.Principal;
 import ome.util.Utils;
 
@@ -37,7 +37,7 @@ public class PermissionsTest extends AbstractManagedContextTest {
 
         void init() {
             user = loginNewUser();
-            IEventContext ec = iAdmin.getEventContext();
+            EventContext ec = iAdmin.getEventContext();
             loginRoot();
             groupName = uuid();
             _group.setName(groupName);

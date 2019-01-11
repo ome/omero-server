@@ -7,6 +7,7 @@
 
 package ome.security.sharing;
 
+import ome.system.EventContext;
 import ome.conditions.ApiUsageException;
 import ome.conditions.SecurityViolation;
 import ome.model.IObject;
@@ -19,7 +20,6 @@ import ome.security.AdminAction;
 import ome.security.SecureAction;
 import ome.security.SecuritySystem;
 import ome.security.basic.BasicSecuritySystem;
-import ome.api.IEventContext;
 import ome.system.Principal;
 import ome.system.Roles;
 
@@ -66,12 +66,12 @@ public class SharingSecuritySystem implements SecuritySystem {
 
     }
 
-    public IEventContext getEventContext() {
+    public EventContext getEventContext() {
         // TODO Auto-generated method stub
         return null;
     }
 
-    public IEventContext getEventContext(boolean refresh) {
+    public EventContext getEventContext(boolean refresh) {
         // TODO Auto-generated method stub
         return null;
     }

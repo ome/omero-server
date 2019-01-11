@@ -21,6 +21,7 @@ import java.util.concurrent.Future;
 import net.sf.ehcache.Ehcache;
 import net.sf.ehcache.Element;
 
+import ome.system.EventContext;
 import ome.api.IPrincipal;
 import ome.api.local.LocalAdmin;
 import ome.conditions.ApiUsageException;
@@ -54,7 +55,6 @@ import ome.services.sessions.stats.SessionStats;
 import ome.services.util.Executor;
 import ome.services.util.Executor.Priority;
 import ome.services.util.ReadOnlyStatus;
-import ome.api.IEventContext;
 import ome.system.OmeroContext;
 import ome.system.Principal;
 import ome.system.Roles;
@@ -876,7 +876,7 @@ public class SessionManagerImpl implements SessionManager, SessionCache.StaleCac
     // =========================================================================
 
     @Override
-    public IEventContext getEventContext(IPrincipal principal) {
+    public EventContext getEventContext(IPrincipal principal) {
         final SessionContext ctx = cache.getSessionContext(principal.getName());
         if (ctx == null) {
             throw new RemovedSessionException("No session with uuid:"
@@ -886,7 +886,7 @@ public class SessionManagerImpl implements SessionManager, SessionCache.StaleCac
     }
 
     @Override
-    public IEventContext reload(final String uuid) {
+    public EventContext reload(final String uuid) {
         final SessionContext ctx = cache.getSessionContext(uuid);
         if (ctx == null) {
             throw new RemovedSessionException("No session with uuid:"
@@ -1259,7 +1259,7 @@ public class SessionManagerImpl implements SessionManager, SessionCache.StaleCac
      * @see ticket:1434
      */
     private void setGroupSecurityContext(final IPrincipal principal, final Long id) {
-        final IEventContext ec = getEventContext(principal);
+        final EventContext ec = getEventContext(principal);
         final ExperimenterGroup[] group = new ExperimenterGroup[1];
 
         final Session s = executor.execute(principal,
@@ -1294,10 +1294,10 @@ public class SessionManagerImpl implements SessionManager, SessionCache.StaleCac
 
         // This could also be achieved by filtering out the "check group"
         // logic from BasicSecuritySystem.
-        executor.execute(principal, new Executor.SimpleWork<IEventContext>(this, "checkGroupSecurityContext", id) {
+        executor.execute(principal, new Executor.SimpleWork<EventContext>(this, "checkGroupSecurityContext", id) {
             @Transactional(readOnly = true)
-            public IEventContext doWork(org.hibernate.Session session,
-                    ServiceFactory sf) {
+            public EventContext doWork(org.hibernate.Session session,
+                                       ServiceFactory sf) {
                 // ticket:2088 - pre-emptive check
                 try {
                     sf.getAdminService().getEventContext();

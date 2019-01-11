@@ -13,7 +13,7 @@ import ome.api.local.LocalQuery;
 import ome.api.local.LocalUpdate;
 import ome.security.SecuritySystem;
 import ome.services.util.BeanHelper;
-import ome.api.IEventContext;
+import ome.system.EventContext;
 import ome.system.SelfConfigurableService;
 import ome.system.SimpleEventContext;
 
@@ -83,7 +83,7 @@ public abstract class AbstractStatefulBean implements SelfConfigurableService,
     }
 
     @RolesAllowed("user")
-    public final IEventContext getCurrentEventContext() {
+    public final EventContext getCurrentEventContext() {
         return new SimpleEventContext(sec.getEventContext());
     }
 

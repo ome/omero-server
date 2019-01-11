@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import ome.system.EventContext;
 import org.springframework.transaction.annotation.Transactional;
 
 import ome.annotations.RolesAllowed;
@@ -25,7 +26,6 @@ import ome.model.enums.DimensionOrder;
 import ome.model.enums.PixelsType;
 import ome.model.stats.StatsInfo;
 import ome.parameters.Parameters;
-import ome.api.IEventContext;
 import ome.util.PixelData;
 
 /**
@@ -118,7 +118,7 @@ public class PixelsImpl extends AbstractLevel2Service implements IPixels {
 
         if (rd == null)
         {
-            final IEventContext ec = this.sec.getEventContext(false);
+            final EventContext ec = this.sec.getEventContext(false);
             final Pixels pixelsObj = this.iQuery.get(Pixels.class, pixId);
             final boolean isGraphCritical = this.sec.isGraphCritical(pixelsObj.getDetails());
             long pixOwner = pixelsObj.getDetails().getOwner().getId();

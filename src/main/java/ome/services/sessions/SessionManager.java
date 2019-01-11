@@ -10,6 +10,7 @@ import java.util.Map;
 
 import net.sf.ehcache.Ehcache;
 
+import ome.system.EventContext;
 import ome.api.IPrincipal;
 import ome.conditions.RemovedSessionException;
 import ome.conditions.SessionTimeoutException;
@@ -18,7 +19,6 @@ import ome.model.meta.Session;
 import ome.model.meta.Share;
 import ome.services.sessions.stats.SessionStats;
 import ome.services.util.Executor;
-import ome.api.IEventContext;
 
 
 /**
@@ -182,7 +182,7 @@ public interface SessionManager {
     // =========================================================================
 
     /**
-     * Provides a partial {@link IEventContext} for the current {@link Session}.
+     * Provides a partial {@link EventContext} for the current {@link Session}.
      * 
      * @param principal
      *            Non null.
@@ -190,7 +190,7 @@ public interface SessionManager {
      * @throws RemovedSessionException
      *             if no session with the given {@link IPrincipal#getName()}
      */
-    IEventContext getEventContext(IPrincipal principal)
+    EventContext getEventContext(IPrincipal principal)
             throws RemovedSessionException;
 
     /**
@@ -203,7 +203,7 @@ public interface SessionManager {
      * @return See above.
      * @throws RemovedSessionException If the uuid does not exist.
      */
-    IEventContext reload(String uuid)
+    EventContext reload(String uuid)
             throws RemovedSessionException;
 
     java.util.List<String> getUserRoles(String uuid);

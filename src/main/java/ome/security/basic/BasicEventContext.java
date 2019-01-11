@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import ome.system.EventContext;
 import ome.api.IPrincipal;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -29,11 +30,10 @@ import ome.services.messages.RegisterServiceCleanupMessage;
 import ome.services.sessions.stats.SessionStats;
 import ome.services.sharing.ShareStore;
 import ome.services.sharing.data.ShareData;
-import ome.api.IEventContext;
 import ome.system.SimpleEventContext;
 
 /**
- * {@link IEventContext} implementation for use within the security system. Holds
+ * {@link EventContext} implementation for use within the security system. Holds
  * various other information needed for proper functioning of a {@link Thread}.
  * 
  * Not-thread-safe. Intended to be held by a {@link ThreadLocal}
@@ -82,11 +82,11 @@ public class BasicEventContext extends SimpleEventContext {
     }
 
     /**
-     * Copy-constructor to not have to allow the mutator {@link #copy(IEventContext)}
-     * or {@code copyContext(IEventContext)} out of the {@link IEventContext}
+     * Copy-constructor to not have to allow the mutator {@link #copy(EventContext)}
+     * or {@code copyContext(EventContext)} out of the {@link EventContext}
      * hierarchy.
      */
-    public BasicEventContext(IPrincipal p, SessionStats stats, IEventContext ec) {
+    public BasicEventContext(IPrincipal p, SessionStats stats, EventContext ec) {
         this(p, stats);
         copyContext(ec);
     }
@@ -99,14 +99,14 @@ public class BasicEventContext extends SimpleEventContext {
     }
 
     /**
-     * Making {@link SimpleEventContext#copy(IEventContext)} available to
+     * Making {@link SimpleEventContext#copy(EventContext)} available to
      * package-private classes.
      */
-    void copyContext(IEventContext ec) {
+    void copyContext(EventContext ec) {
         super.copy(ec);
     }
 
-    void checkAndInitialize(IEventContext ec, LocalAdmin admin, ShareStore store) {
+    void checkAndInitialize(EventContext ec, LocalAdmin admin, ShareStore store) {
         this.copyContext(ec);
 
         // Now re-apply values.

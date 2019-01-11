@@ -12,7 +12,7 @@ import javax.naming.directory.ModificationItem;
 import ome.model.meta.Experimenter;
 import ome.services.ldap.LdapTest.Fixture;
 import ome.services.util.Executor;
-import ome.api.IEventContext;
+import ome.system.EventContext;
 import ome.system.ServiceFactory;
 
 import org.hibernate.Session;
@@ -59,7 +59,7 @@ userPassword: password
                 new BasicAttribute("givenName", NEWNAME));
         fixture.template.modifyAttributes("cn=test1", mods);
 
-        final IEventContext ec = fixture.login("test1", "grp", "password");
+        final EventContext ec = fixture.login("test1", "grp", "password");
         final Experimenter e = (Experimenter)
         fixture.execute(new Executor.SimpleWork(this, "testChangeName") {
             @Transactional(readOnly = false)

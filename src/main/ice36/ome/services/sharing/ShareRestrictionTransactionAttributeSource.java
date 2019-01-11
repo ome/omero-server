@@ -14,8 +14,7 @@ import ome.api.IPrincipal;
 import ome.conditions.SessionException;
 import ome.security.basic.CurrentDetails;
 import ome.services.sessions.state.SessionCache;
-import ome.api.IEventContext;
-import ome.system.Principal;
+import ome.system.EventContext;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,7 +46,7 @@ public class ShareRestrictionTransactionAttributeSource implements
         try {
             IPrincipal principal = current.getLast();
             String uuid = principal.getName();
-            IEventContext ec = cache.getSessionContext(uuid);
+            EventContext ec = cache.getSessionContext(uuid);
             Long shareId = ec.getCurrentShareId();
             if (ec.getCurrentShareId() != null) {
                 log.debug("Returning readOnly tx for shared " + shareId);

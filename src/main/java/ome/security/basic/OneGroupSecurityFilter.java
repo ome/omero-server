@@ -9,7 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import ome.api.IEventContext;
+import ome.system.EventContext;
 import org.hibernate.Filter;
 import org.hibernate.Session;
 import org.springframework.beans.factory.FactoryBean;
@@ -47,9 +47,9 @@ public class OneGroupSecurityFilter extends AbstractSecurityFilter {
      * Default constructor which calls all the necessary setters for this
      * {@link FactoryBean}. Also calls {@link #setDefaultFilterCondition(String)}.
      * This query clause must be kept in sync with
-     * {@link #passesFilter(Session, Details, IEventContext)}.
+     * {@link #passesFilter(Session, Details, EventContext)}.
      *
-     * @see #passesFilter(Session, Details, IEventContext)
+     * @see #passesFilter(Session, Details, EventContext)
      * @see FilterDefinitionFactoryBean#setFilterName(String)
      * @see FilterDefinitionFactoryBean#setParameterTypes(java.util.Map)
      * @see FilterDefinitionFactoryBean#setDefaultFilterCondition(String)
@@ -104,7 +104,7 @@ public class OneGroupSecurityFilter extends AbstractSecurityFilter {
      *            null all {@link Right rights} will be assumed.
      * @return true if the object to which this
      */
-    public boolean passesFilter(Session session, Details d, IEventContext c) {
+    public boolean passesFilter(Session session, Details d, EventContext c) {
 
         final Long currentGroupId = c.getCurrentGroupId();
         final Long currentUserId = c.getCurrentUserId();
@@ -157,7 +157,7 @@ public class OneGroupSecurityFilter extends AbstractSecurityFilter {
         return false;
     }
 
-    public void enable(Session sess, IEventContext ec) {
+    public void enable(Session sess, EventContext ec) {
         final Filter filter = sess.enableFilter(getName());
 
         final Long groupId = ec.getCurrentGroupId();

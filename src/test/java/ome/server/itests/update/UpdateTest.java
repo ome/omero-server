@@ -600,7 +600,7 @@ public class UpdateTest extends AbstractUpdateTest {
         // This does not yet prevent reloading the previous event.
         tag.getDetails().shallowCopy(tag.getDetails().shallowCopy());
         tag = iUpdate.saveAndReturnObject(tag);
-        // IEventContext ec = iAdmin.getEventContext();
+        // EventContext ec = iAdmin.getEventContext();
         // SessionStats stats = sessionManager.getSessionStats(ec.getCurrentSessionUuid());
         // stats.sqlCount();
     }

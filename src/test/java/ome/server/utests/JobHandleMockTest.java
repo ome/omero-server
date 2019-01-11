@@ -8,6 +8,7 @@ package ome.server.utests;
 
 import java.sql.Timestamp;
 
+import ome.system.EventContext;
 import ome.api.ITypes;
 import ome.api.JobHandle;
 import ome.api.local.LocalQuery;
@@ -19,7 +20,6 @@ import ome.security.SecuritySystem;
 import ome.services.JobBean;
 import ome.services.procs.IProcessManager;
 import ome.services.procs.Process;
-import ome.api.IEventContext;
 
 import org.jmock.Mock;
 import org.jmock.MockObjectTestCase;
@@ -39,7 +39,7 @@ public class JobHandleMockTest extends MockObjectTestCase {
     protected LocalUpdate iUpdate;
     protected ITypes iTypes;
     protected SecuritySystem sec;
-    protected IEventContext ec;
+    protected EventContext ec;
     protected IProcessManager pm;
     protected Process process;
 
@@ -54,7 +54,7 @@ public class JobHandleMockTest extends MockObjectTestCase {
         mockUpdate = mock(LocalUpdate.class);
         mockTypes = mock(ITypes.class);
         mockSec = mock(SecuritySystem.class);
-        mockEc = mock(IEventContext.class);
+        mockEc = mock(EventContext.class);
         mockPm = mock(IProcessManager.class);
         mockProcess = mock(Process.class);
         iQuery = (LocalQuery) mockQuery.proxy();
@@ -63,7 +63,7 @@ public class JobHandleMockTest extends MockObjectTestCase {
         sec = (SecuritySystem) mockSec.proxy();
         pm = (IProcessManager) mockPm.proxy();
         process = (Process) mockProcess.proxy();
-        ec = (IEventContext) mockEc.proxy();
+        ec = (EventContext) mockEc.proxy();
         org.jmock.core.Stub stub = new org.jmock.core.stub.DefaultResultStub();
         mockEc.setDefaultStub(stub);
 

@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import ome.api.IEventContext;
+import ome.system.EventContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.perf4j.StopWatch;
@@ -717,7 +717,7 @@ public class ThumbnailCtx
      */
     public boolean isExtendedGraphCritical(Set<Long> pixelsIds)
     {
-        IEventContext ec = securitySystem.getEventContext();
+        EventContext ec = securitySystem.getEventContext();
         Permissions currentGroupPermissions = ec.getCurrentGroupPermissions();
         Permissions readOnly = Permissions.parseString("rwr---");
 

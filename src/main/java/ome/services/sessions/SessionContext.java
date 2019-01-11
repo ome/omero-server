@@ -7,22 +7,22 @@ package ome.services.sessions;
 
 import java.util.List;
 
+import ome.system.EventContext;
 import ome.model.meta.Session;
 import ome.services.sessions.state.SessionCache;
 import ome.services.sessions.stats.SessionStats;
-import ome.api.IEventContext;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Extends {@link IEventContext} to hold a {@link Session}. This is used by the
+ * Extends {@link EventContext} to hold a {@link Session}. This is used by the
  * {@link SessionManager} to store information in the {@link SessionCache}.
  * 
  * @author Josh Moore, josh at glencoesoftware.com
  * @since 3.0-Beta3
  */
-public interface SessionContext extends IEventContext {
+public interface SessionContext extends EventContext {
 
     Session getSession();
 

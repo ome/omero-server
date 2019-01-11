@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import ome.system.EventContext;
 import ome.api.local.LocalQuery;
 import ome.api.local.LocalUpdate;
 import ome.conditions.SecurityViolation;
@@ -24,7 +25,6 @@ import ome.security.auth.RoleProvider;
 import ome.services.sessions.SessionManager;
 import ome.services.util.Executor;
 import ome.services.util.Executor.Work;
-import ome.api.IEventContext;
 import ome.system.OmeroContext;
 import ome.system.Principal;
 import ome.system.Roles;
@@ -203,10 +203,10 @@ public class LdapIntegrationTest extends LdapTest {
             }
 
             @Override
-            public IEventContext login(String username, String group,
-                                       String password) {
+            public EventContext login(String username, String group,
+                                      String password) {
                 Principal user = newSession(this, username, group, password);
-                IEventContext ec = (IEventContext) executor.execute(user,
+                EventContext ec = (EventContext) executor.execute(user,
                         new Executor.SimpleWork(this, "simpleCall") {
                             @Transactional(readOnly = false)
                             public Object doWork(org.hibernate.Session session,

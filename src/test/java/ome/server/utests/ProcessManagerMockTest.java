@@ -9,6 +9,7 @@ package ome.server.utests;
 import java.util.Arrays;
 import java.util.List;
 
+import ome.system.EventContext;
 import ome.api.ITypes;
 import ome.api.IUpdate;
 import ome.api.local.LocalQuery;
@@ -22,7 +23,6 @@ import ome.services.procs.ProcessManager;
 import ome.services.procs.Processor;
 import ome.services.sessions.SessionManager;
 import ome.services.util.Executor;
-import ome.api.IEventContext;
 
 import org.jmock.Mock;
 import org.jmock.MockObjectTestCase;
@@ -40,7 +40,7 @@ public class ProcessManagerMockTest extends MockObjectTestCase {
     private IUpdate iUpdate;
     private ITypes iTypes;
     private SecuritySystem sec;
-    private IEventContext ec;
+    private EventContext ec;
     private Processor processor;
     private Process process;
     private ProcessCallback callback;
@@ -64,7 +64,7 @@ public class ProcessManagerMockTest extends MockObjectTestCase {
         mockUpdate = mock(IUpdate.class);
         mockTypes = mock(ITypes.class);
         mockSec = mock(SecuritySystem.class);
-        mockEc = mock(IEventContext.class);
+        mockEc = mock(EventContext.class);
         mockProcessor = mock(Processor.class);
         mockProcess = mock(Process.class);
         mockCallback = mock(ProcessCallback.class);
@@ -76,7 +76,7 @@ public class ProcessManagerMockTest extends MockObjectTestCase {
         sec = (SecuritySystem) mockSec.proxy();
         processor = (Processor) mockProcessor.proxy();
         process = (Process) mockProcess.proxy();
-        ec = (IEventContext) mockEc.proxy();
+        ec = (EventContext) mockEc.proxy();
         org.jmock.core.Stub stub = new org.jmock.core.stub.DefaultResultStub();
         mockEc.setDefaultStub(stub);
         mockProcessor.setDefaultStub(stub);
