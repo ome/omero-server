@@ -15,8 +15,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import ome.api.IEventContext;
-import ome.api.IPrincipal;
+import ome.system.EventContext;
+import ome.system.Principal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
@@ -154,11 +154,11 @@ public class CurrentDetails implements PrincipalHolder {
         return list().size();
     }
 
-    public IPrincipal getLast() {
+    public Principal getLast() {
         return list().getLast().getPrincipal();
     }
 
-    public void login(IPrincipal principal) {
+    public void login(Principal principal) {
         // Can't use the method in SessionManager since that leads to a
         // circular reference in Spring.
         final String uuid = principal.getName();
@@ -209,7 +209,7 @@ public class CurrentDetails implements PrincipalHolder {
     }
 
     public boolean isGraphCritical(Details details) {
-        IEventContext ec = getCurrentEventContext();
+        EventContext ec = getCurrentEventContext();
         long gid = ec.getCurrentGroupId();
         Permissions perms = ec.getCurrentGroupPermissions();
         if (gid < 0) {
@@ -255,7 +255,7 @@ public class CurrentDetails implements PrincipalHolder {
             g = HibernateUtils.nullSafeGroupId(object);
         }
 
-        final IEventContext ec = getCurrentEventContext();
+        final EventContext ec = getCurrentEventContext();
 
         if (ec.getLeaderOfGroupsList().contains(g)) {
             /* is group leader */
@@ -314,7 +314,7 @@ public class CurrentDetails implements PrincipalHolder {
      * Replaces all the simple-valued fields in the {@link BasicEventContext}.
      * This method
      */
-    void checkAndInitialize(IEventContext ec, LocalAdmin admin, ShareStore store) {
+    void checkAndInitialize(EventContext ec, LocalAdmin admin, ShareStore store) {
         current().checkAndInitialize(ec, admin, store);
     }
 
@@ -330,7 +330,7 @@ public class CurrentDetails implements PrincipalHolder {
     /**
      * @return the current event context
      */
-    public IEventContext getCurrentEventContext() {
+    public EventContext getCurrentEventContext() {
         return current();
     }
 

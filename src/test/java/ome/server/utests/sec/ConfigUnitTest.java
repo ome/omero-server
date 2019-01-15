@@ -15,7 +15,7 @@ import ome.api.local.LocalConfig;
 import ome.conditions.SecurityViolation;
 import ome.logic.ConfigImpl;
 import ome.security.basic.CurrentDetails;
-import ome.api.IEventContext;
+import ome.system.EventContext;
 import ome.system.OmeroContext;
 import ome.system.PreferenceContext;
 import ome.util.SqlAction;
@@ -36,10 +36,10 @@ public class ConfigUnitTest extends MockObjectTestCase {
     Mock sqlMock, ecMock;
 
     class Current extends CurrentDetails {
-        IEventContext ec;
+        EventContext ec;
 
         @Override
-        public IEventContext getCurrentEventContext() {
+        public EventContext getCurrentEventContext() {
             return ec;
         }
     }
@@ -51,8 +51,8 @@ public class ConfigUnitTest extends MockObjectTestCase {
         prefs = (PreferenceContext) ctx.getBean("preferenceContext");
 
         cd = new Current();
-        ecMock = mock(IEventContext.class);
-        cd.ec = (IEventContext) ecMock.proxy();
+        ecMock = mock(EventContext.class);
+        cd.ec = (EventContext) ecMock.proxy();
 
         sqlMock = mock(SqlAction.class);
         sql = (SqlAction) sqlMock.proxy();

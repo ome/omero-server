@@ -12,7 +12,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import ome.api.IPrincipal;
+import ome.system.EventContext;
 import ome.api.local.LocalAdmin;
 import ome.api.local.LocalQuery;
 import ome.conditions.ApiUsageException;
@@ -53,7 +53,6 @@ import ome.services.sessions.state.SessionCache;
 import ome.services.sessions.stats.PerSessionStats;
 import ome.services.sharing.ShareStore;
 import ome.services.util.ReadOnlyStatus;
-import ome.api.IEventContext;
 import ome.system.OmeroContext;
 import ome.system.Principal;
 import ome.system.Roles;
@@ -77,7 +76,7 @@ import com.google.common.collect.Multimap;
 
 /**
  * simplest implementation of {@link SecuritySystem}. Uses an ctor-injected
- * {@link IEventContext} and the {@link ThreadLocal ThreadLocal-}based
+ * {@link EventContext} and the {@link ThreadLocal ThreadLocal-}based
  * {@link CurrentDetails} to provide the security infrastructure.
  * 
  * @author Josh Moore, josh.moore at gmx.de
@@ -264,7 +263,7 @@ public class BasicSecuritySystem implements SecuritySystem,
         checkReady("enableReadFilter");
         // beware
         // http://opensource.atlassian.com/projects/hibernate/browse/HHH-1932
-        final IEventContext ec = getEventContext();
+        final EventContext ec = getEventContext();
         final Session sess = (Session) session;
         for (final SecurityFilter filter : filters) {
             filter.enable(sess, ec);
@@ -354,12 +353,12 @@ public class BasicSecuritySystem implements SecuritySystem,
         final LocalAdmin admin = (LocalAdmin) sf.getAdminService();
 
         // Call to session manager throws an exception on failure
-        final IPrincipal p = clearAndCheckPrincipal();
+        final Principal p = clearAndCheckPrincipal();
 
         // ticket:6639 - Rather than catch the RemoveSessionException
         // we are going to check the type of the context and if it
         // matches, then we know we should do no more loading.
-        IEventContext ec = cd.getCurrentEventContext();
+        EventContext ec = cd.getCurrentEventContext();
         if (ec instanceof BasicSecurityWiring.CloseOnNoSessionContext) {
             throw new SessionTimeoutException("closing", ec);
         }
@@ -372,7 +371,7 @@ public class BasicSecuritySystem implements SecuritySystem,
             if (!isClose) {
                 throw ste;
             }
-            ec = (IEventContext) ste.sessionContext;
+            ec = (EventContext) ste.sessionContext;
         }
 
         // Refill current details
@@ -489,7 +488,7 @@ public class BasicSecuritySystem implements SecuritySystem,
         }
     }
 
-    private IPrincipal clearAndCheckPrincipal() {
+    private Principal clearAndCheckPrincipal() {
 
         // clear even if this fails. (make SecuritySystem unusable)
         invalidateEventContext();
@@ -499,7 +498,7 @@ public class BasicSecuritySystem implements SecuritySystem,
                     "Principal is null. Not logged in to SecuritySystem.");
         }
 
-        final IPrincipal p = cd.getLast();
+        final Principal p = cd.getLast();
 
         if (p.getName() == null) {
             throw new InternalException(
@@ -554,7 +553,7 @@ public class BasicSecuritySystem implements SecuritySystem,
 
     public void invalidateEventContext() {
         if (log.isDebugEnabled()) {
-            log.debug("Invalidating current IEventContext.");
+            log.debug("Invalidating current EventContext.");
         }
         cd.invalidateCurrentEventContext();
     }
@@ -704,8 +703,8 @@ public class BasicSecuritySystem implements SecuritySystem,
         return roles;
     }
 
-    public IEventContext getEventContext(boolean refresh) {
-        IEventContext ec = cd.getCurrentEventContext();
+    public EventContext getEventContext(boolean refresh) {
+        EventContext ec = cd.getCurrentEventContext();
         if (refresh) {
             String uuid = ec.getCurrentSessionUuid();
             ec = sessionManager.reload(uuid);
@@ -713,7 +712,7 @@ public class BasicSecuritySystem implements SecuritySystem,
         return ec;
     }
 
-    public IEventContext getEventContext() {
+    public EventContext getEventContext() {
         return getEventContext(false);
     }
 
@@ -723,7 +722,7 @@ public class BasicSecuritySystem implements SecuritySystem,
      * @return See above.
      */
     public Long getEffectiveUID() {
-        final IEventContext ec = getEventContext();
+        final EventContext ec = getEventContext();
         final Long shareId = ec.getCurrentShareId();
         if (shareId != null) {
             if (shareId < 0) {

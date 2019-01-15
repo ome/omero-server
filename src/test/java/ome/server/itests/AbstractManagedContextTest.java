@@ -13,6 +13,7 @@ import javax.sql.DataSource;
 
 import junit.framework.TestCase;
 
+import ome.system.EventContext;
 import ome.api.IConfig;
 import ome.api.IContainer;
 import ome.api.ILdap;
@@ -40,7 +41,6 @@ import ome.security.basic.PrincipalHolder;
 import ome.services.fulltext.FullTextThread;
 import ome.services.sessions.SessionManager;
 import ome.services.util.Executor;
-import ome.api.IEventContext;
 import ome.system.OmeroContext;
 import ome.system.Principal;
 import ome.system.Roles;
@@ -265,7 +265,7 @@ public class AbstractManagedContextTest extends TestCase {
         login(omeName, groupName, "Test");
     }
 
-    protected Principal login(IEventContext ec) {
+    protected Principal login(EventContext ec) {
         return login(ec.getCurrentUserName(), ec.getCurrentGroupName(),
                 ec.getCurrentEventType());
     }
@@ -279,7 +279,7 @@ public class AbstractManagedContextTest extends TestCase {
     }
 
     protected void indexObject(IObject obj) {
-        IEventContext ec = iAdmin.getEventContext();
+        EventContext ec = iAdmin.getEventContext();
         loginRootKeepGroup();
         iUpdate.indexObject(obj);
         login(ec);

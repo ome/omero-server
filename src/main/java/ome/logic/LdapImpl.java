@@ -26,7 +26,6 @@ import javax.naming.ldap.InitialLdapContext;
 
 import ome.annotations.RolesAllowed;
 import ome.api.ILdap;
-import ome.api.IRoles;
 import ome.api.ServiceInterface;
 import ome.conditions.ApiUsageException;
 import ome.conditions.SecurityViolation;
@@ -695,7 +694,7 @@ public class LdapImpl extends AbstractLevel2Service implements ILdap,
     @RolesAllowed("system")
     public List<Experimenter> discover() {
         List<Experimenter> discoveredExperimenters = Lists.newArrayList();
-        IRoles r = getSecuritySystem().getSecurityRoles();
+        Roles r = getSecuritySystem().getSecurityRoles();
 
         List<Experimenter> localExperimenters = iQuery.findAllByQuery(
                 "select distinct e from Experimenter e "
@@ -719,7 +718,7 @@ public class LdapImpl extends AbstractLevel2Service implements ILdap,
     @RolesAllowed("system")
     public List<ExperimenterGroup> discoverGroups() {
         List<ExperimenterGroup> discoveredGroups = Lists.newArrayList();
-        IRoles r = getSecuritySystem().getSecurityRoles();
+        Roles r = getSecuritySystem().getSecurityRoles();
 
         List<ExperimenterGroup> localGroups = iQuery.findAllByQuery(
                 "select distinct g from ExperimenterGroup g "

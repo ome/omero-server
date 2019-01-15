@@ -19,7 +19,7 @@ import ome.model.meta.Session;
 import ome.parameters.Parameters;
 import ome.server.itests.AbstractManagedContextTest;
 import ome.server.itests.LoginInterceptor;
-import ome.api.IEventContext;
+import ome.system.EventContext;
 import ome.system.Principal;
 import ome.system.ServiceFactory;
 
@@ -51,7 +51,7 @@ public class SessionTest extends AbstractManagedContextTest {
                 aop.p = new Principal(s.getUuid(), "user", "Test");
 
                 // Now we should be able to do something.
-                IEventContext ec = a.getEventContext();
+                EventContext ec = a.getEventContext();
                 AbstractManagedContextTest.assertEquals(
                         ec.getCurrentUserName(), e.getOmeName());
 

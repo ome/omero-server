@@ -8,10 +8,10 @@ package ome.security;
 import java.util.Map;
 import java.util.Set;
 
+import ome.system.EventContext;
 import ome.conditions.SecurityViolation;
 import ome.model.IObject;
 import ome.model.internal.Details;
-import ome.api.IEventContext;
 
 import org.hibernate.Session;
 
@@ -29,7 +29,7 @@ public interface ACLVoter {
     /**
      * test whether the given object can have its
      * {@link Details#getPermissions() Permissions} changed within the current
-     * {@link IEventContext security context}.
+     * {@link EventContext security context}.
      * @param iObject a model object
      * @return if the object's permissions may be changed
      */

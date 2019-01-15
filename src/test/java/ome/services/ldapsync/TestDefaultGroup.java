@@ -9,9 +9,9 @@ import javax.naming.directory.BasicAttribute;
 import javax.naming.directory.DirContext;
 import javax.naming.directory.ModificationItem;
 
+import ome.system.EventContext;
 import ome.conditions.SecurityViolation;
 import ome.services.ldap.LdapTest.Fixture;
-import ome.api.IEventContext;
 import ome.system.Roles;
 
 
@@ -27,7 +27,7 @@ public class TestDefaultGroup implements Modification {
 
     public void modify(Fixture fixture) {
 
-        IEventContext before = fixture.login("test1", "grp", "password");
+        EventContext before = fixture.login("test1", "grp", "password");
         if (2 != before.getMemberOfGroupsList().size()) {
             throw new RuntimeException("Not 2 groups!");
         }
@@ -49,7 +49,7 @@ public class TestDefaultGroup implements Modification {
                 new BasicAttribute("member", "cn=test1,ou=testDefaultGroup,o=eg"));
         fixture.template.modifyAttributes("cn=grp", readd);
 
-        IEventContext after = fixture.login("test1", "grp", "password");
+        EventContext after = fixture.login("test1", "grp", "password");
         if (2 != after.getMemberOfGroupsList().size()) {
             throw new RuntimeException("Not 2 groups!");
         }

@@ -10,13 +10,12 @@ package ome.services.sharing;
 import java.lang.reflect.Method;
 import java.util.NoSuchElementException;
 
-import ome.api.IPrincipal;
 import ome.conditions.SessionException;
 import ome.security.basic.CurrentDetails;
 import ome.services.sessions.state.SessionCache;
-import ome.api.IEventContext;
-import ome.system.Principal;
+import ome.system.EventContext;
 
+import ome.system.Principal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.interceptor.DefaultTransactionAttribute;
@@ -45,9 +44,9 @@ public class ShareRestrictionTransactionAttributeSource implements
     public TransactionAttribute getTransactionAttribute(Method method,
             Class targetClass) {
         try {
-            IPrincipal principal = current.getLast();
+            Principal principal = current.getLast();
             String uuid = principal.getName();
-            IEventContext ec = cache.getSessionContext(uuid);
+            EventContext ec = cache.getSessionContext(uuid);
             Long shareId = ec.getCurrentShareId();
             if (ec.getCurrentShareId() != null) {
                 log.debug("Returning readOnly tx for shared " + shareId);

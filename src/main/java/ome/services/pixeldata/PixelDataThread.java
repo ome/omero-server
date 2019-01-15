@@ -30,7 +30,7 @@ import ome.services.sessions.SessionManager;
 import ome.services.util.ExecutionThread;
 import ome.services.util.Executor;
 import ome.services.util.ReadOnlyStatus;
-import ome.api.IEventContext;
+import ome.system.EventContext;
 import ome.system.Principal;
 import ome.system.ServiceFactory;
 import ome.system.metrics.Metrics;
@@ -341,7 +341,7 @@ public class PixelDataThread extends ExecutionThread implements ApplicationListe
         if (cd.size() <= 0) {
             throw new InternalException("Not logged in.");
         }
-        final IEventContext ec = cd.getCurrentEventContext();
+        final EventContext ec = cd.getCurrentEventContext();
         if (null == ec.getCurrentUserId()) {
             throw new InternalException("No user! Must be wrapped by call to Executor?");
         }
@@ -354,7 +354,7 @@ public class PixelDataThread extends ExecutionThread implements ApplicationListe
         this.executor.get(future);
     }
 
-    private EventLog makeEvent(final IEventContext ec,
+    private EventLog makeEvent(final EventContext ec,
                                final MissingPyramidMessage mpm) {
 
         final Principal p = new Principal(uuid);

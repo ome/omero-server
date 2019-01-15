@@ -48,7 +48,7 @@ import ome.services.sharing.data.Obj;
 import ome.services.sharing.data.ShareData;
 import ome.services.util.Executor;
 import ome.services.util.ServiceHandler;
-import ome.api.IEventContext;
+import ome.system.EventContext;
 import ome.system.Principal;
 import ome.tools.hibernate.QueryBuilder;
 import ome.util.ContextFilter;
@@ -323,7 +323,7 @@ public class ShareBean extends AbstractLevel2Service implements LocalShare {
         //
         // Setting defaults on new session
         //
-        final IEventContext ec = getSecuritySystem().getEventContext();
+        final EventContext ec = getSecuritySystem().getEventContext();
         final String omename = ec.getCurrentUserName();
         final Long user = ec.getCurrentUserId();
         final Long group = ec.getCurrentGroupId();
@@ -761,7 +761,7 @@ public class ShareBean extends AbstractLevel2Service implements LocalShare {
     public void notifyMembersOfShare(long shareId, String subject, String message,
             boolean html) {
 
-        IEventContext ec = getSecuritySystem().getEventContext();
+        EventContext ec = getSecuritySystem().getEventContext();
 
         Set<Experimenter> exps = getAllMembers(shareId);
         exps.add(getShare(shareId).getOwner());
@@ -945,7 +945,7 @@ public class ShareBean extends AbstractLevel2Service implements LocalShare {
      * {@link QueryBuilder#where()} should already have been called.
      */
     protected void applyIfShareAccessible(QueryBuilder qb) {
-        IEventContext ec = getSecuritySystem().getEventContext();
+        EventContext ec = getSecuritySystem().getEventContext();
         if ( ! ec.isCurrentUserAdmin()) {
             qb.param("userId", ec.getCurrentUserId());
             qb.and("(");
@@ -964,7 +964,7 @@ public class ShareBean extends AbstractLevel2Service implements LocalShare {
      */
     protected ShareData getShareIfAccessible(long shareId) {
 
-        IEventContext ec = getSecuritySystem().getEventContext();
+        EventContext ec = getSecuritySystem().getEventContext();
         boolean isAdmin = ec.isCurrentUserAdmin();
         long userId = ec.getCurrentUserId();
         return store.getShareIfAccessible(shareId, isAdmin, userId);

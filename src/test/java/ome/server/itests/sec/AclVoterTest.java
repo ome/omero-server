@@ -17,7 +17,7 @@
  */
 package ome.server.itests.sec;
 
-import ome.api.IEventContext;
+import ome.system.EventContext;
 import org.testng.annotations.Test;
 
 import ome.conditions.SecurityViolation;
@@ -97,7 +97,7 @@ public class AclVoterTest extends AbstractManagedContextTest {
         // since otherwise the Pixels object cannot be linked to the Image
         // object.
         Pixels p = pixels("rw----");
-        IEventContext user = iAdmin.getEventContext();
+        EventContext user = iAdmin.getEventContext();
         ExperimenterGroup group = currentGroup();
         loginRootKeepGroup();
         iAdmin.changePermissions(group, Permissions.parseString(perms));

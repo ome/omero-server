@@ -24,7 +24,7 @@ import ome.security.auth.LdapPasswordProvider;
 import ome.security.auth.PasswordUtil;
 import ome.security.auth.RoleProvider;
 import ome.services.util.Executor;
-import ome.api.IEventContext;
+import ome.system.EventContext;
 import ome.system.OmeroContext;
 import ome.system.Roles;
 import ome.util.SqlAction;
@@ -97,7 +97,7 @@ public class LdapTest extends MockObjectTestCase {
             return ldap.discover();
         }
 
-        public IEventContext login(String username, String group, String password) {
+        public EventContext login(String username, String group, String password) {
             return null;
         }
 

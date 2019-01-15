@@ -43,7 +43,7 @@ import ome.model.roi.Mask;
 import ome.parameters.Parameters;
 import ome.security.SecuritySystem;
 import ome.services.util.Executor;
-import ome.api.IEventContext;
+import ome.system.EventContext;
 import ome.system.ServiceFactory;
 import ome.system.SimpleEventContext;
 import ome.util.ImageUtil;
@@ -441,7 +441,7 @@ public class RenderingBean implements RenderingEngine, Serializable {
      * @see RenderingEngine#getCurrentEventContext()
      */
     @RolesAllowed("user")
-    public IEventContext getCurrentEventContext() {
+    public EventContext getCurrentEventContext() {
         return new SimpleEventContext(secSys.getEventContext());
     }
 

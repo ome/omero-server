@@ -22,11 +22,11 @@ package ome.security.basic;
 import java.util.List;
 import java.util.Map;
 
+import ome.system.EventContext;
 import ome.model.core.Image;
 import ome.model.internal.Details;
 import ome.services.sharing.ShareStore;
 import ome.services.sharing.data.ShareData;
-import ome.api.IEventContext;
 import ome.system.Roles;
 
 import org.apache.commons.collections.CollectionUtils;
@@ -73,7 +73,7 @@ public class SharingSecurityFilter extends AbstractSecurityFilter {
     }
 
     @Override
-    public boolean passesFilter(Session session, Details details, IEventContext ec) {
+    public boolean passesFilter(Session session, Details details, EventContext ec) {
         final Long shareId = ec.getCurrentShareId();
         if (shareId == null) {
             return true;
@@ -83,7 +83,7 @@ public class SharingSecurityFilter extends AbstractSecurityFilter {
     }
 
     @Override
-    public void enable(Session session, IEventContext ec) {
+    public void enable(Session session, EventContext ec) {
         List<Long> imageIds = null;
         final Long shareId = ec.getCurrentShareId();
         if (shareId != null) {

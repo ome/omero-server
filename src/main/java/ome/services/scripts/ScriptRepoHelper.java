@@ -27,7 +27,7 @@ import ome.model.meta.ExperimenterGroup;
 import ome.services.delete.Deletion;
 import ome.services.util.Executor;
 import ome.services.util.ReadOnlyStatus;
-import ome.api.IEventContext;
+import ome.system.EventContext;
 import ome.system.Principal;
 import ome.system.Roles;
 import ome.system.ServiceFactory;
@@ -813,7 +813,7 @@ public class ScriptRepoHelper extends OnContextRefreshedEventListener {
                     @Transactional(readOnly = false)
                     public Object doWork(Session session, ServiceFactory sf) {
                         try {
-                            IEventContext ec = ((LocalAdmin) sf.getAdminService())
+                            EventContext ec = ((LocalAdmin) sf.getAdminService())
                                 .getEventContextQuiet();
                             Deletion d = executor.getContext().getBean(
                                 Deletion.class.getName(), Deletion.class);

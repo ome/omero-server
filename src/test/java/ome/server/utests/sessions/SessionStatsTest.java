@@ -7,6 +7,7 @@ package ome.server.utests.sessions;
 
 import java.util.NoSuchElementException;
 
+import ome.system.EventContext;
 import ome.security.basic.CurrentDetails;
 import ome.server.utests.TestSessionCache;
 import ome.services.messages.GlobalMulticaster;
@@ -19,7 +20,6 @@ import ome.services.sessions.stats.ObjectsReadCounter;
 import ome.services.sessions.stats.SessionStats;
 import ome.services.sessions.stats.SimpleSessionStats;
 import ome.services.sessions.stats.PerSessionStats;
-import ome.api.IEventContext;
 import ome.system.OmeroContext;
 import ome.system.Principal;
 
@@ -139,10 +139,10 @@ public class SessionStatsTest extends MockObjectTestCase {
         return called;
     }
     
-    private IEventContext ec() {
-        Mock mock = new Mock(IEventContext.class);
+    private EventContext ec() {
+        Mock mock = new Mock(EventContext.class);
         mock.setDefaultStub(new DefaultResultStub());
-        return (IEventContext) mock.proxy();
+        return (EventContext) mock.proxy();
     }
     
 

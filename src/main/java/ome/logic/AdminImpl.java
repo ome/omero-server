@@ -24,8 +24,8 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Sets;
 
-import ome.api.IEventContext;
-import ome.api.IRoles;
+import ome.system.EventContext;
+import ome.system.Roles;
 import org.apache.commons.collections.CollectionUtils;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
@@ -84,7 +84,6 @@ import ome.services.query.Query;
 import ome.services.query.QueryParameterDef;
 import ome.services.sessions.events.UserGroupUpdateEvent;
 import ome.system.OmeroContext;
-import ome.system.Roles;
 import ome.system.SimpleEventContext;
 import ome.tools.hibernate.QueryBuilder;
 import ome.tools.hibernate.SecureMerge;
@@ -443,7 +442,7 @@ public class AdminImpl extends AbstractLevel2Service implements LocalAdmin,
     @Transactional(readOnly = false)
     public void updateSelf(@NotNull
     Experimenter e) {
-        IEventContext ec = getSecuritySystem().getEventContext();
+        EventContext ec = getSecuritySystem().getEventContext();
         final Experimenter self = getExperimenter(ec.getCurrentUserId());
         self.setFirstName(e.getFirstName());
         self.setMiddleName(e.getMiddleName());
@@ -569,7 +568,7 @@ public class AdminImpl extends AbstractLevel2Service implements LocalAdmin,
         final String origOmeName = orig.getOmeName();
         final String newOmeName = experimenter.getOmeName();
         if (!origOmeName.equals(newOmeName)) {
-            final IRoles roles = getSecurityRoles();
+            final Roles roles = getSecurityRoles();
             final Set<String> fixedExperimenterNames =
                     ImmutableSet.of(roles.getRootName(), roles.getGuestName());
             if (fixedExperimenterNames.contains(origOmeName)) {
@@ -603,7 +602,7 @@ public class AdminImpl extends AbstractLevel2Service implements LocalAdmin,
         final String origName = orig.getName();
         final String newName = group.getName();
         if (!origName.equals(newName)) {
-            final IRoles roles = getSecurityRoles();
+            final Roles roles = getSecurityRoles();
             final Set<String> fixedGroupNames =
                     ImmutableSet.of(roles.getGuestGroupName(), roles.getSystemGroupName(), roles.getUserGroupName());
             if (fixedGroupNames.contains(origName)) {
@@ -774,7 +773,7 @@ public class AdminImpl extends AbstractLevel2Service implements LocalAdmin,
 
         adminOrPiOfGroups(adminPrivileges.getPrivilege(AdminPrivilege.VALUE_MODIFY_GROUP_MEMBERSHIP), groups);
 
-        final IRoles roles = getSecurityRoles();
+        final Roles roles = getSecurityRoles();
         final boolean removeSystemOrUser =
                 Iterators.any(
                         Iterators.forArray(groups),
@@ -785,7 +784,7 @@ public class AdminImpl extends AbstractLevel2Service implements LocalAdmin,
             throw new ValidationException("experimenter '" + roles.getRootName() + "' may not be removed from the '" +
                 roles.getSystemGroupName() + "' or '" + roles.getUserGroupName() + "' group");
         }
-        final IEventContext eventContext = getEventContext();
+        final EventContext eventContext = getEventContext();
         final boolean userOperatingOnThemself = eventContext.getCurrentUserId().equals(user.getId());
         if (removeSystemOrUser && userOperatingOnThemself) {
             throw new ValidationException("experimenters may not remove themselves from the '" +
@@ -829,7 +828,7 @@ public class AdminImpl extends AbstractLevel2Service implements LocalAdmin,
                     + "must be managed (i.e. have an id)");
         }
 
-        IEventContext ec = getSecuritySystem().getEventContext();
+        EventContext ec = getSecuritySystem().getEventContext();
         if (!(isAdmin() && getCurrentAdminPrivilegesForSession().contains(
                 adminPrivileges.getPrivilege(AdminPrivilege.VALUE_MODIFY_USER)) ||
                 ec.getCurrentUserId().equals(user.getId()))) {
@@ -837,7 +836,7 @@ public class AdminImpl extends AbstractLevel2Service implements LocalAdmin,
                     + " can only set own default group.");
         }
 
-        IRoles roles = getSecuritySystem().getSecurityRoles();
+        Roles roles = getSecuritySystem().getSecurityRoles();
         if (Long.valueOf(roles.getUserGroupId()).equals(group.getId())) {
             throw new ApiUsageException("Cannot set default group to: "
                     + roles.getUserGroupName());
@@ -1008,7 +1007,7 @@ public class AdminImpl extends AbstractLevel2Service implements LocalAdmin,
         final ExperimenterGroup group = groupProxy(groupName);
 
         // Check object
-        final IEventContext ec = getSecuritySystem().getEventContext();
+        final EventContext ec = getSecuritySystem().getEventContext();
         if (!ec.getCurrentUserId().equals(copy.getDetails().getOwner().getId())
                 && !ec.isCurrentUserAdmin()) {
             throw new SecurityViolation("Cannot change group for:" + iObject);
@@ -1386,16 +1385,16 @@ public class AdminImpl extends AbstractLevel2Service implements LocalAdmin,
     // =========================================================================
 
     @PermitAll
-    public IRoles getSecurityRoles() {
+    public Roles getSecurityRoles() {
         return getSecuritySystem().getSecurityRoles();
     }
 
     @PermitAll
-    public IEventContext getEventContext() {
+    public EventContext getEventContext() {
         return new SimpleEventContext(getSecuritySystem().getEventContext(true));
     }
 
-    public IEventContext getEventContextQuiet() {
+    public EventContext getEventContextQuiet() {
         return new SimpleEventContext(getSecuritySystem().getEventContext(false));
     }
 
@@ -1563,7 +1562,7 @@ public class AdminImpl extends AbstractLevel2Service implements LocalAdmin,
             return true;
         }
 
-        IEventContext ec = getEventContext();
+        EventContext ec = getEventContext();
         List<Long> piOf = ec.getLeaderOfGroupsList();
         return piOf.contains(group.getId());
     }

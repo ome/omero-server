@@ -5,7 +5,7 @@
 
 package ome.security;
 
-import ome.api.IRoles;
+import ome.system.EventContext;
 import ome.conditions.ApiUsageException;
 import ome.conditions.SecurityViolation;
 import ome.model.IObject;
@@ -13,7 +13,6 @@ import ome.model.internal.Details;
 import ome.model.meta.ExperimenterGroup;
 import ome.security.basic.BasicSecuritySystem;
 import ome.security.sharing.SharingSecuritySystem;
-import ome.api.IEventContext;
 import ome.system.Principal;
 import ome.system.Roles;
 
@@ -79,11 +78,11 @@ public class SecuritySystemHolder implements SecuritySystem {
         choose().enable(ids);
     }
 
-    public IEventContext getEventContext() {
+    public EventContext getEventContext() {
         return choose().getEventContext();
     }
 
-    public IEventContext getEventContext(boolean refresh) {
+    public EventContext getEventContext(boolean refresh) {
         return choose().getEventContext(refresh);
     }
 
@@ -91,7 +90,7 @@ public class SecuritySystemHolder implements SecuritySystem {
         return choose().getEffectiveUID();
     }
 
-    public IRoles getSecurityRoles() {
+    public Roles getSecurityRoles() {
         return choose().getSecurityRoles();
     }
 

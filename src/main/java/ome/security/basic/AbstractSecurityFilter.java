@@ -7,12 +7,12 @@
 
 package ome.security.basic;
 
+import ome.system.EventContext;
 import ome.model.internal.Details;
 import ome.model.internal.Permissions;
 import ome.model.internal.Permissions.Right;
 import ome.model.internal.Permissions.Role;
 import ome.security.SecurityFilter;
-import ome.api.IEventContext;
 import ome.system.Roles;
 
 import org.slf4j.Logger;
@@ -44,9 +44,9 @@ public abstract class AbstractSecurityFilter extends FilterDefinitionFactoryBean
      * Default constructor which calls all the necessary setters for this
      * {@link FactoryBean}. Also calls {@link #setDefaultFilterCondition(String)}.
      * This query clause must be kept in sync with
-     * {@link #passesFilter(Session, Details, IEventContext)}.
+     * {@link #passesFilter(Session, Details, EventContext)}.
      *
-     * @see #passesFilter(Session, Details, IEventContext)
+     * @see #passesFilter(Session, Details, EventContext)
      * @see FilterDefinitionFactoryBean#setFilterName(String)
      * @see FilterDefinitionFactoryBean#setParameterTypes(java.util.Map)
      * @see FilterDefinitionFactoryBean#setDefaultFilterCondition(String)
@@ -71,18 +71,18 @@ public abstract class AbstractSecurityFilter extends FilterDefinitionFactoryBean
 	    disableBaseFilters(sess);
     }
 
-    public boolean isNonPrivate(IEventContext c) {
+    public boolean isNonPrivate(EventContext c) {
         return c.getCurrentGroupPermissions().isGranted(Role.GROUP, Right.READ)
             || c.getCurrentGroupPermissions().isGranted(Role.WORLD, Right.READ);
     }
 
-    public boolean isAdminOrPi(IEventContext c) {
+    public boolean isAdminOrPi(EventContext c) {
         return c.isCurrentUserAdmin() ||
             c.getLeaderOfGroupsList().contains(c.getCurrentGroupId());
 
     }
 
-    public boolean isShare(IEventContext c) {
+    public boolean isShare(EventContext c) {
         return c.getCurrentShareId() != null;
     }
 

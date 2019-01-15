@@ -62,7 +62,7 @@ import ome.model.roi.Roi;
 import ome.security.SecuritySystem;
 import ome.security.SystemTypes;
 import ome.services.sessions.stats.SessionStats;
-import ome.api.IEventContext;
+import ome.system.EventContext;
 import ome.system.Roles;
 import ome.tools.hibernate.ExtendedMetadata;
 import ome.tools.hibernate.HibernateUtils;
@@ -584,7 +584,7 @@ public class OmeroInterceptor implements Interceptor {
                 continue; // Highly unlikely.
             }
 
-            final IEventContext ec = currentUser.getCurrentEventContext();
+            final EventContext ec = currentUser.getCurrentEventContext();
             final boolean isOwner = ec.getCurrentUserId().equals(linkedUid);
             final boolean isOwnerOrSupervisor = currentUser.isOwnerOrSupervisor(linkedObject);
             final boolean isSupervisor = (!isOwner) && isOwnerOrSupervisor;

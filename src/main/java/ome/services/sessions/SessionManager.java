@@ -10,7 +10,7 @@ import java.util.Map;
 
 import net.sf.ehcache.Ehcache;
 
-import ome.api.IPrincipal;
+import ome.system.EventContext;
 import ome.conditions.RemovedSessionException;
 import ome.conditions.SessionTimeoutException;
 import ome.model.IObject;
@@ -18,7 +18,7 @@ import ome.model.meta.Session;
 import ome.model.meta.Share;
 import ome.services.sessions.stats.SessionStats;
 import ome.services.util.Executor;
-import ome.api.IEventContext;
+import ome.system.Principal;
 
 
 /**
@@ -40,7 +40,7 @@ public interface SessionManager {
      * passed.
      */
     public static class CreationRequest {
-        public IPrincipal principal;
+        public Principal principal;
         public String credentials;
         public String agent;
         public String ip;
@@ -60,7 +60,7 @@ public interface SessionManager {
      * @param ip
      * @return Not null. Instead an exception will be thrown.
      */
-    Session createWithAgent(IPrincipal principal, String credentials, String agent, String ip);
+    Session createWithAgent(Principal principal, String credentials, String agent, String ip);
 
     /**
      * 
@@ -69,7 +69,7 @@ public interface SessionManager {
      * @param ip
      * @return Not null. Instead an exception will be thrown.
      */
-    Session createWithAgent(IPrincipal principal, String agent, String ip);
+    Session createWithAgent(Principal principal, String agent, String ip);
 
     /**
      * 
@@ -81,8 +81,8 @@ public interface SessionManager {
      * @param groupId
      * @return Not null. Instead an exception will be thrown.
      */
-    Share createShare(IPrincipal principal, boolean enabled, long timeToLive,
-            String eventType, String description, long groupId);
+    Share createShare(Principal principal, boolean enabled, long timeToLive,
+                      String eventType, String description, long groupId);
 
     /**
      * Sets the context for the current session to the given value. If it is an
@@ -93,11 +93,11 @@ public interface SessionManager {
      * as the initial context. Passing any other object will result in an
      * {@link ome.conditions.ApiUsageException}.
      *
-     * @param principal {@link IPrincipal} for which the context should be set.
+     * @param principal {@link Principal} for which the context should be set.
      * @param obj {@link IObject} which represents the new context.
      * @return See above.
      */
-    IObject setSecurityContext(IPrincipal principal, IObject obj);
+    IObject setSecurityContext(Principal principal, IObject obj);
 
     /**
      * Certain fields from the {@link Session} instance will
@@ -182,19 +182,19 @@ public interface SessionManager {
     // =========================================================================
 
     /**
-     * Provides a partial {@link IEventContext} for the current {@link Session}.
+     * Provides a partial {@link EventContext} for the current {@link Session}.
      * 
      * @param principal
      *            Non null.
      * @return Never null.
      * @throws RemovedSessionException
-     *             if no session with the given {@link IPrincipal#getName()}
+     *             if no session with the given {@link Principal#getName()}
      */
-    IEventContext getEventContext(IPrincipal principal)
+    EventContext getEventContext(Principal principal)
             throws RemovedSessionException;
 
     /**
-     * Similar to {@link #getEventContext(IPrincipal)} but uses the internal
+     * Similar to {@link #getEventContext(Principal)} but uses the internal
      * reload logic to get a fresh representation of the context. This queries
      * all of the user management tables (experimenter, experimentergroup, etc)
      * and so should not be used anywhere in a critical path.
@@ -203,7 +203,7 @@ public interface SessionManager {
      * @return See above.
      * @throws RemovedSessionException If the uuid does not exist.
      */
-    IEventContext reload(String uuid)
+    EventContext reload(String uuid)
             throws RemovedSessionException;
 
     java.util.List<String> getUserRoles(String uuid);

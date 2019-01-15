@@ -7,7 +7,6 @@
 
 package ome.security.basic;
 
-import ome.api.IPrincipal;
 import ome.security.SecuritySystem;
 import ome.system.Principal;
 
@@ -30,13 +29,13 @@ public interface PrincipalHolder {
      * Get the last, i.e. currently active, principal.
      * @return the current principal
      */
-    public IPrincipal getLast();
+    public Principal getLast();
 
     /**
      * Add a new principal context to the stack.
      * @param principal the principal to add
      */
-    public void login(IPrincipal principal);
+    public void login(Principal principal);
 
     /**
      * Allow logging in directly with an event context.

@@ -24,9 +24,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import ome.system.EventContext;
 import ome.model.enums.AdminPrivilege;
 import ome.model.internal.Details;
-import ome.api.IEventContext;
 import ome.system.Roles;
 
 import org.hibernate.Filter;
@@ -68,13 +68,13 @@ public class LightAdminPrivilegesSecurityFilter extends AbstractSecurityFilter {
     }
 
     @Override
-    public boolean passesFilter(Session session, Details details, IEventContext ec) {
+    public boolean passesFilter(Session session, Details details, EventContext ec) {
         /* this method will not be called with system types */
         return false;
     }
 
     @Override
-    public void enable(Session session, IEventContext ec) {
+    public void enable(Session session, EventContext ec) {
         final List<String> privilegeValues = new ArrayList<String>();
         for (final AdminPrivilege adminPrivilege : ec.getCurrentAdminPrivileges()) {
             privilegeValues.add(adminPrivilege.getValue());

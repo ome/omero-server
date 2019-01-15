@@ -23,6 +23,7 @@ import java.util.Set;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import ome.annotations.RolesAllowed;
+import ome.system.EventContext;
 import ome.api.IPixels;
 import ome.api.IRenderingSettings;
 import ome.api.IRepositoryInfo;
@@ -48,7 +49,6 @@ import ome.model.enums.RenderingModel;
 import ome.parameters.Parameters;
 import ome.services.ThumbnailCtx.NoThumbnail;
 import ome.services.messages.ContextMessage;
-import ome.api.IEventContext;
 import ome.system.OmeroContext;
 import ome.system.SimpleEventContext;
 import ome.util.ImageUtil;
@@ -268,7 +268,7 @@ public class ThumbnailBean extends AbstractLevel2Service
      *
      * @see ome.api.StatefulServiceInterface#getCurrentEventContext()
      */
-    public IEventContext getCurrentEventContext() {
+    public EventContext getCurrentEventContext() {
         return new SimpleEventContext(getSecuritySystem().getEventContext());
     }
 

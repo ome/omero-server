@@ -14,7 +14,7 @@ import java.util.concurrent.Future;
 import ome.annotations.Hidden;
 import ome.annotations.NotNull;
 import ome.annotations.RolesAllowed;
-import ome.api.IPrincipal;
+import ome.system.EventContext;
 import ome.api.ISession;
 import ome.api.ServiceInterface;
 import ome.conditions.AuthenticationException;
@@ -28,7 +28,6 @@ import ome.security.basic.CurrentDetails;
 import ome.security.basic.LightAdminPrivileges;
 import ome.services.sessions.SessionManager.CreationRequest;
 import ome.services.util.Executor;
-import ome.api.IEventContext;
 import ome.system.Principal;
 
 import org.slf4j.Logger;
@@ -82,7 +81,7 @@ public class SessionBean implements ISession {
             throw new SecurityViolation("No current user");
         }
 
-        final IEventContext context = currentContext();
+        final EventContext context = currentContext();
         final Session currentSession;
         if (context instanceof SessionContext) {
             currentSession = ((SessionContext) context).getSession();
@@ -116,16 +115,16 @@ public class SessionBean implements ISession {
     }
 
     @RolesAllowed("user" /* group owner */)
-    public Session createSessionWithTimeout(@NotNull final IPrincipal principal,
+    public Session createSessionWithTimeout(@NotNull final Principal principal,
                                             final long milliseconds) {
         return createSessionWithTimeouts(principal, milliseconds, 0L);
     }
 
     @RolesAllowed("user" /*group owner*/)
-    public Session createSessionWithTimeouts(@NotNull final IPrincipal principal,
+    public Session createSessionWithTimeouts(@NotNull final Principal principal,
                                              final long timeToLiveMilliseconds, final long timeToIdleMilliseconds) {
 
-        final IEventContext context = currentContext();
+        final EventContext context = currentContext();
         final Session currentSession;
         if (context instanceof SessionContext) {
             currentSession = ((SessionContext) context).getSession();
@@ -175,7 +174,7 @@ public class SessionBean implements ISession {
     }
 
     @RolesAllowed( { "user", "guest" })
-    public Session createSession(@NotNull IPrincipal principal,
+    public Session createSession(@NotNull Principal principal,
             @Hidden String credentials) {
 
         Session session = null;
@@ -292,7 +291,7 @@ public class SessionBean implements ISession {
     // ~ Helpers
     // =========================================================================
 
-    IEventContext currentContext() {
+    EventContext currentContext() {
         String user = cd.getLast().getName();
         return mgr.getEventContext(new Principal(user));
     }
