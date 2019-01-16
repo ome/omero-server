@@ -12,7 +12,9 @@ import java.util.Map;
 
 import ome.tools.spring.OnContextRefreshedEventListener;
 
+import org.quartz.JobDetail;
 import org.quartz.Scheduler;
+import org.quartz.SchedulerException;
 import org.quartz.Trigger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,6 +41,8 @@ public class SchedulerFactoryBean extends
 
     private final Map<String, Trigger> triggers = new HashMap<String, Trigger>();
 
+    private final static String JOB_DETAIL_KEY = "jobDetail";
+
     /**
      * Already subclassing another class, so re-using the handler here
      * in a somewhat awkward to re-use the code.
@@ -64,7 +68,6 @@ public class SchedulerFactoryBean extends
         String[] names = cre.getApplicationContext().getBeanNamesForType(
                 Trigger.class);
 
-        final int prevSize = triggers.size();
         for (String name : names) {
             if (triggers.containsKey(name)) {
                 log.error("Scheduler already has trigger named: " + name);
@@ -72,17 +75,25 @@ public class SchedulerFactoryBean extends
             }
             Trigger trigger = (Trigger) cre.getApplicationContext()
                     .getBean(name);
-            triggers.put(name, trigger);
+            registerTrigger(name, trigger);
         }
-
-        final int currentSize = triggers.size();
-        if (prevSize != currentSize) {
-            // Convert trigger map to list
-            Trigger[] tArray = triggers.values().toArray(new Trigger[currentSize]);
-            setTriggers(tArray);
-        }
-
         restartIfNeeded();
+    }
+
+    /**
+     * Registers a {@link Trigger}. A method like this should
+     * really have protected visibility in the superclass.
+     */
+    protected void registerTrigger(String beanName, Trigger trigger) {
+        try {
+            Scheduler scheduler = getObject();
+            triggers.put(beanName, trigger);
+            JobDetail job = (JobDetail) trigger.getJobDataMap().get(JOB_DETAIL_KEY);
+            scheduler.scheduleJob(job, trigger);
+            log.debug(String.format("Registered trigger \"%s\": %s", beanName, trigger));
+        } catch (SchedulerException se) {
+            throw new RuntimeException(se);
+        }
     }
 
     /**
@@ -107,4 +118,5 @@ public class SchedulerFactoryBean extends
             }
         }
     }
+
 }
