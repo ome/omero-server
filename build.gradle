@@ -23,6 +23,7 @@ targetCompatibility = JavaVersion.VERSION_1_8
 repositories {
     mavenCentral()
     mavenLocal()
+    maven { url 'https://artifacts.openmicroscopy.org/artifactory/maven/' }
 }
 
 dependencies {
