@@ -79,25 +79,22 @@ test {
     }
 }
 
-/**
- * This task will resolve to find the current ICE version installed
- * on your system PATH. It will choose the appropriate ice dependency for you
- * and set the a source dir for the build to look at.
- */
-task processIce {
-    if (slice.iceVersion.contains('3.7')) {
-        dependencies.add('compile', 'com.zeroc:ice:3.7.+')
-        sourceSets.main.java {
-            srcDirs 'src/main/ice37', 'src/generated/ice37'
-        }
-        slice.output = file('src/generated/ice37')
-    } else if (slice.iceVersion.contains('3.6')) {
-        dependencies.add('compile', 'com.zeroc:ice:3.6.+')
-        sourceSets.main.java {
-            srcDirs 'src/main/ice36', 'src/generated/ice36'
-        }
-        slice.output = file('src/generated/ice36')
+clean {
+    delete "src/generated"
+}
+
+if (slice.iceVersion.contains('3.7')) {
+    dependencies.add('compile', 'com.zeroc:ice:3.7.+')
+    sourceSets.main.java {
+        srcDirs 'src/main/ice37', 'src/generated/ice37'
     }
+    slice.output = file('src/generated/ice37')
+} else if (slice.iceVersion.contains('3.6')) {
+    dependencies.add('compile', 'com.zeroc:ice:3.6.+')
+    sourceSets.main.java {
+        srcDirs 'src/main/ice36', 'src/generated/ice36'
+    }
+    slice.output = file('src/generated/ice36')
 }
 
 // Add publish functionality
