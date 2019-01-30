@@ -97,5 +97,16 @@ if (slice.iceVersion.contains('3.7')) {
     slice.output = file('src/generated/ice36')
 }
 
+jar {
+    manifest {
+        attributes(
+                'Build-Timestamp': new java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ").format(new Date()),
+                'Created-By': "Gradle ${gradle.gradleVersion}",
+                'Build-Jdk': "${System.properties['java.version']} (${System.properties['java.vendor']} ${System.properties['java.vm.version']})",
+                'Main-Class': 'ome.services.fulltext.Main',
+                "Class-Path": configurations.runtimeClasspath.collect { it.getName() }.join(' ')
+        )
+    }
+}
 // Add publish functionality
 apply from: 'publish.gradle'
