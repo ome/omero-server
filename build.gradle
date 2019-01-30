@@ -26,6 +26,11 @@ repositories {
     maven { url 'https://artifacts.openmicroscopy.org/artifactory/maven/' }
 }
 
+ext {
+    //the database type: must match the version set in omero-model
+    databaseType = "psql"
+}
+
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
     testCompile group: 'org.testng', name: 'testng', version: '6.14.2'
@@ -44,9 +49,10 @@ dependencies {
     implementation "org.springframework:spring-jms:4.3.14.RELEASE"
     implementation "org.springframework.security:spring-security-ldap:4.2.4.RELEASE"
 
-    // Postgres connect driver for java
-    implementation 'org.postgresql:postgresql:42.2.1'
-
+    if (databaseType.equals("psql")) {
+        // Postgres connect driver for java
+        implementation 'org.postgresql:postgresql:42.2.1'
+    }
     // Used by hibernate, see: https://stackoverflow.com/a/14365438
     implementation 'org.javassist:javassist:3.22.0-GA'
 
