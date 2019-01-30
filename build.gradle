@@ -75,7 +75,7 @@ dependencies {
 test {
     // enable TestNG support (default is JUnit)
     useTestNG() {
-        suites "src/test/resources" // project.fileTree(dir: "src/test/resources", include: '**/*.xml')
+        suites "src/test/resources"
     }
 }
 
