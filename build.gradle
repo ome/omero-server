@@ -90,13 +90,17 @@ clean {
 }
 
 if (slice.iceVersion.contains('3.7')) {
-    dependencies.add('compile', 'com.zeroc:ice:3.7.1')
+    dependencies {
+        api 'com.zeroc:ice:3.7.2'
+    }
     sourceSets.main.java {
         srcDirs 'src/main/ice37', 'src/generated/ice37'
     }
     slice.output = file('src/generated/ice37')
 } else if (slice.iceVersion.contains('3.6')) {
-    dependencies.add('compile', 'com.zeroc:ice:3.6.4')
+    dependencies {
+        api 'com.zeroc:ice:3.6.4'
+    }
     sourceSets.main.java {
         srcDirs 'src/main/ice36', 'src/generated/ice36'
     }
