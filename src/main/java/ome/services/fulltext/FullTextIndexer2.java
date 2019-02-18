@@ -29,6 +29,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicReference;
 
 import ome.model.IObject;
 import ome.model.meta.EventLog;
@@ -51,7 +52,9 @@ import org.hibernate.search.Search;
 import org.hibernate.search.bridge.FieldBridge;
 import org.quartz.DateBuilder;
 import org.quartz.JobDetail;
+import org.quartz.JobKey;
 import org.quartz.Scheduler;
+import org.quartz.Trigger;
 import org.quartz.TriggerBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,6 +63,10 @@ import org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean;
 public class FullTextIndexer2 {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FullTextIndexer2.class);
+
+    private static enum Step {
+        PREPARE, INDEX, PURGE, NOTE;
+    }
 
     private static enum Event {
         STARTUP, FIELD_BRIDGE_CONTENTION, NOTHING_NEW_TO_INDEX;
@@ -80,7 +87,7 @@ public class FullTextIndexer2 {
 
     private static final int BATCH_SIZE = 256;
 
-    private static final String JOB_GROUP = "full-text indexer";
+    private static final String JOB_GROUP = FullTextIndexer2.class.getSimpleName();
 
     private static final Set<Class<? extends IObject>> INCLUDE_TYPES =
             ImmutableSet.of(ome.model.core.Image.class,ome.model.containers.Project.class,
@@ -92,12 +99,12 @@ public class FullTextIndexer2 {
     private final FieldBridge bridge;
     private final String countKey;
 
+    private final AtomicReference<JobKey[]> jobs = new AtomicReference<>();
+
     private final SetMultimap<String, Long> toIndex = HashMultimap.create();
     private final SetMultimap<String, Long> toPurge = HashMultimap.create();
 
     private long eventLogId = -1;
-
-    private int jobId = 0;
 
     public FullTextIndexer2(Scheduler scheduler, SessionFactoryImplementor sessionFactory, FieldBridge bridge, String countKey) {
         this.scheduler = scheduler;
@@ -106,43 +113,69 @@ public class FullTextIndexer2 {
         this.countKey = countKey;
     }
 
-    private void register(String method) {
+    private void register(Step step, TriggerBuilder<Trigger> trigger, String message) {
         try {
-            scheduler.scheduleJob(createJob(method), TriggerBuilder.newTrigger().startNow().build());
-            LOGGER.debug("registered job for immediate execution: {}", method);
+            scheduler.scheduleJob(trigger.forJob(jobs.get()[step.ordinal()]).build());
+            LOGGER.debug("registered job {} for {}", step, message);
+        } catch (NullPointerException npe) {
+            LOGGER.debug("indexer is not running: not registering job {}", step);
         } catch (Throwable t) {
-            LOGGER.error("failed to register immediate job so indexing may have stopped", t);
+            LOGGER.error("failed to register job {} so indexing may have stopped", step, t);
         }
     }
 
-    private void register(String method, Event reason) {
+    private void register(Step step) {
+        register(step, TriggerBuilder.newTrigger().startNow(), "immediate execution");
+    }
+
+    private void register(Step step, Event reason) {
         final Date when = getWhen(reason);
-        try {
-            scheduler.scheduleJob(createJob(method), TriggerBuilder.newTrigger().startAt(when).build());
-            LOGGER.debug("registered job for execution at {}: {}", when, method);
-        } catch (Throwable t) {
-            LOGGER.error("failed to register scheduled job so indexing may have stopped", t);
-        }
-    }
-
-    private JobDetail createJob(String method) throws ReflectiveOperationException {
-        final MethodInvokingJobDetailFactoryBean factory = new MethodInvokingJobDetailFactoryBean();
-        factory.setGroup(JOB_GROUP);
-        factory.setName(method + "-" + jobId++);
-        factory.setTargetObject(this);
-        factory.setTargetMethod(method);
-        factory.setConcurrent(false);
-        factory.afterPropertiesSet();
-        return factory.getObject();
+        register(step, TriggerBuilder.newTrigger().startAt(when), "execution at " + when);
     }
 
     public void start() {
+        final JobKey[] newJobs = new JobKey[Step.values().length];
+        if (!jobs.compareAndSet(null, newJobs)) {
+            LOGGER.warn("not starting indexer: it is already running");
+            return;
+        }
         LOGGER.info("starting indexer");
         try {
-            register("prepare", Event.STARTUP);
+            for (final Step step : Step.values()) {
+                final MethodInvokingJobDetailFactoryBean factory = new MethodInvokingJobDetailFactoryBean();
+                factory.setGroup(JOB_GROUP);
+                factory.setName(step.toString());
+                factory.setTargetObject(this);
+                factory.setTargetMethod(step.name().toLowerCase());
+                factory.setConcurrent(false);
+                factory.afterPropertiesSet();
+                final JobDetail jobDetail = factory.getObject();
+                final JobKey job = jobDetail.getKey();
+                newJobs[step.ordinal()] = job;
+                LOGGER.debug("adding job {}", job);
+                scheduler.addJob(jobDetail, false);
+            }
+            register(Step.PREPARE, Event.STARTUP);
         } catch (Throwable t) {
             LOGGER.error("failed to start indexer", t);
         }
+    }
+
+    public void stop() {
+        final JobKey[] oldJobs = jobs.getAndSet(null);
+        if (oldJobs == null) {
+            LOGGER.warn("not stopping indexer: it is not running");
+            return;
+        }
+        try {
+            for (final JobKey job : oldJobs) {
+                LOGGER.debug("deleting job {}", job);
+                scheduler.deleteJob(job);
+            }
+        } catch (Throwable t) {
+            LOGGER.error("failed to stop indexer promptly", t);
+        }
+        LOGGER.info("stopped indexer");
     }
 
     public void prepare() {
@@ -212,11 +245,11 @@ public class FullTextIndexer2 {
         }
         try {
             if (!toIndex.isEmpty()) {
-                register("index");
+                register(Step.INDEX);
             } else if (!toPurge.isEmpty()) {
-                register("purge");
+                register(Step.PURGE);
             } else {
-                register("prepare", Event.NOTHING_NEW_TO_INDEX);
+                register(Step.PREPARE, Event.NOTHING_NEW_TO_INDEX);
             }
         } catch (Throwable t) {
             LOGGER.error("failed to continue indexer", t);
@@ -230,7 +263,7 @@ public class FullTextIndexer2 {
         } else {
             LOGGER.info("failed to lock field bridge so will wait awhile");
             try {
-                register("index", Event.FIELD_BRIDGE_CONTENTION);
+                register(Step.INDEX, Event.FIELD_BRIDGE_CONTENTION);
             } catch (Throwable t) {
                 LOGGER.error("failed to continue indexer", t);
             }
@@ -269,9 +302,9 @@ public class FullTextIndexer2 {
         }
         try {
             if (!toPurge.isEmpty()) {
-                register("purge");
+                register(Step.PURGE);
             } else {
-                register("note");
+                register(Step.NOTE);
             }
         } catch (Throwable t) {
             LOGGER.error("failed to continue indexer", t);
@@ -285,7 +318,7 @@ public class FullTextIndexer2 {
         } else {
             LOGGER.info("failed to lock field bridge so will wait awhile");
             try {
-                register("purge", Event.FIELD_BRIDGE_CONTENTION);
+                register(Step.PURGE, Event.FIELD_BRIDGE_CONTENTION);
             } catch (Throwable t) {
                 LOGGER.error("failed to continue indexer", t);
             }
@@ -320,7 +353,7 @@ public class FullTextIndexer2 {
             session.close();
         }
         try {
-            register("note");
+            register(Step.NOTE);
         } catch (Throwable t) {
             LOGGER.error("failed to continue indexer", t);
         }
@@ -357,7 +390,7 @@ public class FullTextIndexer2 {
             session.close();
         }
         try {
-            register("prepare");
+            register(Step.PREPARE);
         } catch (Throwable t) {
             LOGGER.error("failed to continue indexer", t);
         }
