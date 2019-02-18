@@ -55,10 +55,8 @@
 
   <bean id="fullTextIndexer2" class="ome.services.fulltext.FullTextIndexer2" init-method="start" lazy-init="false">
     <constructor-arg ref="scheduler"/>
-    <constructor-arg ref="executor"/>
+    <constructor-arg ref="sessionFactory"/>
     <constructor-arg ref="fullTextBridge"/>
-    <constructor-arg ref="sessionManager"/>
-    <constructor-arg ref="roles"/>
     <constructor-arg value="PersistentEventLogLoader.v2.current_id"/>
   </bean>
 
