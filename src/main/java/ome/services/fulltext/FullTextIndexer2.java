@@ -39,6 +39,7 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.SetMultimap;
 
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.CacheMode;
 import org.hibernate.FlushMode;
 import org.hibernate.Hibernate;
@@ -50,6 +51,7 @@ import org.hibernate.jdbc.Work;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.bridge.FieldBridge;
+import org.python.google.common.base.Splitter;
 import org.quartz.DateBuilder;
 import org.quartz.JobDetail;
 import org.quartz.JobKey;
@@ -121,15 +123,14 @@ public class FullTextIndexer2 {
     /**
      * Which model object types to index.
      */
-    private static final Set<Class<? extends IObject>> INCLUDE_TYPES =
-            ImmutableSet.of(ome.model.core.Image.class,ome.model.containers.Project.class,
-                    ome.model.containers.Dataset.class, ome.model.screen.Plate.class, ome.model.screen.Screen.class,
-                    ome.model.screen.PlateAcquisition.class, ome.model.screen.Well.class);
+    private final Set<Class<? extends IObject>> includeTypes;
 
     private final Scheduler scheduler;
     private final SessionFactory sessionFactory;
     private final FieldBridge bridge;
     private final String countKey;
+
+    private boolean isIndexerDisabled;
 
     private final AtomicReference<JobKey[]> jobs = new AtomicReference<>();
 
@@ -144,12 +145,31 @@ public class FullTextIndexer2 {
      * @param sessionFactory the Hibernate session factory
      * @param bridge the field bridge to set when indexing
      * @param countKey the name of the configuration key for tracking progress through the event log
+     * @param includeTypesList the names of the model object classes to index, comma-separated
      */
-    public FullTextIndexer2(Scheduler scheduler, SessionFactory sessionFactory, FieldBridge bridge, String countKey) {
+    public FullTextIndexer2(Scheduler scheduler, SessionFactory sessionFactory, FieldBridge bridge, String countKey,
+            String includeTypesList) {
         this.scheduler = scheduler;
         this.sessionFactory = sessionFactory;
         this.bridge = bridge;
         this.countKey = countKey;
+
+        final ImmutableSet.Builder<Class<? extends IObject>> includeTypes = ImmutableSet.builder();
+        for (final String className : Splitter.on(',').trimResults().split(includeTypesList)) {
+            try {
+                includeTypes.add(Class.forName(className).asSubclass(IObject.class));
+            } catch (ClassCastException | ReflectiveOperationException e) {
+                throw new IllegalArgumentException("include types must be a comma-separated list of model object types", e);
+            }
+        }
+        this.includeTypes = includeTypes.build();
+    }
+
+    /**
+     * @param cronExpression the cron expression configured for triggering indexing
+     */
+    public void setCronExpression(String cronExpression) {
+        this.isIndexerDisabled = StringUtils.isBlank(cronExpression);
     }
 
     // HELPERS FOR SCHEDULING JOBS //
@@ -195,6 +215,10 @@ public class FullTextIndexer2 {
      * Start the indexer. Ongoing operation occurs via Quartz.
      */
     public void start() {
+        if (isIndexerDisabled) {
+            LOGGER.info("not starting indexer: the configured cron expression is blank");
+            return;
+        }
         final JobKey[] newJobs = new JobKey[Step.values().length];
         if (!jobs.compareAndSet(null, newJobs)) {
             LOGGER.warn("not starting indexer: it is already running");
@@ -228,7 +252,11 @@ public class FullTextIndexer2 {
     public void stop() {
         final JobKey[] oldJobs = jobs.getAndSet(null);
         if (oldJobs == null) {
-            LOGGER.warn("not stopping indexer: it is not running");
+            if (isIndexerDisabled) {
+                LOGGER.info("not stopping indexer: the configured cron expression is blank");
+            } else {
+                LOGGER.warn("not stopping indexer: it is not running");
+            }
             return;
         }
         try {
@@ -357,7 +385,16 @@ public class FullTextIndexer2 {
                 query.setParameterList("ids", entityIds);
                 query.setReadOnly(true);
                 for (final Object entity : query.list()) {
-                    if (INCLUDE_TYPES.contains(Hibernate.getClass(entity))) {
+                    @SuppressWarnings("unchecked")
+                    final Class<? extends IObject> entityClass = Hibernate.getClass(entity);
+                    boolean isInclude = false;
+                    for (final Class<? extends IObject> includeType : includeTypes) {
+                        if (includeType.isAssignableFrom(entityClass)) {
+                            isInclude = true;
+                            break;
+                        }
+                    }
+                    if (isInclude) {
                         LOGGER.debug("indexing {}:{}", entityType, ((IObject) entity).getId());
                         fullTextSession.index(entity);
                     } else {

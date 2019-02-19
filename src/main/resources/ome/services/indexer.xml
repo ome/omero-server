@@ -59,6 +59,8 @@
     <constructor-arg ref="sessionFactory"/>
     <constructor-arg ref="fullTextBridge"/>
     <constructor-arg value="PersistentEventLogLoader.v2.current_id"/>
+    <constructor-arg value="${omero.search.include_types}"/>
+    <property name="cronExpression" value="${omero.search.cron}"/>
   </bean>
 
   <bean id="fullTextIndexer2TriggerGuard" class="ome.services.util.BeanInstantiationGuard" depends-on="executor">
