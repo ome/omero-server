@@ -44,8 +44,8 @@ import org.hibernate.FlushMode;
 import org.hibernate.Hibernate;
 import org.hibernate.Query;
 import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
-import org.hibernate.engine.SessionFactoryImplementor;
 import org.hibernate.jdbc.Work;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
@@ -60,18 +60,41 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean;
 
+/**
+ * An indexer bean replacing the 5.4 full-text thread with adequate functionality.
+ * Exists as a stand-in while Hibernate / Spring upgrade issues remain unresolved.
+ * @author m.t.b.carroll@dundee.ac.uk
+ * @since 5.5.0
+ */
 public class FullTextIndexer2 {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FullTextIndexer2.class);
 
     private static enum Step {
-        PREPARE, INDEX, PURGE, NOTE;
+        /* Determine from the event log what next to consider indexing. */
+        PREPARE,
+        /* Index a batch of model objects. */
+        INDEX,
+        /* Purge a batch of model objects. */
+        PURGE,
+        /* Note the progress made by the indexer. */
+        NOTE;
     }
 
     private static enum Event {
-        STARTUP, FIELD_BRIDGE_CONTENTION, NOTHING_NEW_TO_INDEX;
+        /* Time to wait from startup to first indexing run. Allows the services adequate initialization time. */
+        STARTUP,
+        /* How long to wait to try to relock the field bridge. */
+        FIELD_BRIDGE_CONTENTION,
+        /* How long to wait after finding nothing new to index. */
+        NOTHING_NEW_TO_INDEX;
     }
 
+    /**
+     * Configures durations related to {@link Event} values.
+     * @param reason the event that occurred
+     * @return when next to act
+     */
     private static Date getWhen(Event reason) {
         switch (reason) {
         case STARTUP:
@@ -85,17 +108,26 @@ public class FullTextIndexer2 {
         }
     }
 
+    /**
+     * Maximum number of event log entries to process in one transaction.
+     */
     private static final int BATCH_SIZE = 256;
 
+    /**
+     * An identifier for this indexer's Quartz jobs.
+     */
     private static final String JOB_GROUP = FullTextIndexer2.class.getSimpleName();
 
+    /**
+     * Which model object types to index.
+     */
     private static final Set<Class<? extends IObject>> INCLUDE_TYPES =
             ImmutableSet.of(ome.model.core.Image.class,ome.model.containers.Project.class,
                     ome.model.containers.Dataset.class, ome.model.screen.Plate.class, ome.model.screen.Screen.class,
                     ome.model.screen.PlateAcquisition.class, ome.model.screen.Well.class);
 
     private final Scheduler scheduler;
-    private final SessionFactoryImplementor sessionFactory;
+    private final SessionFactory sessionFactory;
     private final FieldBridge bridge;
     private final String countKey;
 
@@ -106,13 +138,28 @@ public class FullTextIndexer2 {
 
     private long eventLogId = -1;
 
-    public FullTextIndexer2(Scheduler scheduler, SessionFactoryImplementor sessionFactory, FieldBridge bridge, String countKey) {
+    /**
+     * Construct a new indexer.
+     * @param scheduler the Quartz scheduler for the indexing jobs
+     * @param sessionFactory the Hibernate session factory
+     * @param bridge the field bridge to set when indexing
+     * @param countKey the name of the configuration key for tracking progress through the event log
+     */
+    public FullTextIndexer2(Scheduler scheduler, SessionFactory sessionFactory, FieldBridge bridge, String countKey) {
         this.scheduler = scheduler;
         this.sessionFactory = sessionFactory;
         this.bridge = bridge;
         this.countKey = countKey;
     }
 
+    // HELPERS FOR SCHEDULING JOBS //
+
+    /**
+     * Schedule a job for execution.
+     * @param step which job to schedule
+     * @param trigger the execution trigger with the start time set
+     * @param message a description of the job in terms of when it executes, for the log
+     */
     private void register(Step step, TriggerBuilder<Trigger> trigger, String message) {
         try {
             scheduler.scheduleJob(trigger.forJob(jobs.get()[step.ordinal()]).build());
@@ -124,15 +171,29 @@ public class FullTextIndexer2 {
         }
     }
 
+    /**
+     * Schedule a job for immediate execution.
+     * @param step which job to schedule
+     */
     private void register(Step step) {
         register(step, TriggerBuilder.newTrigger().startNow(), "immediate execution");
     }
 
+    /**
+     * Schedule a job for delayed execution.
+     * @param step which job to schedule
+     * @param reason the event that occurred to prompt the delay
+     */
     private void register(Step step, Event reason) {
         final Date when = getWhen(reason);
         register(step, TriggerBuilder.newTrigger().startAt(when), "execution at " + when);
     }
 
+    // LIFECYCLE METHODS INVOKED BY SPRING //
+
+    /**
+     * Start the indexer. Ongoing operation occurs via Quartz.
+     */
     public void start() {
         final JobKey[] newJobs = new JobKey[Step.values().length];
         if (!jobs.compareAndSet(null, newJobs)) {
@@ -161,6 +222,9 @@ public class FullTextIndexer2 {
         }
     }
 
+    /**
+     * Stop the indexer.
+     */
     public void stop() {
         final JobKey[] oldJobs = jobs.getAndSet(null);
         if (oldJobs == null) {
@@ -178,6 +242,11 @@ public class FullTextIndexer2 {
         LOGGER.info("stopped indexer");
     }
 
+    // STEPS OF INDEXING LAUNCHED BY QUARTZ //
+
+    /**
+     * Query the database for new event log entries indicating model objects to process.
+     */
     public void prepare() {
         final Session session = sessionFactory.openSession();
         try {
@@ -221,7 +290,7 @@ public class FullTextIndexer2 {
             @SuppressWarnings("unchecked")
             final List<EventLog> logEntries = (List<EventLog>) query.list();
             if (logEntries.isEmpty()) {
-                LOGGER.debug("no new event log entries", logEntries.size());
+                LOGGER.debug("no new event log entries");
             } else {
                 LOGGER.debug("reviewing {} event log entries", logEntries.size());
                 for (final EventLog logEntry : logEntries) {
@@ -256,6 +325,9 @@ public class FullTextIndexer2 {
         }
     }
 
+    /**
+     * Index a batch of model objects.
+     */
     public void index() {
         LOGGER.info("indexing objects: count = {}", toIndex.size());
         if (DetailsFieldBridge.tryLock()) {
@@ -311,6 +383,9 @@ public class FullTextIndexer2 {
         }
     }
 
+    /**
+     * Purge a batch of model objects.
+     */
     public void purge() {
         LOGGER.info("purging objects: count = {}", toPurge.size());
         if (DetailsFieldBridge.tryLock()) {
@@ -359,6 +434,9 @@ public class FullTextIndexer2 {
         }
     }
 
+    /**
+     * Note which event log entries were processed.
+     */
     public void note() {
         LOGGER.debug("noting event log entries as processed");
         final Session session = sessionFactory.openSession();
