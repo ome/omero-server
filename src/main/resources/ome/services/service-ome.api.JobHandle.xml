@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# 
+# $Id$
+# 
+# Copyright 2007 Glencoe Software, Inc. All rights reserved.
+# Use is subject to license terms supplied in LICENSE.txt
+#
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-->
+
+<!--
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Written by:  Josh Moore, josh at glencoesoftware.com
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+  <bean parent="stateful"
+        id="internal-ome.api.JobHandle"
+        class="ome.services.JobBean" scope="prototype">
+    <property name="typesService" ref="internal-ome.api.ITypes"/>
+    <property name="updateService" ref="internal-ome.api.IUpdate"/>
+    <property name="processManager" ref="processManager"/>
+  </bean>
+  
+  <bean id="managed-ome.api.JobHandle" parent="managedStatefulService" scope="prototype">
+    <property name="proxyInterfaces" value="ome.api.JobHandle"/>
+    <property name="target" ref="internal-ome.api.JobHandle"/>
+  </bean>
+  
+  <bean id="processManager" class="ome.services.procs.ProcessManager">
+    <constructor-arg ref="sessionManager"/>
+    <constructor-arg ref="securitySystem"/>
+    <constructor-arg ref="executor"/>
+    <constructor-arg>
+      <list/>
+    </constructor-arg>
+  </bean>
+
+  <bean id="process-jobs-run" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+    <property name="targetObject" ref="processManager" />
+    <property name="targetMethod" value="run" />
+    <property name="concurrent" value="false" />
+  </bean>
+
+  <!--
+  <bean id="process-jobs-every-30-seconds" class="org.springframework.scheduling.quartz.CronTriggerBean">
+    <property name="jobDetail" ref="process-jobs-run" />
+    <property name="cronExpression" value="0,30 * * * * ?" />
+  </bean>
+  -->
+
+</beans>

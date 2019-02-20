@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# 
+# $Id$
+# 
+# Copyright 2006 University of Dundee. All rights reserved.
+# Use is subject to license terms supplied in LICENSE.txt
+#
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-->
+
+<!--
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Written by:  Josh Moore <josh.moore@gmx.de>
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+  <bean
+          id="internal-omeis.providers.re.RenderingEngine"
+          class="ome.services.RenderingBean" scope="prototype">
+	  <constructor-arg ref="/OMERO/Pixels"/>
+	  <constructor-arg ref="executor"/>
+	  <constructor-arg ref="internal-ome.api.LocalCompress"/>
+	  <constructor-arg ref="securitySystem"/>
+	  <constructor-arg ref="internal-ome.api.LutProvider"/>
+  </bean>
+  
+  <bean id="managed-omeis.providers.re.RenderingEngine" parent="selfManagingService" scope="prototype">
+    <property name="proxyInterfaces" value="omeis.providers.re.RenderingEngine"/>
+    <property name="target" ref="internal-omeis.providers.re.RenderingEngine"/>
+  </bean>
+
+</beans>

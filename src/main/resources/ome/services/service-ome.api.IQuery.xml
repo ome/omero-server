@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# 
+# $Id$
+# 
+# Copyright 2006 University of Dundee. All rights reserved.
+# Use is subject to license terms supplied in LICENSE.txt
+#
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-->
+
+<!--
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Written by:  Josh Moore <josh.moore@gmx.de>
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+  <alias name="internal-ome.api.IQuery" alias="internal-ome.api.LocalQuery"/> 
+  <bean parent="level1" id="internal-ome.api.IQuery" class="ome.logic.QueryImpl">
+    <property name="analyzer" value="${omero.search.analyzer}"/>
+  </bean>
+ 
+  <bean id="managed-ome.api.IQuery" parent="managedService">
+    <property name="proxyInterfaces">
+      <list>
+        <value>ome.api.IQuery</value>
+        <value>ome.api.local.LocalQuery</value>        
+      </list>
+    </property>
+    <property name="target" ref="internal-ome.api.IQuery"/>
+  </bean>  
+  
+</beans>

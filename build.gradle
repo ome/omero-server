@@ -1,0 +1,122 @@
+buildscript {
+    repositories {
+        gradlePluginPortal()
+    }
+    dependencies {
+        classpath "gradle.plugin.com.zeroc.gradle.ice-builder:slice:1.4.5"
+    }
+}
+
+plugins {
+    id "java-library"
+    id "maven-publish"
+}
+
+// We have to use old plugin syntax in order for slice plugin to work
+apply plugin: "com.zeroc.gradle.ice-builder.slice"
+
+group = 'org.openmicroscopy'
+version = '5.5.0-SNAPSHOT'
+sourceCompatibility = JavaVersion.VERSION_1_8
+targetCompatibility = JavaVersion.VERSION_1_8
+
+repositories {
+    mavenCentral()
+    mavenLocal()
+    maven { url 'https://artifacts.openmicroscopy.org/artifactory/maven/' }
+}
+
+ext {
+    //the database type: must match the version set in omero-model
+    databaseType = "psql"
+}
+
+dependencies {
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+    testCompile group: 'org.testng', name: 'testng', version: '6.14.2'
+    testCompile group: 'jmock', name: 'jmock', version: '1.+'
+    testCompile group: 'org.apache.directory.server', name: 'apacheds-all', version: '1.5.7'
+    testCompile group: 'log4j', name: 'log4j', version: '1.2.17'
+
+    // https://mvnrepository.com/artifact/org.apache.directory.shared/shared-ldap
+    // testCompile group: 'org.apache.directory.shared', name: 'shared-ldap-constants', version: '1.0.0-M1'
+    // testCompile group: 'org.apache.directory.shared', name: 'shared-ldap', version: '0.9.15'
+
+    api 'org.openmicroscopy:omero-renderer:5.5.0-SNAPSHOT'
+
+    // Spring framework stuff
+    implementation "org.springframework:spring-context-support:4.3.14.RELEASE"
+    implementation "org.springframework:spring-jms:4.3.14.RELEASE"
+    implementation "org.springframework.security:spring-security-ldap:4.2.4.RELEASE"
+
+    if (databaseType.equals("psql")) {
+        // Postgres connect driver for java
+        implementation 'org.postgresql:postgresql:42.2.1'
+    }
+    // Used by hibernate, see: https://stackoverflow.com/a/14365438
+    implementation 'org.javassist:javassist:3.22.0-GA'
+
+    // API monitoring thing: http://jamonapi.sourceforge.net
+    implementation 'com.jamonapi:jamon:2.81'
+
+    implementation 'com.github.marcus-nl.btm:btm:3.0.0-mk1'
+
+    implementation 'org.apache.pdfbox:pdfbox:2.0.8'
+    implementation 'org.apache.commons:commons-collections4:4.1'
+    implementation 'org.apache.xmlgraphics:batik-all:1.9.1'
+
+    implementation 'commons-beanutils:commons-beanutils:1.9.3'
+
+    implementation 'com.sun.mail:javax.mail:1.6.1'
+
+    implementation 'com.mortennobel:java-image-scaling:0.8.6'
+
+    implementation 'org.quartz-scheduler:quartz:2.2.1'
+
+    implementation 'org.subethamail:subethasmtp:3.1.7'
+
+    implementation 'net.sf.ehcache:ehcache:2.10.4'
+}
+
+test {
+    // enable TestNG support (default is JUnit)
+    useTestNG() {
+        suites "src/test/resources"
+    }
+}
+
+clean {
+    delete "src/generated"
+}
+
+if (slice.iceVersion.contains('3.7')) {
+    dependencies {
+        api 'com.zeroc:ice:3.7.2'
+    }
+    sourceSets.main.java {
+        srcDirs 'src/main/ice37', 'src/generated/ice37'
+    }
+    slice.output = file('src/generated/ice37')
+} else if (slice.iceVersion.contains('3.6')) {
+    dependencies {
+        api 'com.zeroc:ice:3.6.4'
+    }
+    sourceSets.main.java {
+        srcDirs 'src/main/ice36', 'src/generated/ice36'
+    }
+    slice.output = file('src/generated/ice36')
+}
+
+jar {
+    manifest {
+        attributes(
+                'Build-Timestamp': new java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ").format(new Date()),
+                'Created-By': "Gradle ${gradle.gradleVersion}",
+                'Build-Jdk': "${System.properties['java.version']} (${System.properties['java.vendor']} ${System.properties['java.vm.version']})",
+                'Main-Class': 'ome.services.fulltext.Main',
+                "Class-Path": configurations.runtimeClasspath.collect { it.getName() }.join(' ')
+        )
+    }
+}
+// Add publish functionality
+apply from: 'publish.gradle'
