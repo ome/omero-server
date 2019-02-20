@@ -28,7 +28,6 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
 import ome.model.IObject;
@@ -85,28 +84,29 @@ public class FullTextIndexer2 {
 
     private static enum Event {
         /* Time to wait from startup to first indexing run. Allows the services adequate initialization time. */
-        STARTUP,
+        STARTUP(20),
         /* How long to wait to try to relock the field bridge. */
-        FIELD_BRIDGE_CONTENTION,
+        FIELD_BRIDGE_CONTENTION(5),
         /* How long to wait after finding nothing new to index. */
-        NOTHING_NEW_TO_INDEX;
-    }
+        NOTHING_NEW_TO_INDEX(2);
 
-    /**
-     * Configures durations related to {@link Event} values.
-     * @param reason the event that occurred
-     * @return when next to act
-     */
-    private static Date getWhen(Event reason) {
-        switch (reason) {
-        case STARTUP:
-            return DateBuilder.futureDate(1, DateBuilder.IntervalUnit.MINUTE);
-        case FIELD_BRIDGE_CONTENTION:
-            return DateBuilder.futureDate(10, DateBuilder.IntervalUnit.SECOND);
-        case NOTHING_NEW_TO_INDEX:
-            return DateBuilder.futureDate(2, DateBuilder.IntervalUnit.SECOND);
-        default:
-            throw new IllegalArgumentException("cannot provide date for: " + reason);
+        private final int seconds;
+
+        /**
+         * Constructor configures duration of quiescence after event.
+         * @param seconds how many seconds to wait
+         */
+        private Event(int seconds) {
+            this.seconds = seconds;
+        }
+
+        /**
+         * Calculate the time from now to finish waiting.
+         * @param reason the event that occurred
+         * @return when next to act
+         */
+        private Date getWhen() {
+            return DateBuilder.futureDate(seconds, DateBuilder.IntervalUnit.SECOND);
         }
     }
 
@@ -121,9 +121,14 @@ public class FullTextIndexer2 {
     private static final String JOB_GROUP = FullTextIndexer2.class.getSimpleName();
 
     /**
+     * The event log actions of which to take note.
+     */
+    private final Collection<String> actions;
+
+    /**
      * Which model object types to index.
      */
-    private final Set<Class<? extends IObject>> includeTypes;
+    private final Collection<Class<? extends IObject>> includeTypes;
 
     private final Scheduler scheduler;
     private final SessionFactory sessionFactory;
@@ -145,14 +150,20 @@ public class FullTextIndexer2 {
      * @param sessionFactory the Hibernate session factory
      * @param bridge the field bridge to set when indexing
      * @param countKey the name of the configuration key for tracking progress through the event log
+     * @param actionsList the event log actions to take note of, comma-separated
      * @param includeTypesList the names of the model object classes to index, comma-separated
      */
     public FullTextIndexer2(Scheduler scheduler, SessionFactory sessionFactory, FieldBridge bridge, String countKey,
-            String includeTypesList) {
+            String actionsList, String includeTypesList) {
         this.scheduler = scheduler;
         this.sessionFactory = sessionFactory;
         this.bridge = bridge;
         this.countKey = countKey;
+
+        this.actions = ImmutableSet.copyOf(Splitter.on(',').trimResults().split(actionsList));
+        if (this.actions.isEmpty()) {
+            throw new IllegalArgumentException("event log actions must be specified");
+        }
 
         final ImmutableSet.Builder<Class<? extends IObject>> includeTypes = ImmutableSet.builder();
         for (final String className : Splitter.on(',').trimResults().split(includeTypesList)) {
@@ -205,7 +216,7 @@ public class FullTextIndexer2 {
      * @param reason the event that occurred to prompt the delay
      */
     private void register(Step step, Event reason) {
-        final Date when = getWhen(reason);
+        final Date when = reason.getWhen();
         register(step, TriggerBuilder.newTrigger().startAt(when), "execution at " + when);
     }
 
@@ -270,7 +281,59 @@ public class FullTextIndexer2 {
         LOGGER.info("stopped indexer");
     }
 
-    // STEPS OF INDEXING LAUNCHED BY QUARTZ //
+    // STEPS OF INDEXING LAUNCHED BY QUARTZ (first, their private helpers) //
+
+    /**
+     * Determine if the given type of model object is to be included in indexing.
+     * @param entityClass a model object type
+     * @return if the type is to be indexed
+     */
+    private boolean isIncluded(Class<? extends IObject> entityClass) {
+        for (final Class<? extends IObject> includeType : includeTypes) {
+            if (includeType.isAssignableFrom(entityClass)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Remove note of the model objects that will be handled in a later indexer run.
+     * @param entities some model objects
+     * @param session the session to use for queries
+     */
+    private void removeObsoleteEntries(SetMultimap<String, Long> entities, Session session) {
+        final SetMultimap<String, Long> obsoleteEntries = HashMultimap.create();
+        final String hql = "SELECT DISTINCT entityId FROM EventLog " +
+                "WHERE id > :id AND entityType = :type AND entityId IN (:ids) AND action IN (:actions)";
+        for (final Map.Entry<String, Collection<Long>> entityOneType : entities.asMap().entrySet()) {
+            final String entityType = entityOneType.getKey();
+            final Collection<Long> entityIds = entityOneType.getValue();
+            try {
+                if (!isIncluded(Class.forName(entityType).asSubclass(IObject.class))) {
+                    continue;
+                }
+            } catch (ClassCastException | ReflectiveOperationException e) {
+                LOGGER.warn("unknown entity type in event log: {}", entityType, e);
+                obsoleteEntries.putAll(entityType, entityIds);
+                continue;
+            }
+            final Query query = session.createQuery(hql);
+            query.setParameter("id", eventLogId);
+            query.setParameter("type", entityType);
+            query.setParameterList("ids", entityIds);
+            query.setParameterList("actions", actions);
+            @SuppressWarnings("unchecked")
+            final List<Long> entityIdsObsolete = (List<Long>) query.list();
+            obsoleteEntries.putAll(entityType, entityIdsObsolete);
+        }
+        for (final Map.Entry<String, Long> obsoleteEntry : obsoleteEntries.entries()) {
+            final String entityType = obsoleteEntry.getKey();
+            final Long entityId = obsoleteEntry.getValue();
+            LOGGER.debug("skipping {}:{}", entityType, entityId);
+            entities.remove(entityType, entityId);
+        }
+    }
 
     /**
      * Query the database for new event log entries indicating model objects to process.
@@ -311,10 +374,11 @@ public class FullTextIndexer2 {
                     }
                 }
             });
-            final String hql = "FROM EventLog WHERE id > :id ORDER BY id";
+            final String hql = "FROM EventLog WHERE id > :id AND action IN (:actions) ORDER BY id";
             final Query query = session.createQuery(hql);
             query.setMaxResults(BATCH_SIZE);
             query.setParameter("id", eventLogId);
+            query.setParameterList("actions", actions);
             @SuppressWarnings("unchecked")
             final List<EventLog> logEntries = (List<EventLog>) query.list();
             if (logEntries.isEmpty()) {
@@ -322,19 +386,17 @@ public class FullTextIndexer2 {
             } else {
                 LOGGER.debug("reviewing {} event log entries", logEntries.size());
                 for (final EventLog logEntry : logEntries) {
-                    switch (logEntry.getAction()) {
-                    case "INSERT":
-                    case "UPDATE":
-                    case "REINDEX":
-                        toIndex.put(logEntry.getEntityType(), logEntry.getEntityId());
-                        break;
-                    case "DELETE":
+                    if ("DELETE".equals(logEntry.getAction())) {
                         toIndex.remove(logEntry.getEntityType(), logEntry.getEntityId());
                         toPurge.put(logEntry.getEntityType(), logEntry.getEntityId());
-                        break;
+                    } else {
+                        toIndex.put(logEntry.getEntityType(), logEntry.getEntityId());
                     }
                     eventLogId = logEntry.getId();
                 }
+                LOGGER.debug("looking ahead for which log entries are obsolete");
+                removeObsoleteEntries(toIndex, session);
+                removeObsoleteEntries(toPurge, session);
             }
             transaction.rollback();
         } finally {
@@ -387,14 +449,7 @@ public class FullTextIndexer2 {
                 for (final Object entity : query.list()) {
                     @SuppressWarnings("unchecked")
                     final Class<? extends IObject> entityClass = Hibernate.getClass(entity);
-                    boolean isInclude = false;
-                    for (final Class<? extends IObject> includeType : includeTypes) {
-                        if (includeType.isAssignableFrom(entityClass)) {
-                            isInclude = true;
-                            break;
-                        }
-                    }
-                    if (isInclude) {
+                    if (isIncluded(entityClass)) {
                         LOGGER.debug("indexing {}:{}", entityType, ((IObject) entity).getId());
                         fullTextSession.index(entity);
                     } else {
@@ -449,8 +504,8 @@ public class FullTextIndexer2 {
                 final Class<? extends IObject> entityClass;
                 try {
                     entityClass = Class.forName(entityType).asSubclass(IObject.class);
-                } catch (ClassNotFoundException e) {
-                    LOGGER.error("unknown entity type in event log: {}", entityType, e);
+                } catch (ClassCastException | ReflectiveOperationException e) {
+                    LOGGER.warn("unknown entity type in event log: {}", entityType, e);
                     continue;
                 }
                 for (final Long entityId :entityIds) {
