@@ -26,6 +26,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
@@ -49,6 +50,7 @@ import org.hibernate.Transaction;
 import org.hibernate.jdbc.Work;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
+import org.hibernate.search.SearchFactory;
 import org.hibernate.search.bridge.FieldBridge;
 import org.python.google.common.base.Splitter;
 import org.quartz.DateBuilder;
@@ -79,7 +81,9 @@ public class FullTextIndexer2 {
         /* Purge a batch of model objects. */
         PURGE,
         /* Note the progress made by the indexer. */
-        NOTE;
+        NOTE,
+        /* Defragment the search index. */
+        OPTIMIZE;
     }
 
     private static enum Event {
@@ -116,6 +120,11 @@ public class FullTextIndexer2 {
     private static final int BATCH_SIZE = 256;
 
     /**
+     * After how many purges to defragment the search index.
+     */
+    private static final int OPTIMIZE_COUNT = 4096;
+
+    /**
      * An identifier for this indexer's Quartz jobs.
      */
     private static final String JOB_GROUP = FullTextIndexer2.class.getSimpleName();
@@ -141,6 +150,7 @@ public class FullTextIndexer2 {
 
     private final SetMultimap<String, Long> toIndex = HashMultimap.create();
     private final SetMultimap<String, Long> toPurge = HashMultimap.create();
+    private final Map<Class<? extends IObject>, Integer> purgeCounts = new HashMap<>();
 
     private long eventLogId = -1;
 
@@ -251,7 +261,7 @@ public class FullTextIndexer2 {
                 LOGGER.debug("adding job {}", job);
                 scheduler.addJob(jobDetail, false);
             }
-            register(Step.PREPARE, Event.STARTUP);
+            register(Step.OPTIMIZE, Event.STARTUP);
         } catch (Throwable t) {
             LOGGER.error("failed to start indexer", t);
         }
@@ -408,7 +418,18 @@ public class FullTextIndexer2 {
             } else if (!toPurge.isEmpty()) {
                 register(Step.PURGE);
             } else {
-                register(Step.PREPARE, Event.NOTHING_NEW_TO_INDEX);
+                boolean isOptimize = false;
+                for (final int count : purgeCounts.values()) {
+                    if (count >= OPTIMIZE_COUNT) {
+                        isOptimize = true;
+                        break;
+                    }
+                }
+                if (isOptimize) {
+                    register(Step.OPTIMIZE);
+                } else {
+                    register(Step.PREPARE, Event.NOTHING_NEW_TO_INDEX);
+                }
             }
         } catch (Throwable t) {
             LOGGER.error("failed to continue indexer", t);
@@ -508,9 +529,13 @@ public class FullTextIndexer2 {
                     LOGGER.warn("unknown entity type in event log: {}", entityType, e);
                     continue;
                 }
-                for (final Long entityId :entityIds) {
+                for (final Long entityId : entityIds) {
                     LOGGER.debug("purging {}:{}", entityType, entityId);
                     fullTextSession.purge(entityClass, entityId);
+                }
+                if (isIncluded(entityClass)) {
+                    final Integer count = purgeCounts.get(entityClass);
+                    purgeCounts.put(entityClass, entityIds.size() + (count == null ? 0 : count));
                 }
             }
             transaction.commit();
@@ -555,6 +580,42 @@ public class FullTextIndexer2 {
                     }
                 }
             });
+            transaction.commit();
+        } finally {
+            session.close();
+        }
+        try {
+            register(Step.PREPARE);
+        } catch (Throwable t) {
+            LOGGER.error("failed to continue indexer", t);
+        }
+    }
+
+    /**
+     * Defragment the search index.
+     */
+    public void optimize() {
+        final Session session = sessionFactory.openSession();
+        try {
+            final FullTextSession fullTextSession = Search.getFullTextSession(session);
+            fullTextSession.setCacheMode(CacheMode.IGNORE);
+            fullTextSession.setFlushMode(FlushMode.COMMIT);
+            final Transaction transaction = fullTextSession.beginTransaction();
+            final SearchFactory searchFactory = fullTextSession.getSearchFactory();
+            if (purgeCounts.isEmpty()) {
+                LOGGER.info("defragmenting whole search index");
+                searchFactory.optimize();
+            } else {
+                for (final Map.Entry<Class<? extends IObject>, Integer> purgeCount : purgeCounts.entrySet()) {
+                    if (purgeCount.getValue() >= OPTIMIZE_COUNT) {
+                        final Class<? extends IObject> entityClass = purgeCount.getKey();
+                        LOGGER.info("defragmenting search index for {}", entityClass);
+                        searchFactory.optimize(entityClass);
+                        purgeCounts.remove(entityClass);
+                        break;
+                    }
+                }
+            }
             transaction.commit();
         } finally {
             session.close();
