@@ -7,6 +7,10 @@ cache:
     - $HOME/.gradle/caches/
     - $HOME/.gradle/wrapper/
 before_install:
+  - sudo apt-key adv --keyserver keyserver.ubuntu.com --recv 5E6DA83306132997
+  - sudo apt-add-repository "deb http://zeroc.com/download/apt/ubuntu14.04 stable main"
+  - sudo apt-get update -q
+  - sudo apt-get install libzeroc-ice-java -y
   - git clone git://github.com/ome/ice-builder-gradle
   - cd ice-builder-gradle && ./gradlew publishToMavenLocal
   - cd ..
