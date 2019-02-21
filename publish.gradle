@@ -16,6 +16,19 @@ publishing {
             artifact javadocJar
         }
     }
+    repositories {
+        maven {
+            credentials {
+                username = System.getenv('ARTIFACTORY_USER') ?: "${findProperty('artifactory_user')}"
+                password = System.getenv('ARTIFACTORY_PASSWORD') ?: "${findProperty('artifactory_password')}"
+            }
+            if (version.endsWith('SNAPSHOT')) {
+                url "https://artifacts.openmicroscopy.org/artifactory/ome.snapshots"
+            } else {
+                url "https://artifacts.openmicroscopy.org/artifactory/ome.staging"
+            }
+        }
+    }
 }
 
 javadoc {
