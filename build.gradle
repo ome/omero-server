@@ -16,7 +16,7 @@ plugins {
 apply plugin: "com.zeroc.gradle.ice-builder.slice"
 
 group = 'org.openmicroscopy'
-version = '5.5.0-SNAPSHOT'
+version = '5.5.0-m3'
 sourceCompatibility = JavaVersion.VERSION_1_8
 targetCompatibility = JavaVersion.VERSION_1_8
 
@@ -24,6 +24,9 @@ repositories {
     mavenCentral()
     mavenLocal()
     maven { url 'https://artifacts.openmicroscopy.org/artifactory/maven/' }
+    maven {
+        url "https://artifacts.unidata.ucar.edu/repository/unidata-all/"
+    }
 }
 
 ext {
@@ -42,7 +45,7 @@ dependencies {
     // testCompile group: 'org.apache.directory.shared', name: 'shared-ldap-constants', version: '1.0.0-M1'
     // testCompile group: 'org.apache.directory.shared', name: 'shared-ldap', version: '0.9.15'
 
-    api 'org.openmicroscopy:omero-renderer:5.5.0-SNAPSHOT'
+    api 'org.openmicroscopy:omero-renderer:5.5.0-m3'
 
     // Spring framework stuff
     implementation "org.springframework:spring-context-support:4.3.14.RELEASE"
