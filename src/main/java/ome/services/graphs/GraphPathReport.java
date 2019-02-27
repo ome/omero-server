@@ -174,8 +174,8 @@ public class GraphPathReport {
     private static void report() throws IOException {
         /* the information is gathered, now write the report */
         out.write(".. Content for this page is generated using\n");
-        out.write(".. https://github.com/openmicroscopy/openmicroscopy/blob/develop/");
-        out.write("components/server/src/ome/services/graphs/GraphPathReport.java\n\n");
+        out.write(".. https://github.com/ome/omero-server/blob/master/");
+        out.write("src/main/java/ome/services/graphs/GraphPathReport.java\n\n");
         out.write("Glossary of all OMERO Model Objects\n");
         out.write("===================================\n\n");
         out.write("Overview\n");
