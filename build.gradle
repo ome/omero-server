@@ -16,7 +16,7 @@ plugins {
 apply plugin: "com.zeroc.gradle.ice-builder.slice"
 
 group = 'org.openmicroscopy'
-version = '5.5.0-m3'
+version = '5.5.0-SNAPSHOT'
 sourceCompatibility = JavaVersion.VERSION_1_8
 targetCompatibility = JavaVersion.VERSION_1_8
 
