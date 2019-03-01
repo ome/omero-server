@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2017 University of Dundee & Open Microscopy Environment.
+ * Copyright (C) 2014-2019 University of Dundee & Open Microscopy Environment.
  * All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -515,6 +515,7 @@ public class GraphTraversal {
             /* actually do the planning of the operation */
             planning.toProcess.addAll(targetSet);
             planOperation();
+            orderFileDeletion();
         } else {
             /* act as if the target objects have no links and no rules match them */
             for (final CI targetObject : targetSet) {
@@ -564,6 +565,7 @@ public class GraphTraversal {
             /* actually do the planning of the operation */
             planning.toProcess.addAll(targetSet);
             planOperation();
+            orderFileDeletion();
         } else {
             /* act as if the target objects have no links and no rules match them */
             for (final CI targetObject : targetSet) {
@@ -1209,6 +1211,53 @@ public class GraphTraversal {
             planning.blockedBy.put(object, new HashSet<CI>(Sets.intersection(planning.befores.get(object), queuedItems)));
             for (final CI afterItem : Sets.intersection(planning.afters.get(object), queuedItems)) {
                 planning.blockedBy.get(afterItem).add(object);
+            }
+        }
+    }
+
+    /**
+     * Note the directory contents that must be deleted before the parent directory is deleted.
+     */
+    private void orderFileDeletion() {
+        /* find which files are to be deleted */
+        final String originalFileClassName = OriginalFile.class.getName();
+        final Set<Long> originalFileIds = new HashSet<>();
+        for (final CI object : planning.deleted) {
+            if (originalFileClassName.equals(object.className)) {
+                originalFileIds.add(object.id);
+            }
+        }
+        /* find which of those files are directories in a repository */
+        final SetMultimap<String, Long> directoryRepos = HashMultimap.create();
+        final String directoryRepoQuery =
+                "SELECT id, repo FROM OriginalFile WHERE mimetype = 'Directory' AND repo IS NOT NULL AND id IN (:ids)";
+        for (final List<Long> originalFileIdsBatch : Iterables.partition(originalFileIds, BATCH_SIZE)) {
+            for (final Object[] result :
+                (List<Object[]>) session.createQuery(directoryRepoQuery).setParameterList("ids", originalFileIdsBatch).list()) {
+                final Long id = (Long) result[0];
+                final String repo = (String) result[1];
+                directoryRepos.put(repo, id);
+            }
+        }
+        /* find and note the contents of those directories */
+        final String contentQuery = "SELECT id FROM OriginalFile WHERE repo = :repo AND path IN "
+                + "(SELECT path || name || '/' FROM OriginalFile WHERE id = :id)";
+        for (final Entry<String, Long> repoAndDirectoryId : directoryRepos.entries()) {
+            final String repo = repoAndDirectoryId.getKey();
+            final Long directoryId = repoAndDirectoryId.getValue();
+            final CI directory = new CI(originalFileClassName, directoryId);
+            for (final long contentId :
+                (List<Long>) session.createQuery(contentQuery).setParameter("repo", repo).setParameter("id", directoryId).list()) {
+                if (originalFileIds.contains(contentId)) {
+                    final CI content = new CI(originalFileClassName, contentId);
+                    Set<CI> blockers = planning.blockedBy.get(directory);
+                    if (blockers == null) {
+                        blockers = new HashSet<>();
+                        planning.blockedBy.put(directory, blockers);
+                    }
+                    blockers.add(content);
+                    log.debug("before deleting {} must first delete {}", directory, content);
+                }
             }
         }
     }
