@@ -120,7 +120,7 @@ public class SearchBeanTest extends MockObjectTestCase {
     public void testResetDefaults() {
         bean = new SearchBean(executor, analyzer);
         bean.setBatchSize(4);
-        bean.setCaseSentivice(false);
+        bean.setCaseSensitive(false);
         bean.setMergedBatches(true);
         bean.setReturnUnloaded(true);
         // Disallowed bean.setUseProjections(true);
