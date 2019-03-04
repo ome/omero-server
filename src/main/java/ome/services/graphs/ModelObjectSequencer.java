@@ -36,7 +36,9 @@ import com.google.common.collect.Ordering;
  * This class groups the utility methods for performing such ordering.
  * @author m.t.b.carroll@dundee.ac.uk
  * @since 5.1.1
+ * @deprecated no longer used internally, replaced by {@code GraphTraversal.orderFileDeletion()}
  */
+@Deprecated
 public class ModelObjectSequencer {
     /**
      * Sort a list of original file IDs such that files precede containing directories.
