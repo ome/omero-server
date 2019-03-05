@@ -1,5 +1,5 @@
 /*
- *   Copyright 2006-2018 University of Dundee. All rights reserved.
+ *   Copyright 2006-2019 University of Dundee. All rights reserved.
  *   Use is subject to license terms supplied in LICENSE.txt
  */
 
@@ -585,10 +585,15 @@ public class BasicACLVoter implements ACLVoter {
                 hasLightAdminPrivilege = true;
             }
 
+            final boolean isLinkageScope = scopes[i].equals(Scope.LINK) || scopes[i].equals(Scope.ANNOTATE);
+
             if (hasLightAdminPrivilege) {
                 rv |= (1<<i);
             } else if (sysType) {
-                // no privilege
+                /* system types allow only linking */
+                if (isLinkageScope) {
+                    rv |= (1<<i);
+                }
             } else if (leader) {
                 rv |= (1<<i);
             } else if (grpPermissions == null) {
@@ -612,6 +617,10 @@ public class BasicACLVoter implements ACLVoter {
             // As of ticket:8562 this is handled by
             // the separation of ANNOTATE and WRITE
             else if (member && grpPermissions.isGranted(GROUP, scope.right) ) {
+                rv |= (1<<i);
+            }
+            else if (isLinkageScope && (sysTypes.isInSystemGroup(d) || sysTypes.isInUserGroup(d))) {
+                // Can always link to objects in system or user group.
                 rv |= (1<<i);
             }
         }
