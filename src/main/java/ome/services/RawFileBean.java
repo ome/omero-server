@@ -357,16 +357,16 @@ public class RawFileBean extends AbstractStatefulBean implements RawFileStore {
             String mode = "r";
             final File osFile = new File(ioService.getFilesPath(file.getId()));
             if (!osFile.exists() || osFile.canWrite()) {
-            try {
-                if (admin.canUpdate(file)) {
-                    mode = "rw";
+                try {
+                    if (admin.canUpdate(file)) {
+                        mode = "rw";
+                    }
+                } catch (InternalException ie) {
+                    // ticket:10657 this is caused by the current
+                    // group being set to "-1" meaning no write permission
+                    // logic can be assumed.
+                    log.warn("No permissions info: using 'r' as mode for file " + fileId);
                 }
-            } catch (InternalException ie) {
-                // ticket:10657 this is caused by the current
-                // group being set to "-1" meaning no write permission
-                // logic can be assumed.
-                log.warn("No permissions info: using 'r' as mode for file " + fileId);
-            }
             }
 
             if (buffer == null) {
