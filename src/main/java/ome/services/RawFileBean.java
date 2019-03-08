@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2006-2017 University of Dundee & Open Microscopy Environment.
+ * Copyright (C) 2006-2019 University of Dundee & Open Microscopy Environment.
  * All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -355,6 +355,8 @@ public class RawFileBean extends AbstractStatefulBean implements RawFileStore {
             file = iQuery.get(OriginalFile.class, fileId);
 
             String mode = "r";
+            final File osFile = new File(ioService.getFilesPath(file.getId()));
+            if (!osFile.exists() || osFile.canWrite()) {
             try {
                 if (admin.canUpdate(file)) {
                     mode = "rw";
@@ -364,6 +366,7 @@ public class RawFileBean extends AbstractStatefulBean implements RawFileStore {
                 // group being set to "-1" meaning no write permission
                 // logic can be assumed.
                 log.warn("No permissions info: using 'r' as mode for file " + fileId);
+            }
             }
 
             if (buffer == null) {
