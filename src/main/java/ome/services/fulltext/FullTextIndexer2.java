@@ -455,7 +455,6 @@ public class FullTextIndexer2 {
         final ParserSession parserSession = new ParserSession();
         final Session session = sessionFactory.openSession();
         try {
-            DetailsFieldBridge.setFieldBridge(bridge);
             final FullTextSession fullTextSession = Search.getFullTextSession(session);
             fullTextSession.setCacheMode(CacheMode.IGNORE);
             fullTextSession.setFlushMode(FlushMode.COMMIT);
@@ -514,7 +513,6 @@ public class FullTextIndexer2 {
         }
         final Session session = sessionFactory.openSession();
         try {
-            DetailsFieldBridge.setFieldBridge(bridge);
             final FullTextSession fullTextSession = Search.getFullTextSession(session);
             fullTextSession.setCacheMode(CacheMode.IGNORE);
             fullTextSession.setFlushMode(FlushMode.COMMIT);
