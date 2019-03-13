@@ -37,6 +37,8 @@
     <constructor-arg value="IndexerAdapter"/>
   </bean>
 
+  <!-- Disable legacy indexer.
+
   <bean id="fullTextIndexerTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
     <property name="jobDetail" ref="fullTextThreadRun" />
     <property name="cronExpression" value="${omero.search.cron}" />
@@ -45,6 +47,26 @@
   <bean id="fullTextIndexerTriggerGuard" class="ome.services.util.BeanInstantiationGuard" depends-on="executor">
     <constructor-arg ref="readOnlyStatus"/>
     <constructor-arg value="fullTextIndexerTrigger"/>
+    <property name="isWriteDb" value="true"/>
+    <property name="isWriteRepo" value="true"/>
+  </bean>
+
+  -->
+
+  <bean id="fullTextIndexer2" class="ome.services.fulltext.FullTextIndexer2"
+        init-method="start" destroy-method="stop" lazy-init="false">
+    <constructor-arg ref="scheduler"/>
+    <constructor-arg ref="sessionFactory"/>
+    <constructor-arg ref="fullTextBridge"/>
+    <constructor-arg value="PersistentEventLogLoader.v2.current_id"/>
+    <constructor-arg value="${omero.search.include_actions}"/>
+    <constructor-arg value="${omero.search.include_types}"/>
+    <property name="cronExpression" value="${omero.search.cron}"/>
+  </bean>
+
+  <bean id="fullTextIndexer2TriggerGuard" class="ome.services.util.BeanInstantiationGuard" depends-on="executor">
+    <constructor-arg ref="readOnlyStatus"/>
+    <constructor-arg value="fullTextIndexer2"/>
     <property name="isWriteDb" value="true"/>
     <property name="isWriteRepo" value="true"/>
   </bean>

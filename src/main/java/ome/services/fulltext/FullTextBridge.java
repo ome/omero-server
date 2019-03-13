@@ -37,6 +37,7 @@ import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.Field.Index;
 import org.apache.lucene.document.Field.Store;
+import org.hibernate.proxy.HibernateProxy;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.LuceneOptions;
 import org.hibernate.search.bridge.builtin.DateBridge;
@@ -176,7 +177,10 @@ public class FullTextBridge extends BridgeHelper {
             IAnnotated annotated = (IAnnotated) object;
             List<Annotation> list = annotated.linkedAnnotationList();
             for (Annotation annotation : list) {
-                String at = annotationTypeString(annotation);
+                if (annotation instanceof HibernateProxy) {
+                    annotation = (Annotation) ((HibernateProxy) annotation).getHibernateLazyInitializer().getImplementation();
+                }
+                final String at = annotation.getClass().getSimpleName();
                 add(document, "annotation.type", at, opts);
                 if (annotation.getName() != null) {
                     add(document, "annotation.name", annotation.getName(), opts);
@@ -400,23 +404,4 @@ public class FullTextBridge extends BridgeHelper {
             }
         }
     }
-
-    /**
-     * Return the short type name of an {@link Annotation}. If the instance is
-     * an {@link ome.model.annotations.TextAnnotation} the returned value will
-     * be "TextAnnotation".
-     *
-     * @param annotation
-     * @return See above.
-     */
-    private String annotationTypeString(Annotation annotation) {
-        Class ac = Utils.trueClass(annotation.getClass());
-        int dot = ac.getName().lastIndexOf('.');
-        if (dot < 0) {
-            dot = -1;
-        }
-        String at = ac.getName().substring(dot + 1, ac.getName().length());
-        return at;
-    }
-
 }

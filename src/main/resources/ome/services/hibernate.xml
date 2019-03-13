@@ -2,7 +2,7 @@
 <!--
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # 
-# Copyright 2006-2016 University of Dundee. All rights reserved.
+# Copyright 2006-2019 University of Dundee. All rights reserved.
 # Use is subject to license terms supplied in LICENSE.txt
 #
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -47,7 +47,7 @@
 
   <bean id="hibernateProperties"
     class="org.springframework.beans.factory.config.PropertiesFactoryBean"
-    depends-on="serverDirectoryCheck"> <!-- ticket:5526 -->
+    depends-on="serverDirectoryCheck,configuredAnalyzer"> <!-- ticket:5526 -->
     <description>
     Scope: private
     </description>
@@ -74,13 +74,15 @@
         <!-- batch -->
         <prop key="hibernate.search.default.indexwriter.batch.merge_factor">${omero.search.merge_factor}</prop>
         <prop key="hibernate.search.default.indexwriter.batch.ram_buffer_size">${omero.search.ram_buffer_size}</prop>
-        <prop key="hibernate.search.default.indexwriter.batch.max_field_length">2147483647</prop><!-- Integer.MAX_VALUE -->
         <!-- tx -->
         <prop key="hibernate.search.default.indexwriter.transaction.merge_factor">${omero.search.merge_factor}</prop>
         <prop key="hibernate.search.default.indexwriter.transaction.ram_buffer_size">${omero.search.ram_buffer_size}</prop>
-        <prop key="hibernate.search.default.indexwriter.transaction.max_field_length">2147483647</prop><!-- Integer.MAX_VALUE -->
       </props>
     </property>
+  </bean>
+
+  <bean id="configuredAnalyzer" class="ome.services.fulltext.ConfiguredAnalyzer">
+    <constructor-arg value="${omero.search.analyzer}"/>
   </bean>
 
   <!-- Scope: private -->
