@@ -37,5 +37,7 @@ gradle-local.properties
 # Gradle cache
 .gradle
 
-# Ignore generated source code
-/src/generated/*
+# Only include main and test from src dir (for now)
+src/*
+!src/main/*
+!src/test/*
