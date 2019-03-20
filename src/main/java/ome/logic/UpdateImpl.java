@@ -1,5 +1,5 @@
 /*
- *   Copyright 2006-2016 University of Dundee. All rights reserved.
+ *   Copyright 2006-2019 University of Dundee. All rights reserved.
  *   Use is subject to license terms supplied in LICENSE.txt
  */
 
@@ -22,6 +22,7 @@ import java.util.concurrent.Future;
 import ome.annotations.RolesAllowed;
 import ome.api.IUpdate;
 import ome.api.ServiceInterface;
+import ome.api.local.LocalAdmin;
 import ome.api.local.LocalQuery;
 import ome.api.local.LocalUpdate;
 import ome.conditions.ApiUsageException;
@@ -33,8 +34,10 @@ import ome.services.eventlogs.EventLogLoader;
 import ome.services.fulltext.FullTextBridge;
 import ome.services.fulltext.FullTextIndexer;
 import ome.services.fulltext.FullTextThread;
+import ome.services.search.IndexWatcher;
 import ome.services.sessions.SessionManager;
 import ome.services.util.Executor;
+import ome.system.EventContext;
 import ome.tools.hibernate.ReloadFilter;
 import ome.tools.hibernate.UpdateFilter;
 import ome.util.Utils;
@@ -58,6 +61,8 @@ public class UpdateImpl extends AbstractLevel1Service implements LocalUpdate {
 
     private final Logger log = LoggerFactory.getLogger(UpdateImpl.class);
 
+    protected transient LocalAdmin localAdmin;
+
     protected transient LocalQuery localQuery;
 
     protected transient Executor executor;
@@ -65,6 +70,13 @@ public class UpdateImpl extends AbstractLevel1Service implements LocalUpdate {
     protected transient SessionManager sessionManager;
 
     protected transient FullTextBridge fullTextBridge;
+
+    protected transient IndexWatcher indexWatcher;
+
+    public final void setAdminService(LocalAdmin admin) {
+        getBeanHelper().throwIfAlreadySet(this.localAdmin, admin);
+        this.localAdmin = admin;
+    }
 
     public final void setQueryService(LocalQuery query) {
         getBeanHelper().throwIfAlreadySet(this.localQuery, query);
@@ -84,6 +96,11 @@ public class UpdateImpl extends AbstractLevel1Service implements LocalUpdate {
     public void setFullTextBridge(FullTextBridge fullTextBridge) {
         getBeanHelper().throwIfAlreadySet(this.fullTextBridge, fullTextBridge);
         this.fullTextBridge = fullTextBridge;
+    }
+
+    public void setIndexWatcher(IndexWatcher indexWatcher) {
+        getBeanHelper().throwIfAlreadySet(this.indexWatcher, indexWatcher);
+        this.indexWatcher = indexWatcher;
     }
 
     public Class<? extends ServiceInterface> getServiceInterface() {
@@ -216,6 +233,7 @@ public class UpdateImpl extends AbstractLevel1Service implements LocalUpdate {
                     "Non-managed object cannot be indexed.");
         }
 
+        /*
         CreationLogLoader logs = new CreationLogLoader(localQuery, row);
         FullTextIndexer fti = new FullTextIndexer(logs);
         fti.setApplicationContext(this.executor.getContext());
@@ -224,6 +242,24 @@ public class UpdateImpl extends AbstractLevel1Service implements LocalUpdate {
                 fti, this.fullTextBridge, true);
         Future<Object> future = executor.submit(Executors.callable(ftt));
         executor.get(future);
+        */
+
+        /* Gather information for new event for REINDEX log entry. */
+        final EventContext ec = localAdmin.getEventContextQuiet();
+        final long userId = ec.getCurrentUserId();
+        long groupId = ec.getCurrentGroupId();
+        final long sessionId = ec.getCurrentSessionId();
+        if (groupId == -1) {
+            /* Must provide a real group. */
+            groupId = localAdmin.getDefaultGroup(userId).getId();
+        }
+        /* Write REINDEX to event log and wait for processing. */
+        log.debug("Awaiting indexing of {}.", row);
+        try {
+            indexWatcher.indexObject(row, userId, groupId, sessionId).acquire();
+        } catch (InterruptedException ie) {
+            log.warn("unexpectedly awoken", ie);
+        }
     }
 
     // ~ Internals

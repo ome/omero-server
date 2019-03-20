@@ -21,11 +21,14 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
   <bean parent="level1" id="internal-ome.api.IUpdate" class="ome.logic.UpdateImpl">
+    <property name="adminService" ref="internal-ome.api.LocalAdmin"/>
     <property name="queryService" ref="internal-ome.api.LocalQuery"/>
     <property name="executor" ref="executor"/>
     <property name="sessionManager" ref="sessionManager"/>
     <property name="fullTextBridge" ref="fullTextBridge"/>
+    <property name="indexWatcher" ref="indexWatcher"/>
   </bean>
+
   <alias name="internal-ome.api.IUpdate" alias="internal-ome.api.LocalUpdate"/>
 
   <bean id="managed-ome.api.IUpdate" parent="managedService">
@@ -37,5 +40,20 @@
     </property>
     <property name="target" ref="internal-ome.api.IUpdate"/>
   </bean>
-  
+
+  <bean name="indexWatcher" class="ome.services.search.IndexWatcher">
+    <constructor-arg ref="dataSource"/>
+    <constructor-arg value="PersistentEventLogLoader.v2.current_id"/>
+  </bean>
+
+  <bean id="indexWatcherTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+    <property name="jobDetail">
+      <bean class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+        <property name="targetObject" ref="indexWatcher"/>
+        <property name="targetMethod" value="poll"/>
+        <property name="concurrent" value="false"/>
+      </bean>
+    </property>
+    <property name="cronExpression" value="*/1 * * * * ?"/>
+  </bean>
 </beans>
