@@ -633,6 +633,12 @@ public class SearchBean extends AbstractStatefulBean implements Search {
     @Transactional
     @RolesAllowed("user")
     public void setCaseSentivice(boolean caseSensitive) {
+        setCaseSensitive(caseSensitive);
+    }
+
+    @Transactional
+    @RolesAllowed("user")
+    public void setCaseSensitive(boolean caseSensitive) {
         synchronized (values) {
             values.caseSensitive = caseSensitive;
         }
