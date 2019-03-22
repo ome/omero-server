@@ -31,6 +31,7 @@ import javax.sql.DataSource;
 import ome.model.IObject;
 import ome.model.enums.EventType;
 
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 /**
@@ -139,14 +140,12 @@ public class IndexWatcher {
      * Respond to the progress of the Indexer thread.
      */
     private void applyFilters() {
-        final String value = dataSource.queryForObject("SELECT value FROM configuration WHERE name = ?", countKey, String.class);
-        if (value == null) {
-            return;
-        }
         final long currentId;
         try {
+            final String value = dataSource.queryForObject("SELECT value FROM configuration WHERE name = ?", countKey,
+                    String.class);
             currentId = Long.valueOf(value);
-        } catch (NumberFormatException nfe) {
+        } catch (EmptyResultDataAccessException | NullPointerException | NumberFormatException e) {
             return;
         }
         final Iterator<Function<Long, Boolean>> entryIter = eventLogFilters.iterator();
