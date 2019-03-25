@@ -1,5 +1,5 @@
 /*
- *   Copyright 2006-2017 University of Dundee. All rights reserved.
+ *   Copyright 2006-2019 University of Dundee. All rights reserved.
  *   Use is subject to license terms supplied in LICENSE.txt
  */
 
@@ -524,6 +524,9 @@ public class OmeroInterceptor implements Interceptor {
             return rv;
         }
 
+        final boolean isDir = changedObject instanceof OriginalFile &&
+                "Directory".equals(((OriginalFile) changedObject).getMimetype());
+
         final Long currentGroupId = currentUser.getGroup().getId();
         final boolean currentGroupNegative = currentGroupId < 0;
         final IObject[] candidates = em.getLockCandidates(changedObject);
@@ -534,7 +537,7 @@ public class OmeroInterceptor implements Interceptor {
             // the linkage.
             if (sysTypes.isSystemType(linkedObject.getClass()) ||
                     sysTypes.isInSystemGroup(linkedObject.getDetails()) ||
-                    sysTypes.isInUserGroup(linkedObject.getDetails())) {
+                    sysTypes.isInUserGroup(linkedObject.getDetails()) && !isDir) {
                 continue;
             }
 
