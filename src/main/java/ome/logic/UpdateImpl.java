@@ -18,6 +18,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 import ome.annotations.RolesAllowed;
 import ome.api.IUpdate;
@@ -26,6 +27,7 @@ import ome.api.local.LocalAdmin;
 import ome.api.local.LocalQuery;
 import ome.api.local.LocalUpdate;
 import ome.conditions.ApiUsageException;
+import ome.conditions.InternalException;
 import ome.conditions.ValidationException;
 import ome.model.IObject;
 import ome.model.meta.EventLog;
@@ -256,7 +258,10 @@ public class UpdateImpl extends AbstractLevel1Service implements LocalUpdate {
         /* Write REINDEX to event log and wait for processing. */
         log.debug("Awaiting indexing of {}.", row);
         try {
-            indexWatcher.indexObject(row, userId, groupId, sessionId).acquire();
+            if (!indexWatcher.indexObject(row, userId, groupId, sessionId).tryAcquire(1, TimeUnit.MINUTES)) {
+                log.info("Timed out while awaiting indexing of {}.", row);
+                throw new InternalException("indexing did not occur within a reasonable time");
+            }
         } catch (InterruptedException ie) {
             log.warn("unexpectedly awoken", ie);
         }
