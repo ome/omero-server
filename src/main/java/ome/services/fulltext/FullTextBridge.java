@@ -15,7 +15,9 @@ import ome.model.IAnnotated;
 import ome.model.ILink;
 import ome.model.IObject;
 import ome.model.annotations.Annotation;
+import ome.model.annotations.DoubleAnnotation;
 import ome.model.annotations.FileAnnotation;
+import ome.model.annotations.LongAnnotation;
 import ome.model.annotations.MapAnnotation;
 import ome.model.annotations.TagAnnotation;
 import ome.model.annotations.TextAnnotation;
@@ -193,6 +195,16 @@ public class FullTextBridge extends BridgeHelper {
                     String termValue = term.getTermValue();
                     termValue = termValue == null ? "" : termValue;
                     add(document, "term", termValue, opts);
+                } else if (annotation instanceof DoubleAnnotation) {
+                    final Double value = ((DoubleAnnotation) annotation).getDoubleValue();
+                    if (value != null) {
+                        add(document, "annotation", value.toString(), opts);
+                    }
+                } else if (annotation instanceof LongAnnotation) {
+                    final Long value = ((LongAnnotation) annotation).getLongValue();
+                    if (value != null) {
+                        add(document, "annotation", value.toString(), opts);
+                    }
                 } else if (annotation instanceof TextAnnotation) {
                     TextAnnotation text = (TextAnnotation) annotation;
                     String textValue = text.getTextValue();
