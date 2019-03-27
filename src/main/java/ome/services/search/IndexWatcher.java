@@ -115,7 +115,8 @@ public class IndexWatcher {
      * Note how to respond to the progress of the Indexer thread.
      */
     private void createFilters() {
-        final long latestId = dataSource.queryForObject("SELECT id FROM eventlog ORDER BY id DESC LIMIT 1", Long.class);
+        final long latestId = dataSource.queryForObject("SELECT id FROM eventlog WHERE action = 'REINDEX' ORDER BY id DESC LIMIT 1",
+                Long.class);
         eventLogFilters.add(new Function<Long, Boolean>() {
             /* Proceed no further until the indexer has caught up with the event log as it is now. */
             @Override
