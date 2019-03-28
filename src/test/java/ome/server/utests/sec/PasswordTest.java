@@ -47,7 +47,7 @@ public class PasswordTest extends MockObjectTestCase {
     static File file = null;
     static {
         try {
-            file = ResourceUtils.getFile("classpath:ome/server/utests/sec/"
+            file = ResourceUtils.getFile("classpath:ome/server/sec/"
                     + "PasswordTest_FilePasswordProvider.properties");
         } catch (Exception e) {
             e.printStackTrace();

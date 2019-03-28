@@ -94,7 +94,7 @@ public class TokenizationTest extends MockObjectTestCase {
             Map<String, Integer> queryToResults = new HashMap();
             queryToResults.put("GFP", 3);
             queryToResults.put("GFP*", 3);
-            queryToResults.put("GFP-H2B", 2);
+            queryToResults.put("GFP-H2B", 3);
             queryToResults.put("\"GFP H2B\"", 2);
             queryToResults.put("\"H2B GFP\"", 0);
 
@@ -119,7 +119,7 @@ public class TokenizationTest extends MockObjectTestCase {
     // =============================================================
 
     private void addDocuments(IndexWriter writer, String[] docs)
-            throws CorruptIndexException, IOException {
+            throws IOException {
         for (int j = 0; j < docs.length; j++) {
             Document d = new Document();
             d.add(new Field("contents", docs[j], Field.Store.YES,
