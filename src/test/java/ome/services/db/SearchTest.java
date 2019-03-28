@@ -11,12 +11,15 @@ import ome.model.IObject;
 import ome.model.meta.Event;
 import ome.model.meta.Experimenter;
 
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.queryParser.MultiFieldQueryParser;
 import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.queryParser.QueryParser;
+import org.apache.lucene.util.Version;
 import org.hibernate.CacheMode;
 import org.hibernate.FlushMode;
 import org.hibernate.Query;
@@ -82,8 +85,8 @@ public class SearchTest extends TestCase {
         ht.setupSession();
 
         String queryStr = "root OR manual";
-        QueryParser qp = new MultiFieldQueryParser(new String[] { "omeName",
-                "status" }, new StandardAnalyzer());
+        QueryParser qp = new MultiFieldQueryParser(Version.LUCENE_31, new String[] { "omeName",
+                "status" }, new StandardAnalyzer(Version.LUCENE_31));
         org.apache.lucene.search.Query lq = qp.parse(queryStr);
         FullTextSession fts = Search.getFullTextSession(ht.s);
         Query q = fts.createFullTextQuery(lq, Event.class, Experimenter.class);
@@ -98,8 +101,8 @@ public class SearchTest extends TestCase {
     private <T extends IObject> List<T> query(HibernateTest ht,
             String queryStr, Class<T> k, String... fields)
             throws ParseException {
-        MultiFieldQueryParser parser = new MultiFieldQueryParser(fields,
-                new StandardAnalyzer());
+        MultiFieldQueryParser parser = new MultiFieldQueryParser(Version.LUCENE_31, fields,
+                new StandardAnalyzer(Version.LUCENE_31));
         org.apache.lucene.search.Query luceneQuery = parser.parse(queryStr);
         FullTextSession fts = Search.getFullTextSession(ht.s);
         Query q = fts.createFullTextQuery(luceneQuery, k);

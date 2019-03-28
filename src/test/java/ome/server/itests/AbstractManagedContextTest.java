@@ -13,6 +13,8 @@ import javax.sql.DataSource;
 
 import junit.framework.TestCase;
 
+import ome.model.enums.DimensionOrder;
+import ome.model.enums.PixelsType;
 import ome.system.EventContext;
 import ome.api.IConfig;
 import ome.api.IContainer;
@@ -23,7 +25,6 @@ import ome.api.ISession;
 import ome.api.local.LocalAdmin;
 import ome.api.local.LocalQuery;
 import ome.api.local.LocalUpdate;
-import ome.formats.MockedOMEROImportFixture;
 import ome.model.IObject;
 import ome.model.containers.Dataset;
 import ome.model.core.Image;
@@ -34,7 +35,6 @@ import ome.model.internal.Permissions.Role;
 import ome.model.meta.Experimenter;
 import ome.model.meta.ExperimenterGroup;
 import ome.model.meta.Session;
-import ome.parameters.Parameters;
 import ome.security.SecuritySystem;
 import ome.security.basic.CurrentDetails;
 import ome.security.basic.PrincipalHolder;
@@ -56,8 +56,6 @@ import org.springframework.aop.interceptor.JamonPerformanceMonitorInterceptor;
 import org.springframework.aop.target.HotSwappableTargetSource;
 import org.springframework.ldap.core.LdapTemplate;
 import org.springframework.mail.MailSender;
-import org.springframework.orm.hibernate3.HibernateTemplate;
-import org.springframework.util.ResourceUtils;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -99,8 +97,6 @@ public class AbstractManagedContextTest extends TestCase {
 
     protected LdapTemplate ldapTemplate;
 
-    protected HibernateTemplate hibernateTemplate;
-
     protected SecuritySystem securitySystem;
 
     protected Roles roles;
@@ -117,7 +113,7 @@ public class AbstractManagedContextTest extends TestCase {
      * @see org.springframework.test.AbstractDependencyInjectionSpringContextTests#onSetUp()
      */
     @BeforeClass
-    protected final void onSetUp() throws Exception {
+    protected final void onSetUp() {
         this.applicationContext = OmeroContext.getManagedServerContext();
         applicationContext.refreshAllIfNecessary();
 
@@ -126,9 +122,6 @@ public class AbstractManagedContextTest extends TestCase {
 
         ldapTemplate = (LdapTemplate) applicationContext
                 .getBean("ldapTemplate");
-
-        // data = new OMEData();
-        // data.setDataSource(dataSource);
 
         securitySystem = (SecuritySystem) applicationContext
                 .getBean("securitySystem");
@@ -142,7 +135,7 @@ public class AbstractManagedContextTest extends TestCase {
         // Service setup
         JamonPerformanceMonitorInterceptor jamon = new JamonPerformanceMonitorInterceptor();
         loginAop = new LoginInterceptor((CurrentDetails) holder);
-        factory = new ServiceFactory((OmeroContext) applicationContext);
+        factory = new ServiceFactory(applicationContext);
         factory = new InterceptingServiceFactory(factory, loginAop, jamon);
         iQuery = (LocalQuery) factory.getQueryService();
         iUpdate = (LocalUpdate) factory.getUpdateService();
@@ -164,7 +157,7 @@ public class AbstractManagedContextTest extends TestCase {
     }
 
     @AfterClass
-    protected final void onTearDown() throws Exception {
+    protected final void onTearDown() {
         sessionManager.closeAll();
     }
 
@@ -294,8 +287,7 @@ public class AbstractManagedContextTest extends TestCase {
     }
 
     protected String getOmeroDataDir() {
-        return ((OmeroContext) applicationContext)
-                .getProperty("omero.data.dir");
+        return applicationContext.getProperty("omero.data.dir");
     }
 
     protected Image new_Image(String name) {
@@ -305,31 +297,20 @@ public class AbstractManagedContextTest extends TestCase {
     }
 
     protected Pixels makePixels() {
-        try {
-            MockedOMEROImportFixture fixture = new MockedOMEROImportFixture(
-                    this.factory, "");
 
-            List<omero.model.Pixels> pix = fixture.fullImport(ResourceUtils
-                    .getFile("classpath:tinyTest.d3d.dv"), "tinyTest");
-            if (pix == null) {
-                throw new RuntimeException("No pixels returned.");
-            }
-            if (pix.size() != 1) {
-                throw new RuntimeException("Expected 1, got: " + pix.size());
-            }
-
-            return new Pixels(pix.get(0).getId().getValue(), false);
-        } catch (Exception e) {
-            if (e instanceof RuntimeException) {
-                throw (RuntimeException) e;
-            } else {
-                throw new RuntimeException(e);
-            }
-        }
+        Pixels pixels = new Pixels();
+        pixels.setSizeX(24);
+        pixels.setSizeY(24);
+        pixels.setSizeZ(5);
+        pixels.setSizeT(5);
+        pixels.setSizeC(2);
+        pixels.setPixelsType(new PixelsType(PixelsType.VALUE_INT16));
+        pixels.setDimensionOrder(new DimensionOrder(DimensionOrder.VALUE_XYCZT));
+        return iUpdate.saveAndReturnObject(pixels);
     }
 
     protected Image makeImage(boolean withDataset) throws Exception {
-        return makeImage("classpath:tinyTest.d3d.dv", withDataset);
+        return makeImage("test", withDataset);
     }
 
     protected Image makeImage(String path, boolean withDataset) throws Exception {
@@ -339,37 +320,15 @@ public class AbstractManagedContextTest extends TestCase {
     }
     
     protected Image makeImage(String path, boolean withDataset, Integer pixelCount) throws Exception {
-        
-        MockedOMEROImportFixture fixture = new MockedOMEROImportFixture(
-                this.factory, "");
 
-        File test = ResourceUtils.getFile(path);
-        List<omero.model.Pixels> pixs = fixture.fullImport(test, "test");
-        // fullImport calls tearDown
-
-        if (pixelCount != null) {
-            assertEquals(pixelCount.intValue(), pixs.size());
-        }
-        omero.model.Pixels p = pixs.get(0);
-        assertNotNull(p);
-        Image i = new Image(p.getImage().getId().getValue(), false);
-
+        Image i = new_Image(path);
+        i = iUpdate.saveAndReturnObject(i);
         if (withDataset) {
             Dataset d = new Dataset();
             d.setName("test image");
             d.linkImage(i);
             iUpdate.saveObject(d);
         }
-
-        i = this.factory.getQueryService().findByQuery(
-                "select i from Image i "
-                        + "left outer join fetch i.datasetLinks dil "
-                        + "left outer join fetch dil.parent d "
-                        + "left outer join fetch d.imageLinks "
-                        + "left outer join fetch i.pixels p "
-                        + "where p.id = :id",
-                new Parameters().addId(pixs.get(0).getId().getValue()));
-
         assertNotNull(i);
         return i;
     }
