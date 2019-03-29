@@ -1232,8 +1232,11 @@ public class GraphTraversal {
         final String directoryRepoQuery =
                 "SELECT id, repo FROM OriginalFile WHERE mimetype = 'Directory' AND repo IS NOT NULL AND id IN (:ids)";
         for (final List<Long> originalFileIdsBatch : Iterables.partition(originalFileIds, BATCH_SIZE)) {
-            for (final Object[] result :
-                (List<Object[]>) session.createQuery(directoryRepoQuery).setParameterList("ids", originalFileIdsBatch).list()) {
+            final Query hibQuery = session.createQuery(directoryRepoQuery);
+            hibQuery.setParameterList("ids", originalFileIdsBatch);
+            @SuppressWarnings("unchecked")
+            final List<Object[]> results = hibQuery.list();
+            for (final Object[] result : results) {
                 final Long id = (Long) result[0];
                 final String repo = (String) result[1];
                 directoryRepos.put(repo, id);
@@ -1246,8 +1249,12 @@ public class GraphTraversal {
             final String repo = repoAndDirectoryId.getKey();
             final Long directoryId = repoAndDirectoryId.getValue();
             final CI directory = new CI(originalFileClassName, directoryId);
-            for (final long contentId :
-                (List<Long>) session.createQuery(contentQuery).setParameter("repo", repo).setParameter("id", directoryId).list()) {
+            final Query hibQuery = session.createQuery(contentQuery);
+            hibQuery.setParameter("repo", repo);
+            hibQuery.setParameter("id", directoryId);
+            @SuppressWarnings("unchecked")
+            final List<Long> contentIds = hibQuery.list();
+            for (final long contentId : contentIds) {
                 if (originalFileIds.contains(contentId)) {
                     final CI content = new CI(originalFileClassName, contentId);
                     Set<CI> blockers = planning.blockedBy.get(directory);
