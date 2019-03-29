@@ -1,6 +1,4 @@
 /*
- *   $Id$
- *
  *   Copyright 2011 Glencoe Software, Inc. All rights reserved.
  *   Use is subject to license terms supplied in LICENSE.txt
  */
@@ -105,11 +103,11 @@ public class BlobShareStoreTest extends TestCase {
 
     File[] loadBlobs() throws Exception {
         File f33 = ResourceUtils
-                .getFile("classpath:ome/server/utests/sharing/33.blob");
+                .getFile("classpath:ome/server/sharing/33.blob");
         File f34 = ResourceUtils
-                .getFile("classpath:ome/server/utests/sharing/34.blob");
+                .getFile("classpath:ome/server/sharing/34.blob");
         File f35 = ResourceUtils
-                .getFile("classpath:ome/server/utests/sharing/35.blob");
+                .getFile("classpath:ome/server/sharing/35.blob");
         return new File[] { f35, f34, f33 };
     }
 
