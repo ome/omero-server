@@ -1,13 +1,10 @@
 /*
- * ome.security.basic.MergeEventListener
- *
  *   Copyright 2006 University of Dundee. All rights reserved.
  *   Use is subject to license terms supplied in LICENSE.txt
  */
 
 package ome.security.basic;
 
-// Java imports
 import java.util.Map;
 
 import ome.conditions.SecurityViolation;
@@ -37,7 +34,7 @@ import org.springframework.util.Assert;
  * In general, enforces the detached-graph re-attachment "Commandments" as
  * outlined in TODO. Objects that are transient (no ID) are unchanged; objects
  * that are managed (with ID) are checked for validity (i.e. must have a
- * version); and unloaded/filtered objects & collections are re-filled.
+ * version); and unloaded/filtered objects and collections are re-filled.
  * 
  * @author Josh Moore, josh.moore at gmx.de
  * @version $Revision$, $Date$

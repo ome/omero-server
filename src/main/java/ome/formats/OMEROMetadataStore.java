@@ -79,7 +79,7 @@ import org.perf4j.StopWatch;
  * attempts have been made to allow the caller to switch back and forth between 
  * Images and Pixels during metadata population it is <b>strongly</b> 
  * encouraged that at least Images and Pixels are populated in ascending order. 
- * For example: Image_1 --> Pixels_1, Pixels_2 followed by Image_2 --> Pixels_1,
+ * For example: Image_1 to Pixels_1, Pixels_2 followed by Image_2 to Pixels_1,
  * Pixels2, Pixels_3.
  * 
  * @author Brian W. Loranger brain at lifesci.dundee.ac.uk
@@ -2019,10 +2019,10 @@ public class OMEROMetadataStore
      * Checks the entire object graph for sections that may be collapsed if
      * the data is derived from a Plate. Collapsible points:
      * <ul>
-     *   <li>Image --> ObjectiveSettings</li>
-     *   <li>Image --> Channel --> LogicalChannel --> LightSettings</li>
-     *   <li>Image --> Channel --> LogicalChannel --> LightPath</li>
-     *   <li>Image --> Channel --> LogicalChannel --> DetectorSettings</li>
+     *   <li>Image to ObjectiveSettings</li>
+     *   <li>Image to Channel to LogicalChannel to LightSettings</li>
+     *   <li>Image to Channel to LogicalChannel to LightPath</li>
+     *   <li>Image to Channel to LogicalChannel to DetectorSettings</li>
      * </ul>
      */
     public void checkAndCollapseGraph()

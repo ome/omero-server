@@ -237,7 +237,7 @@ public abstract class ListAsSQLArrayUserType<T> implements UserType, Parameteriz
     /**
      * Warning, this one is special. You have to define a class that extends
      * ENUM_LIST&lt;E&gt; and that has a no arguments constructor. For example :
-     * class MyEnumsList extends ENUM_LIST&&ltMyEnumType&gt; { public
+     * class MyEnumsList extends ENUM_LIST&lt;MyEnumType&gt; { public
      * MyEnumList(){ super( MyEnum.values() ); } } Then, define :
      * hibernate.property type="com.myPackage.MyEnumsList" hibernate.column
      * name="fieldName" sql-type="int[]"

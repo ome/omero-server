@@ -1,6 +1,4 @@
 /*
- *   $Id$
- *
  *   Copyright 2008 Glencoe Software, Inc. All rights reserved.
  *   Use is subject to license terms supplied in LICENSE.txt
  */
@@ -25,7 +23,7 @@ import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.scheduling.SchedulingException;
 
 /**
- * Produces a <a href="http://www.opensymphony.com/quartz/Quartz</a>
+ * Produces a
  * {@link Scheduler} which automatically loads all the triggers it can find.
  *
  * @author Josh Moore, josh at glencoesoftware.com

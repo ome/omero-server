@@ -5,7 +5,6 @@
 
 package ome.security.basic;
 
-// Java imports
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -60,8 +59,8 @@ import ome.tools.hibernate.HibernateUtils;
  * assumes that an empty value signifies increased security levels, empty values
  * here signify reduced security levels. E.g.,
  * 
- * Details: user == null ==> object belongs to root CurrentDetails: user == null
- * ==> current user is "nobody" (anonymous)
+ * Details: user == null implies that the object belongs to root
+ * CurrentDetails: user == null implies that the current user is "nobody" (anonymous)
  */
 public class CurrentDetails implements PrincipalHolder {
 
