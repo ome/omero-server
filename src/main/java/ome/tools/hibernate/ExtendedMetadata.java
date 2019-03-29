@@ -382,7 +382,7 @@ public static class Impl extends OnContextRefreshedEventListener implements Exte
 
     /**
      * Note: this implementation does not yet take into account the mapping
-     * of joined subclasses like Job to UpdateJob.
+     * of joined subclasses like Job -&gt; UpdateJob.
      */
     public String getSQLJoin(String fromType, String fromAlias, String toType, String toAlias) {
         String fromPath = "UNKNOWN";
