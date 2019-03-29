@@ -41,7 +41,7 @@ import org.testng.annotations.Test;
 /**
  * 
  */
-@Test(groups = {"ome/services/sharing"})
+@Test(groups = {"ome/services/sharing", "integration"})
 public class SharingTest extends AbstractManagedContextTest {
 
     private static Filter justOne = new Filter().page(0, 1);
