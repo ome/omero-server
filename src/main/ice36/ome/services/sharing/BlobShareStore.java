@@ -92,7 +92,7 @@ public class BlobShareStore extends ShareStore implements
     protected Map<Long, List<Long>> obToImageCache = new HashMap<Long, List<Long>>();
 
     /**
-     * Because there is a cyclic dependency (SF->ACLVoter->BlobStore->SF), we
+     * Because there is a cyclic dependency (SF -&gt; ACLVoter -&gt; BlobStore -&gt; SF), we
      * have to lazy-load the session factory via the context.
      */
     public void setApplicationContext(ApplicationContext applicationContext)
