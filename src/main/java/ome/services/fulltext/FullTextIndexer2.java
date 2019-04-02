@@ -377,7 +377,11 @@ public class FullTextIndexer2 {
                     try {
                         final ResultSet results = stmt.executeQuery();
                         if (results.next()) {
-                            eventLogId = Long.parseLong(results.getString(1));
+                            try {
+                                eventLogId = Long.parseLong(results.getString(1));
+                            } catch (NullPointerException | NumberFormatException e) {
+                                /* take as being missing */
+                            }
                         }
                     } finally {
                         stmt.close();
