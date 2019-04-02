@@ -64,8 +64,62 @@ import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean;
 
 /**
- * An indexer bean replacing the 5.4 full-text thread with adequate functionality.
+ * An indexer bean replacing the 5.4 full-text thread {@link FullTextIndexer} with adequate functionality.
  * Exists as a stand-in while Hibernate / Spring upgrade issues remain unresolved.
+ * <p>
+ * Ignores the 5.4 full-text thread's configuration properties:
+ * <ul>
+ * <li>{@code omero.search.repetitions}
+ * <li>{@code omero.search.reporting_loops}
+ * </ul>
+ * <p>
+ * In not using the the 5.4 event log loader also ignores:
+ * <ul>
+ * <li>{@code omero.search.batch}
+ * <li>{@code omero.search.event_log_loader}
+ * <li>{@code omero.search.excludes}
+ * <li>{@code omero.search.max_partition_size}
+ * </ul>
+ * <p>
+ * Further, the value of {@code omero.search.cron} is ignored except for that a blank value still disables the indexing thread.
+ * <p>
+ * The {@link #start()} and {@link #stop()} methods are the means by which Spring controls the indexing thread's lifecycle.
+ * The {@link #start()} method schedules the <tt>OPTMIIZE</tt> Quartz job.
+ * Interplay among the Quartz jobs is:
+ * <dl>
+ * <dt><tt>PREPARE</tt></dt>
+ * <dd><ol>
+ * <li>From the event log note a batch of new activity.
+ * <li>Then if there are new objects to index then trigger <tt>INDEX</tt>.
+ * <li>Else if objects were deleted then trigger <tt>PURGE</tt>.
+ * <li>Else if much purging has been done of some object type since its previous <tt>OPTIMIZE</tt> then trigger another.
+ * <li>Else schedule <tt>PREPARE</tt> for delayed execution.
+ * </ol></dd>
+ * <dt><tt>INDEX</tt></dt>
+ * <dd><ol>
+ * <li>If locking the field bridge fails then schedule <tt>INDEX</tt> for delayed execution then finish.
+ * <li>Index a batch of objects.
+ * <li>Then if objects were deleted then trigger <tt>PURGE</tt>.
+ * <li>Else trigger <tt>NOTE</tt>.
+ * </ol></dd>
+ * <dt><tt>PURGE</tt></dt>
+ * <dd><ol>
+ * <li>If locking the field bridge fails then schedule <tt>PURGE</tt> for delayed execution then finish.
+ * <li>Purge a batch of objects.
+ * <li>Then trigger <tt>NOTE</tt>.
+ * </ol></dd>
+ * <dt><tt>NOTE</tt></dt>
+ * <dd><ol>
+ * <li>Write a note of progress through the event log back to the database.
+ * <li>Then trigger <tt>PREPARE</tt>.
+ * </ol></dd>
+ * <dt><tt>OPTIMIZE</tt></dt>
+ * <dd><ol>
+ * <li>If much purging has been done of some object type since the previous <tt>OPTIMIZE</tt> then optimize its index.
+ * <li>Else optimize the whole search index.
+ * <li>Then trigger <tt>PREPARE</tt>.
+ * </ol></dd>
+ * </dl>
  * @author m.t.b.carroll@dundee.ac.uk
  * @since 5.5.0
  */
