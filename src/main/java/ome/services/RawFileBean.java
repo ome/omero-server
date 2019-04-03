@@ -22,6 +22,7 @@ package ome.services;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.NonWritableChannelException;
@@ -479,7 +480,7 @@ public class RawFileBean extends AbstractStatefulBean implements RawFileStore {
     public void write(byte[] buf, long position, int length) {
         errorIfNotLoaded();
         ByteBuffer nioBuffer = MappedByteBuffer.wrap(buf);
-        nioBuffer.limit(length);
+        ((Buffer) nioBuffer).limit(length);
 
         if (diskSpaceChecking) {
             iRepositoryInfo.sanityCheckRepository();
