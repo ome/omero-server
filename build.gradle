@@ -98,3 +98,9 @@ if (slice.iceVersion.contains("3.7")) {
     }
     slice.output = file("$generatedDir/ice36")
 }
+
+jar {
+    manifest {
+        attributes("Main-Class": 'ome.services.fulltext.Main')
+    }
+}
