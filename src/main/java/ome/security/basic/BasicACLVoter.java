@@ -1,5 +1,5 @@
 /*
- *   Copyright 2006-2018 University of Dundee. All rights reserved.
+ *   Copyright 2006-2019 University of Dundee. All rights reserved.
  *   Use is subject to license terms supplied in LICENSE.txt
  */
 
@@ -499,19 +499,18 @@ public class BasicACLVoter implements ACLVoter {
             return rv; // EARLY EXIT!
         }
 
+        final boolean isDir = iObject instanceof OriginalFile &&
+                "Directory".equals(((OriginalFile) iObject).getMimetype());
+
         Permissions grpPermissions = null;
         if (d.getGroup() != null) {
             /* got a group set so review its permissions */
             final Long gid = d.getGroup().getId();
-            if (roles.getUserGroupId() == gid) {
+            if (!isDir && roles.getUserGroupId() == gid) {
                 /* special handling for user group permissions */
-                if (iObject instanceof OriginalFile && "Directory".equals(((OriginalFile) iObject).getMimetype())) {
-                    grpPermissions = c.getPermissionsForGroup(gid);
-                } else {
-                    grpPermissions = new Permissions(Permissions.PRIVATE);
-                }
+                grpPermissions = new Permissions(Permissions.PRIVATE);
             } else {
-                /* not user group so use group's permissions */
+                /* use group's permissions */
                 grpPermissions = c.getPermissionsForGroup(gid);
             }
         }
@@ -585,10 +584,15 @@ public class BasicACLVoter implements ACLVoter {
                 hasLightAdminPrivilege = true;
             }
 
+            final boolean isLinkageScope = scopes[i].equals(Scope.LINK) || scopes[i].equals(Scope.ANNOTATE);
+
             if (hasLightAdminPrivilege) {
                 rv |= (1<<i);
             } else if (sysType) {
-                // no privilege
+                /* system types allow only linking */
+                if (isLinkageScope) {
+                    rv |= (1<<i);
+                }
             } else if (leader) {
                 rv |= (1<<i);
             } else if (grpPermissions == null) {
@@ -612,6 +616,10 @@ public class BasicACLVoter implements ACLVoter {
             // As of ticket:8562 this is handled by
             // the separation of ANNOTATE and WRITE
             else if (member && grpPermissions.isGranted(GROUP, scope.right) ) {
+                rv |= (1<<i);
+            }
+            else if (isLinkageScope && (sysTypes.isInSystemGroup(d) || sysTypes.isInUserGroup(d) && !isDir)) {
+                // Can always link to objects in system or user group except for user-group directories.
                 rv |= (1<<i);
             }
         }
