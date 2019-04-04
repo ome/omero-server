@@ -22,6 +22,26 @@
   HOOKS : These beans are used to provide startup and shutdown logic.
   </description>
 
+  <bean id="version.package" class="ome.system.UpgradeCheck"
+        factory-method="getPackage"/>
+  <bean id="omero.version" factory-bean="version.package"
+        factory-method="getImplementationVersion"/>
+  <bean class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+        <property name="targetObject">
+            <bean class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+                <property name="targetClass" value="java.lang.System" />
+                <property name="targetMethod" value="getProperties" />
+            </bean>
+        </property>
+        <property name="targetMethod" value="setProperty" />
+        <property name="arguments">
+            <list>
+                <value>omero.verison</value>
+                <ref bean="omero.version"/>
+            </list>
+        </property>
+    </bean>
+
   <bean id="dbPatchCheck"
      class="ome.services.util.DBPatchCheck"
      init-method="start" lazy-init="false">
