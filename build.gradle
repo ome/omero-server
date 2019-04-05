@@ -1,11 +1,11 @@
 plugins {
     id "java-library"
-    id "org.openmicroscopy.project" version "5.5.0-m4"
+    id "org.openmicroscopy.project" version "5.5.0-m5"
     id "org.openmicroscopy.gradle.ice-builder.slice" version "1.5.0-m4"
 }
 
 group = "org.openmicroscopy"
-version = "5.5.0-SNAPSHOT"
+version = "5.5.0-m5"
 
 repositories {
     mavenLocal()
@@ -34,7 +34,7 @@ dependencies {
     // testCompile group: 'org.apache.directory.shared', name: 'shared-ldap-constants', version: '1.0.0-M1'
     // testCompile group: 'org.apache.directory.shared', name: 'shared-ldap', version: '0.9.15'
 
-    api('org.openmicroscopy:omero-renderer:5.5.0-m4')
+    api('org.openmicroscopy:omero-renderer:5.5.0-m5')
 
     // Spring framework stuff
     implementation("org.springframework:spring-context-support:4.3.14.RELEASE")
