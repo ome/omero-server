@@ -24,7 +24,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Handles the ":query:" specifier from etc/omero.properties.
+ * Handles the ":query:" specifier from etc/omero-server.properties.
  *
  * The string following ":query:" is interpreted as an LDAP query to be run in
  * combination with the "omero.ldap.group_filter" value. Properties of the form

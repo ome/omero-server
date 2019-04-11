@@ -34,7 +34,7 @@ public class DBPatchCheck {
     private final static String line = "***************************************************************************************\n";
     private final static String see = "See https://docs.openmicroscopy.org/latest/omero/sysadmins/server-upgrade.html\n";
     private final static String no_table = mk("Error connecting to database table dbpatch. You may need to bootstrap.\n");
-    private final static String wrong_version = mk("DB version (%s) does not match omero.properties (%s). Please apply a db upgrade.\n");
+    private final static String wrong_version = mk("DB version (%s) does not match omero-server.properties (%s). Please apply a db upgrade.\n");
 
     private static String mk(String msg) {
         StringBuilder sb = new StringBuilder();

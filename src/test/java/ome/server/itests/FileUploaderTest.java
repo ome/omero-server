@@ -51,7 +51,7 @@ public class FileUploaderTest extends TestCase {
 
     @Test
     public void testUploadingFromClasspath() throws Exception {
-        File file = ResourceUtils.getFile("classpath:omero.properties");
+        File file = ResourceUtils.getFile("classpath:omero-server.properties");
         f = new FileUploader(sf, file);
         f.run();
     }

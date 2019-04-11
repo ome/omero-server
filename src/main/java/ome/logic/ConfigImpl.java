@@ -247,7 +247,7 @@ public class ConfigImpl extends AbstractLevel2Service implements LocalConfig {
     @RolesAllowed("system")
     public Map<String, String> getConfigDefaults() {
         File etc = new File("etc");
-        File omero = new File(etc, "omero.properties");
+        File omero = new File(etc, "omero-server.properties");
         Properties p = new Properties();
         Map<String, String> rv = new HashMap<String, String>();
         try {

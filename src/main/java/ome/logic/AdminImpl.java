@@ -1219,7 +1219,7 @@ public class AdminImpl extends AbstractLevel2Service implements LocalAdmin,
                             + "to user:"
                             + e.getOmeName()
                             + ". Please turn on the debug "
-                            + "mode in omero.properties by the: omero.mail.debug=true");
+                            + "mode in omero-server.properties by the: omero.mail.debug=true");
         }
     }
     
