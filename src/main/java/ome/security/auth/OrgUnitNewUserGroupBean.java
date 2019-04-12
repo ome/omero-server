@@ -15,7 +15,7 @@ import org.springframework.ldap.core.LdapOperations;
 import org.springframework.ldap.core.LdapRdn;
 
 /**
- * Handles the ":ou:" specifier from etc/omero-server.properties by adding the user
+ * Handles the ":ou:" specifier from omero-server.properties by adding the user
  * to a group named by the final organizational unit. For example, if a user
  * is in the group, "ou=HookeLab,ou=biology,ou=example", then the user will
  * be added to the "HookeLab" group.

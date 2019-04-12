@@ -64,7 +64,7 @@ public interface Executor extends ApplicationContextAware {
         SYSTEM,
 
         /**
-         * Uses the limited thread pool configured via etc/omero-server.properties
+         * Uses the limited thread pool configured via omero-server.properties
          * with omero.threads.max_threads, etc.
          */
         USER,

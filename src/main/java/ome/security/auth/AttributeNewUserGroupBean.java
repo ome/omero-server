@@ -20,7 +20,7 @@ import org.springframework.ldap.core.DistinguishedName;
 import org.springframework.ldap.core.LdapOperations;
 
 /**
- * Handles the "*_attribute" specifiers from etc/omero-server.properties.
+ * Handles the "*_attribute" specifiers from omero-server.properties.
  *
  * The values of the attribute equal to the string following ":*_attribute:" are
  * taken to be the names and/or DNs of {@link ome.model.meta.ExperimenterGroup}
