@@ -108,7 +108,7 @@ jar {
 processResources {
     with copySpec {
         from 'src/main/resources'
-        // Use a closure to remove lines
+        // Set version
         filter { String line ->
             line.startsWith('omero.version') ? 'omero.version='+version : line
         }
