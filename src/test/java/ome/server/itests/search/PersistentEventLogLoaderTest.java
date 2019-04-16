@@ -1,6 +1,4 @@
 /*
- *   $Id$
- *
  *   Copyright 2008 Glencoe Software, Inc. All rights reserved.
  *   Use is subject to license terms supplied in LICENSE.txt
  */
@@ -19,7 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-@Test(groups = { "query", "fulltext" })
+@Test(groups = { "query", "fulltext", "integration" })
 public class PersistentEventLogLoaderTest extends AbstractManagedContextTest {
 
     Executor ex;

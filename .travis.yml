@@ -20,3 +20,4 @@ install:
 
 script:
   - ./gradlew publishToMavenLocal
+  - ./gradlew test

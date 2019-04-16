@@ -26,7 +26,6 @@ import ome.services.util.Executor;
 import ome.system.Principal;
 import ome.system.ServiceFactory;
 import ome.util.ContextFilter;
-import omero.ApiUsageException;
 
 import org.hibernate.ObjectNotFoundException;
 import org.hibernate.Session;

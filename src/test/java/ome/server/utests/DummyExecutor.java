@@ -1,6 +1,4 @@
 /*
- *   $Id$
- *
  *   Copyright 2007 Glencoe Software, Inc. All rights reserved.
  *   Use is subject to license terms supplied in LICENSE.txt
  */
@@ -44,11 +42,11 @@ public class DummyExecutor implements Executor {
         this.service = service;
     }
 
-    public Object execute(Principal p, Work work) {
+    public <T> T execute(Principal p, Work<T> work) {
         return execute(null, p, work);
     }
 
-    public Object execute(Map<String, String> callContext, Principal p, Work work) {
+    public <T> T execute(Map<String, String> callContext, Principal p, Work<T> work) {
         return work.doWork(session, sf);
     }
 

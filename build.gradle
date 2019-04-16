@@ -28,7 +28,10 @@ dependencies {
     testImplementation("org.testng:testng:6.14.2")
     testImplementation("jmock:jmock:1.+")
     testImplementation("org.apache.directory.server:apacheds-all:1.5.7")
-    testImplementation("log4j:log4j:1.2.17")
+    testImplementation('org.openmicroscopy:omero-common-test:5.5.0-m5')
+    testImplementation('org.slf4j:slf4j-log4j12:1.5.0')
+    configurations.testCompile.exclude(group: 'org.slf4j', module: 'jcl-over-slf4j')
+
 
     // https://mvnrepository.com/artifact/org.apache.directory.shared/shared-ldap
     // testCompile group: 'org.apache.directory.shared', name: 'shared-ldap-constants', version: '1.0.0-M1'
@@ -70,10 +73,11 @@ dependencies {
     implementation("net.sf.ehcache:ehcache:2.10.4")
 }
 
+
 test {
     // enable TestNG support (default is JUnit)
     useTestNG() {
-        suites "src/test/resources"
+        suites "src/test/resources/unit.testng.xml"
     }
 }
 

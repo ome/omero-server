@@ -15,19 +15,21 @@ import java.util.Map;
 import ome.services.fulltext.FullTextAnalyzer;
 
 import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.Token;
+import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.index.IndexWriter;
+import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
-import org.apache.lucene.search.Searcher;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.RAMDirectory;
+import org.apache.lucene.util.Version;
+
 import org.jmock.MockObjectTestCase;
 import org.testng.annotations.Test;
 
@@ -35,10 +37,11 @@ import org.testng.annotations.Test;
 public class TokenizationTest extends MockObjectTestCase {
 
     void assertTokenizes(String text, String... tokens) {
-        List<Token> results = tokenize(text);
+
+        List<String> results = tokenize(text);
         assertEquals(tokens.length, results.size());
         for (int i = 0; i < tokens.length; i++) {
-            String term = results.get(i).term();
+            String term = results.get(i);
             assertEquals(String.format("%s!=%s:%s", tokens[i], term,
                     results.toString()), tokens[i], term);
         }
@@ -76,12 +79,12 @@ public class TokenizationTest extends MockObjectTestCase {
 
     @Test
     public void testTokenizationWithQuery() throws Exception {
-        Searcher searcher = null;
+        IndexSearcher searcher = null;
         try {
             Directory directory = new RAMDirectory();
             Analyzer analyzer = new FullTextAnalyzer();
-            IndexWriter writer = new IndexWriter(directory, analyzer,
-                    IndexWriter.MaxFieldLength.UNLIMITED);
+            IndexWriterConfig config = new IndexWriterConfig(Version.LUCENE_31, analyzer);
+            IndexWriter writer = new IndexWriter(directory, config);
 
             String[] docs = { "GFP-CSFV-abc", "GFP-H2B-123", "GFP_H2B-456" };
             addDocuments(writer, docs);
@@ -91,11 +94,11 @@ public class TokenizationTest extends MockObjectTestCase {
             Map<String, Integer> queryToResults = new HashMap();
             queryToResults.put("GFP", 3);
             queryToResults.put("GFP*", 3);
-            queryToResults.put("GFP-H2B", 2);
+            queryToResults.put("GFP-H2B", 3);
             queryToResults.put("\"GFP H2B\"", 2);
             queryToResults.put("\"H2B GFP\"", 0);
 
-            QueryParser parser = new QueryParser("contents", analyzer);
+            QueryParser parser = new QueryParser(Version.LUCENE_31, "contents", analyzer);
             for (String queryStr : queryToResults.keySet()) {
                 Query query = parser.parse(queryStr);
                 System.out.println("Query: " + query.toString("contents"));
@@ -116,7 +119,7 @@ public class TokenizationTest extends MockObjectTestCase {
     // =============================================================
 
     private void addDocuments(IndexWriter writer, String[] docs)
-            throws CorruptIndexException, IOException {
+            throws IOException {
         for (int j = 0; j < docs.length; j++) {
             Document d = new Document();
             d.add(new Field("contents", docs[j], Field.Store.YES,
@@ -126,22 +129,16 @@ public class TokenizationTest extends MockObjectTestCase {
         writer.close();
     }
 
-    private List<Token> tokenize(String a) {
-        // StandardAnalyzer sa = new StandardAnalyzer();
-        FullTextAnalyzer sa = new FullTextAnalyzer();
-        TokenStream ts = sa.tokenStream("field", new StringReader(a));
-        List<Token> tokens = new ArrayList<Token>();
-        try {
-            while (true) {
-                Token t = new Token();
-                t = ts.next(t);
-                if (t == null) {
-                    break;
-                }
-                tokens.add(t);
+    private List<String> tokenize(String a) {
+        List<String> tokens = new ArrayList<>();
+        Analyzer analyzer = new FullTextAnalyzer();
+        try (TokenStream ts  = analyzer.tokenStream(null, new StringReader(a))) {
+            ts.reset();  // required
+            while (ts.incrementToken()) {
+                tokens.add(ts.getAttribute(CharTermAttribute.class).toString());
             }
-        } catch (IOException io) {
-            // ok
+        } catch (IOException e) {
+            new RuntimeException(e);  // Shouldn't happen...
         }
         return tokens;
     }

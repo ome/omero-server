@@ -22,8 +22,6 @@ import ome.api.IQuery;
 import ome.server.itests.ManagedContextFixture;
 import ome.testing.Report;
 
-import org.apache.log4j.Category;
-import org.apache.log4j.Level;
 import org.hibernate.SessionFactory;
 import org.hibernate.classic.Session;
 import org.hibernate.engine.FilterDefinition;
@@ -258,8 +256,6 @@ public class SqlHibernateDatasourceComparisonTest extends TestCase {
         System.out.println("Clearing stats");
         rawstats.clear();
         omestats.clear();
-
-        Category.getInstance("org.hibernate.SQL").setLevel(Level.DEBUG);
 
         // callHibernateAlone();
         callHibernateChannels();

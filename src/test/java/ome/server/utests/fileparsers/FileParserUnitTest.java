@@ -29,10 +29,10 @@ public class FileParserUnitTest extends TestCase {
     @Test
     public void testPdfParse() throws Exception {
         File abc123 = ResourceUtils
-                .getFile("classpath:ome/server/utests/fileparsers/ABC123.pdf");
+                .getFile("classpath:ome/server/fileparsers/ABC123.pdf");
         PdfParser parser = new PdfParser();
         parser.setApplicationContext(new OmeroContext(
-                "classpath:ome/server/utests/fileparsers/config.xml"));
+                "classpath:ome/server/fileparsers/config.xml"));
         StringBuffer sb = new StringBuffer();
         Iterable<Reader> text = parser.parse(abc123);
         for (Reader reader : text) {

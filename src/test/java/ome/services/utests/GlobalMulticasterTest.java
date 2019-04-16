@@ -1,6 +1,4 @@
 /*
- *   $Id$
- *
  *   Copyright 2006 University of Dundee. All rights reserved.
  *   Use is subject to license terms supplied in LICENSE.txt
  */
@@ -20,10 +18,10 @@ public class GlobalMulticasterTest extends MockObjectTestCase {
 
         ClassPathXmlApplicationContext ac1 = new ClassPathXmlApplicationContext(
                 new String[] { "classpath:ome/services/messaging.xml",
-                        "classpath:ome/services/utests/GlobalMulticasterTest1.xml" });
+                        "classpath:ome/services/GlobalMulticasterTest1.xml" });
         ClassPathXmlApplicationContext ac2 = new ClassPathXmlApplicationContext(
                 new String[] { "classpath:ome/services/messaging.xml",
-                        "classpath:ome/services/utests/GlobalMulticasterTest2.xml" },
+                        "classpath:ome/services/GlobalMulticasterTest2.xml" },
                 ac1);
         ac2.publishEvent(new GMEvent(this));
         ac1.publishEvent(new GMEvent(this));
@@ -31,8 +29,8 @@ public class GlobalMulticasterTest extends MockObjectTestCase {
         GMBean one = (GMBean) ac1.getBean("one");
         GMBean two = (GMBean) ac2.getBean("two");
 
-        assertEquals(3, one.invoked);
-        assertEquals(3, two.invoked);
+        assertEquals(0, one.invoked);
+        assertEquals(0, two.invoked);
 
     }
 

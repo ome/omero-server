@@ -21,7 +21,7 @@ import ome.util.SqlAction;
 import org.hibernate.Session;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
-import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
@@ -196,12 +196,12 @@ public class SequencesTest extends AbstractManagedContextTest {
                     PlatformTransactionManager tm = new DataSourceTransactionManager(
                             ds);
                     TransactionTemplate tt = new TransactionTemplate(tm);
-                    final SimpleJdbcTemplate jdbc = new SimpleJdbcTemplate(ds);
+                    final JdbcTemplate jdbc = new JdbcTemplate(ds);
 
                     tt.execute(new TransactionCallback() {
                         public Object doInTransaction(TransactionStatus status) {
-                            values[DURING] = jdbc.queryForLong(
-                                    "select ome_nextval(?)", seq_name);
+                            values[DURING] = (Long) jdbc.queryForObject(
+                                    "select ome_nextval(?)", new Object[] { seq_name }, Long.class);
                             return null;
                         }
                     });

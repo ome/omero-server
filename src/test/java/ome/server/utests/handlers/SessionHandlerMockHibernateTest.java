@@ -1,12 +1,9 @@
 /*
- * ome.server.utests.handlers.SessionHandlerMockHibernateTest
- *
  *   Copyright 2006 University of Dundee. All rights reserved.
  *   Use is subject to license terms supplied in LICENSE.txt
  */
 package ome.server.utests.handlers;
 
-// Java imports
 import java.lang.reflect.Method;
 import java.sql.Connection;
 import java.util.ArrayList;
@@ -416,7 +413,7 @@ public class SessionHandlerMockHibernateTest extends MockObjectTestCase {
         }
     }
 
-    private InvokedRecorder exactly(int count) {
+    public InvokedRecorder exactly(int count) {
         return new InvokedRecorder(count);
     }
 
