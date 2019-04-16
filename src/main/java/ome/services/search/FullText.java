@@ -158,7 +158,7 @@ public class FullText extends SearchAction {
         
         try {
             final Analyzer a = analyzer.newInstance();
-            final QueryParser parser = new /*Analyzing*/QueryParser(Version.LUCENE_31, "combined_fields", a);
+            final QueryParser parser = new /*Analyzing*/QueryParser(Version.LUCENE_24, "combined_fields", a);
             parser.setAllowLeadingWildcard(values.leadingWildcard);
             q = parser.parse(queryStr);
         } catch (ParseException pe) {
