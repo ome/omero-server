@@ -104,3 +104,13 @@ jar {
         attributes("Main-Class": 'ome.services.fulltext.Main')
     }
 }
+
+processResources {
+    with copySpec {
+        from 'src/main/resources'
+        // Set version
+        filter { String line ->
+            line.startsWith('omero.version') ? 'omero.version='+version : line
+        }
+    }
+}

@@ -1,6 +1,4 @@
 /*
- *   $Id$
- *
  *   Copyright 2006 University of Dundee. All rights reserved.
  *   Use is subject to license terms supplied in LICENSE.txt
  */
@@ -14,13 +12,14 @@
 
 package ome.logic;
 
-import java.io.File;
-import java.io.FileReader;
+import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.locks.ReadWriteLock;
@@ -246,23 +245,26 @@ public class ConfigImpl extends AbstractLevel2Service implements LocalConfig {
 
     @RolesAllowed("system")
     public Map<String, String> getConfigDefaults() {
-        File etc = new File("etc");
-        File omero = new File(etc, "omero.properties");
-        Properties p = new Properties();
+        //TODO: remove hard-coded list
+        List<String> files = new ArrayList<String>();
+        files.add("omero-model.properties");
+        files.add("omero-common.properties");
+        files.add("omero-server.properties");
+        files.add("omero-blitz.properties");
+        files.add("omero.properties");
         Map<String, String> rv = new HashMap<String, String>();
-        try {
-            FileReader r = new FileReader(omero);
-            p.load(r);
-            for (Entry<Object, Object> entry : p.entrySet()) {
-                    rv.put(entry.getKey().toString(),
-                            entry.getValue().toString());
+        Iterator<String> i = files.iterator();
+        while (i.hasNext()) {
+            try (InputStream stream = getClass().getResourceAsStream(i.next())) {
+                Properties p = new Properties();
+                p.load(stream);
+            }  catch (Exception e) {
+                InternalException ie = new InternalException(e.getMessage());
+                ie.initCause(e);
+                throw ie;
             }
-            return rv;
-        } catch (Exception e) {
-            InternalException ie = new InternalException(e.getMessage());
-            ie.initCause(e);
-            throw ie;
         }
+        return rv;
     }
 
     @PermitAll
