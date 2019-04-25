@@ -1,5 +1,5 @@
 /*
- *   Copyright 2006 University of Dundee. All rights reserved.
+ *   Copyright 2006-2019 University of Dundee. All rights reserved.
  *   Use is subject to license terms supplied in LICENSE.txt
  */
 
@@ -17,7 +17,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -41,6 +40,9 @@ import ome.services.db.DatabaseIdentity;
 import ome.system.PreferenceContext;
 import ome.util.SqlAction;
 
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -85,7 +87,7 @@ import org.springframework.transaction.annotation.Transactional;
  * Local configurations are not exposed to clients, and are typically only used
  * within a server instance.
  */
-public class ConfigImpl extends AbstractLevel2Service implements LocalConfig {
+public class ConfigImpl extends AbstractLevel2Service implements ApplicationContextAware, LocalConfig {
 
     /*
      * Stateful differences: -------------------- A stateful service must be
@@ -96,6 +98,8 @@ public class ConfigImpl extends AbstractLevel2Service implements LocalConfig {
      * @see https://trac.openmicroscopy.org/ome/ticket/173
      */
     private transient SqlAction sql;
+
+    private transient ResourceLoader resourceLoader;
 
     private transient PreferenceContext prefs;
 
@@ -127,6 +131,11 @@ public class ConfigImpl extends AbstractLevel2Service implements LocalConfig {
     public final void setSqlAction(SqlAction sql) {
         getBeanHelper().throwIfAlreadySet(this.sql, sql);
         this.sql = sql;
+    }
+
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) {
+        this.resourceLoader = applicationContext;
     }
 
     /**
@@ -252,17 +261,19 @@ public class ConfigImpl extends AbstractLevel2Service implements LocalConfig {
         files.add("omero-server.properties");
         files.add("omero-blitz.properties");
         files.add("omero.properties");
-        Map<String, String> rv = new HashMap<String, String>();
-        Iterator<String> i = files.iterator();
-        while (i.hasNext()) {
-            try (InputStream stream = getClass().getResourceAsStream(i.next())) {
-                Properties p = new Properties();
+        final Properties p = new Properties();
+        for (final String file : files) {
+            try (final InputStream stream  = resourceLoader.getResource(file).getInputStream()) {
                 p.load(stream);
             }  catch (Exception e) {
-                InternalException ie = new InternalException(e.getMessage());
+                final InternalException ie = new InternalException("in reading " + file + ": " + e.getMessage());
                 ie.initCause(e);
                 throw ie;
             }
+        }
+        final Map<String, String> rv = new HashMap<>();
+        for (final Map.Entry<Object, Object> entry : p.entrySet()) {
+            rv.put(entry.getKey().toString(), entry.getValue().toString());
         }
         return rv;
     }
