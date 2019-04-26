@@ -25,6 +25,7 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.stream.Stream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,7 +33,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Iterables;
 
 import ome.model.meta.Experimenter;
 import ome.model.meta.Node;
@@ -150,8 +150,8 @@ public class SessionProviderInMemory implements SessionProvider, ReadOnlyStatus.
     @Override
     public Session findSessionById(long id, ServiceFactory sf) {
         final SortedSet<Long> tries = new TreeSet<Long>();
-        /* in Java 8 maybe could use Stream instead of Iterables */
-        for (final Session session : Iterables.concat(openSessions.values(), closedSessions.values())) {
+        final Stream<Session> sessionStream = Stream.concat(openSessions.values().stream(), closedSessions.values().stream());
+        for (final Session session : (Iterable<Session>) sessionStream::iterator) {
             if (session.getId().equals(id)) {
                 return session;
             } else {
