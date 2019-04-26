@@ -20,6 +20,7 @@
 package ome.services.graphs;
 
 import java.lang.reflect.Modifier;
+import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -50,7 +51,6 @@ import org.springframework.context.event.ContextRefreshedEvent;
 import com.google.common.base.Joiner;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Maps;
 import com.google.common.collect.SetMultimap;
 
 import ome.model.IObject;
@@ -358,7 +358,8 @@ public class GraphPathBean extends OnContextRefreshedEventListener {
                     sb.append(" from ");
                     sb.append(superclassWithProperty);
                 } else {
-                    final Entry<String, String> classPropertyFullName = Maps.immutableEntry(property.holder, fullPropertyPath);
+                    final Entry<String, String> classPropertyFullName =
+                            new AbstractMap.SimpleImmutableEntry<>(property.holder, fullPropertyPath);
                     if (interfaceForProperty != null) {
                         sb.append(" see ");
                         final String implementedInterface = interfaceForProperty.getName();
@@ -367,13 +368,14 @@ public class GraphPathBean extends OnContextRefreshedEventListener {
                         /* It would be nice to set PropertyDetails to have the interface as the holder,
                          * but then properties would not be unique by declarer class and instance ID. */
                     }
-                    final Entry<String, String> classPropertyShortName = Maps.immutableEntry(property.holder, shortPropertyPath);
+                    final Entry<String, String> classPropertyShortName =
+                            new AbstractMap.SimpleImmutableEntry<>(property.holder, shortPropertyPath);
                     /* entity linkages by non-inherited properties are recorded */
                     if (valueClassName == null) {
                         simplePropertiesNested.put(property.holder, fullPropertyPath);
                         simplePropertiesDirect.put(property.holder, shortPropertyPath);
                     } else {
-                        linkedTo.put(property.holder, Maps.immutableEntry(valueClassName, fullPropertyPath));
+                        linkedTo.put(property.holder, new AbstractMap.SimpleImmutableEntry<>(valueClassName, fullPropertyPath));
                         linkedBy.put(valueClassName, classPropertyFullName);
                     }
                     final PropertyKind propertyKind;
@@ -523,7 +525,7 @@ public class GraphPathBean extends OnContextRefreshedEventListener {
      * @return the kind of property it is
      */
     public PropertyKind getPropertyKind(String className, String propertyName) {
-        return propertyKinds.get(Maps.immutableEntry(className, propertyName));
+        return propertyKinds.get(new AbstractMap.SimpleImmutableEntry<>(className, propertyName));
     }
 
     /**
@@ -533,7 +535,7 @@ public class GraphPathBean extends OnContextRefreshedEventListener {
      * @return the Hibernate type of the property
      */
     public Type getPropertyType(String className, String propertyName) {
-        return propertyTypes.get(Maps.immutableEntry(className, propertyName));
+        return propertyTypes.get(new AbstractMap.SimpleImmutableEntry<>(className, propertyName));
     }
 
     /**
@@ -543,7 +545,7 @@ public class GraphPathBean extends OnContextRefreshedEventListener {
      * @return the implemented interface, may be {@code null}
      */
     public String getInterfaceImplemented(String className, String propertyName) {
-        return implementedInterfaces.get(Maps.immutableEntry(className, propertyName));
+        return implementedInterfaces.get(new AbstractMap.SimpleImmutableEntry<>(className, propertyName));
     }
 
     /**
@@ -553,7 +555,7 @@ public class GraphPathBean extends OnContextRefreshedEventListener {
      * @return if the property can be accessed
      */
     public boolean isPropertyAccessible(String className, String propertyName) {
-        return accessibleProperties.contains(Maps.immutableEntry(className, propertyName));
+        return accessibleProperties.contains(new AbstractMap.SimpleImmutableEntry<>(className, propertyName));
     }
 
     /**

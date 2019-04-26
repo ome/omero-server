@@ -19,6 +19,7 @@
 
 package ome.services.graphs;
 
+import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -47,7 +48,6 @@ import com.google.common.base.Objects;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
-import com.google.common.collect.Maps;
 import com.google.common.collect.SetMultimap;
 import com.google.common.collect.Sets;
 
@@ -532,7 +532,7 @@ public class GraphTraversal {
         for (final CI deletedObject : planning.deleted) {
             deleted.put(deletedObject.className, deletedObject.id);
         }
-        return Maps.immutableEntry(included, deleted);
+        return new AbstractMap.SimpleImmutableEntry<>(included, deleted);
     }
 
     /**
@@ -582,7 +582,7 @@ public class GraphTraversal {
         for (final CI deletedObject : planning.deleted) {
             deleted.add(deletedObject.toIObject());
         }
-        return Maps.immutableEntry(included, deleted);
+        return new AbstractMap.SimpleImmutableEntry<>(included, deleted);
     }
 
     /**
@@ -911,7 +911,7 @@ public class GraphTraversal {
             } else if (!planning.detailsNoted.containsKey(linked)) {
                 log.warn("failed to query for " + linked);
             } else {
-                linkerLinked.add(Maps.immutableEntry(linker, linked));
+                linkerLinked.add(new AbstractMap.SimpleImmutableEntry<>(linker, linked));
                 if (propertyIsAccessible) {
                     planning.befores.put(linked, linker);
                     planning.afters.put(linker, linked);
@@ -1282,7 +1282,7 @@ public class GraphTraversal {
                 idMap = HashMultimap.create();
                 linkerToIdToLinked.put(linker.toCP(), idMap);
             }
-            idMap.put(linker.id, Maps.immutableEntry(linked.className, linked.id));
+            idMap.put(linker.id, new AbstractMap.SimpleImmutableEntry<>(linked.className, linked.id));
         }
     }
 
@@ -1623,7 +1623,7 @@ public class GraphTraversal {
                 final Collection<Long> allIds = oneClassToDelete.getValue();
                 assertMayBeDeleted(className, allIds);
             }
-            toJoinAndDelete.add(Maps.immutableEntry(eachToJoin, eachToDelete));
+            toJoinAndDelete.add(new AbstractMap.SimpleImmutableEntry<>(eachToJoin, eachToDelete));
         }
         return new PlanExecutor() {
             @Override
