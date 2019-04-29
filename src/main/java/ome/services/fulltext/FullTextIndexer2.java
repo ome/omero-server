@@ -43,10 +43,12 @@ import org.apache.commons.lang.StringUtils;
 import org.hibernate.CacheMode;
 import org.hibernate.FlushMode;
 import org.hibernate.Hibernate;
+import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
+import org.hibernate.UnresolvableObjectException;
 import org.hibernate.jdbc.Work;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
@@ -145,6 +147,8 @@ public class FullTextIndexer2 {
         STARTUP(20),
         /* How long to wait to try to relock the field bridge. */
         FIELD_BRIDGE_CONTENTION(5),
+        /* How long to wait after failing to read data via Hibernate. */
+        HIBERNATE_QUERY_ERROR(10),
         /* How long to wait after finding nothing new to index. */
         NOTHING_NEW_TO_INDEX(2);
 
@@ -404,6 +408,7 @@ public class FullTextIndexer2 {
      */
     public void prepare() {
         final Session session = sessionFactory.openSession();
+        HibernateException hibernateQueryError = null;
         try {
             LOGGER.debug("adding any new REINDEX entries");
             session.setFlushMode(FlushMode.COMMIT);
@@ -467,11 +472,18 @@ public class FullTextIndexer2 {
                 removeObsoleteEntries(toPurge, session);
             }
             transaction.rollback();
+        } catch (UnresolvableObjectException uoe) {
+            hibernateQueryError = uoe;
         } finally {
             session.close();
         }
         try {
-            if (!toIndex.isEmpty()) {
+            if (hibernateQueryError != null) {
+                toIndex.clear();
+                toPurge.clear();
+                LOGGER.info("Hibernate query failed, aborting this indexer run", hibernateQueryError);
+                register(Step.PREPARE, Event.HIBERNATE_QUERY_ERROR);
+            } else if (!toIndex.isEmpty()) {
                 register(Step.INDEX);
             } else if (!toPurge.isEmpty()) {
                 register(Step.PURGE);
@@ -512,6 +524,7 @@ public class FullTextIndexer2 {
         }
         final ParserSession parserSession = new ParserSession();
         final Session session = sessionFactory.openSession();
+        HibernateException hibernateQueryError = null;
         try {
             final FullTextSession fullTextSession = Search.getFullTextSession(session);
             fullTextSession.setCacheMode(CacheMode.IGNORE);
@@ -537,13 +550,20 @@ public class FullTextIndexer2 {
             }
             transaction.commit();
             toIndex.clear();
+        } catch (UnresolvableObjectException uoe) {
+            hibernateQueryError = uoe;
         } finally {
             DetailsFieldBridge.unlock();
             session.close();
             parserSession.closeParsedFiles();
         }
         try {
-            if (!toPurge.isEmpty()) {
+            if (hibernateQueryError != null) {
+                toIndex.clear();
+                toPurge.clear();
+                LOGGER.info("Hibernate query failed, aborting this indexer run", hibernateQueryError);
+                register(Step.PREPARE, Event.HIBERNATE_QUERY_ERROR);
+            } else if (!toPurge.isEmpty()) {
                 register(Step.PURGE);
             } else {
                 register(Step.NOTE);
@@ -570,6 +590,7 @@ public class FullTextIndexer2 {
             return;
         }
         final Session session = sessionFactory.openSession();
+        HibernateException hibernateQueryError = null;
         try {
             final FullTextSession fullTextSession = Search.getFullTextSession(session);
             fullTextSession.setCacheMode(CacheMode.IGNORE);
@@ -596,12 +617,21 @@ public class FullTextIndexer2 {
             }
             transaction.commit();
             toPurge.clear();
+        } catch (UnresolvableObjectException uoe) {
+            hibernateQueryError = uoe;
         } finally {
             DetailsFieldBridge.unlock();
             session.close();
         }
         try {
-            register(Step.NOTE);
+            if (hibernateQueryError != null) {
+                toIndex.clear();
+                toPurge.clear();
+                LOGGER.info("Hibernate query failed, aborting this indexer run", hibernateQueryError);
+                register(Step.PREPARE, Event.HIBERNATE_QUERY_ERROR);
+            } else {
+                register(Step.NOTE);
+            }
         } catch (Throwable t) {
             LOGGER.error("failed to continue indexer", t);
         }
