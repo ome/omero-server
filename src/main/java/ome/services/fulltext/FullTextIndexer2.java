@@ -53,6 +53,7 @@ import org.hibernate.jdbc.Work;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.SearchFactory;
+import org.hibernate.search.bridge.BridgeException;
 import org.hibernate.search.bridge.FieldBridge;
 import org.python.google.common.base.Splitter;
 import org.quartz.DateBuilder;
@@ -552,6 +553,12 @@ public class FullTextIndexer2 {
             toIndex.clear();
         } catch (UnresolvableObjectException uoe) {
             hibernateQueryError = uoe;
+        } catch (BridgeException be) {
+            if (be.getCause() instanceof UnresolvableObjectException) {
+                hibernateQueryError = (UnresolvableObjectException) be.getCause();
+            } else {
+                throw be;
+            }
         } finally {
             DetailsFieldBridge.unlock();
             session.close();
@@ -619,6 +626,12 @@ public class FullTextIndexer2 {
             toPurge.clear();
         } catch (UnresolvableObjectException uoe) {
             hibernateQueryError = uoe;
+        } catch (BridgeException be) {
+            if (be.getCause() instanceof UnresolvableObjectException) {
+                hibernateQueryError = (UnresolvableObjectException) be.getCause();
+            } else {
+                throw be;
+            }
         } finally {
             DetailsFieldBridge.unlock();
             session.close();
