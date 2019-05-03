@@ -56,7 +56,7 @@ public class IQueryMockSessionTest extends MockObjectTestCase {
         ec.stubs().method("getCurrentUserId").will(returnValue(1L));
         final Mock sec = mock(SecuritySystem.class);
         sec.stubs().method("getEventContext").will(returnValue(ec.proxy()));
-        timeoutSetter = new TimeoutSetter((SecuritySystem) sec.proxy(), 10, 10);
+        timeoutSetter = new TimeoutSetter((SecuritySystem) sec.proxy(), 10, 20);
     }
 
     @Override
@@ -103,7 +103,7 @@ public class IQueryMockSessionTest extends MockObjectTestCase {
 
     protected Mock criteriaUniqueResultCall(Object obj) {
         Mock mockCriteria = mock(Criteria.class);
-        mockCriteria.stubs().method("setTimeout");
+        mockCriteria.stubs().method("setTimeout").with(eq(10));
         mockCriteria.expects(once()).method("uniqueResult").will(
                 returnValue(obj));
         return mockCriteria;
@@ -111,7 +111,7 @@ public class IQueryMockSessionTest extends MockObjectTestCase {
 
     protected Mock criteriaListCall(List blank) {
         Mock mockCriteria = mock(Criteria.class);
-        mockCriteria.stubs().method("setTimeout");
+        mockCriteria.stubs().method("setTimeout").with(eq(10));
         mockCriteria.expects(once()).method("list").will(returnValue(blank));
         return mockCriteria;
     }

@@ -51,7 +51,7 @@ public class SearchBeanTest extends MockObjectTestCase {
         ec.stubs().method("getCurrentUserId").will(returnValue(1L));
         final Mock sec = mock(SecuritySystem.class);
         sec.stubs().method("getEventContext").will(returnValue(ec.proxy()));
-        timeoutSetter = new TimeoutSetter((SecuritySystem) sec.proxy(), 10, 10);
+        timeoutSetter = new TimeoutSetter((SecuritySystem) sec.proxy(), 10, 20);
     }
 
     @Test
