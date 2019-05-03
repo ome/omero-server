@@ -66,9 +66,9 @@ public class TimeoutSetter {
      */
     public void setTimeout(Consumer<Integer> query) {
         final EventContext ec = securitySystem.getEventContext();
-        final Long userId = ec.getCurrentUserId();
         final int selectedTimeout = ec.isCurrentUserAdmin() ? timeoutAdmin : timeout;
         query.accept(selectedTimeout);
+        final Long userId = ec.getCurrentUserId();
         if (userId == null) {
             LOGGER.debug("Set timeout for unknown user's query to {}s.", selectedTimeout);
         } else {

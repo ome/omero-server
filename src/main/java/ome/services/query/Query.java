@@ -1,5 +1,5 @@
 /*
- *   Copyright 2006-2017 University of Dundee. All rights reserved.
+ *   Copyright 2006-2019 University of Dundee. All rights reserved.
  *   Use is subject to license terms supplied in LICENSE.txt
  */
 
@@ -100,6 +100,8 @@ public abstract class Query<T> implements HibernateCallback {
 
     /* if the Hibernate level 2 cache should be used */
     private Boolean isCacheable = null;
+
+    private Integer timeout = null;
 
     /**
      * one of two possible outcomes of the {@link #buildQuery(Session)} method.
@@ -239,6 +241,9 @@ public abstract class Query<T> implements HibernateCallback {
             }
             
             if (_query != null) {
+                if (timeout != null) {
+                    _query.setTimeout(timeout);
+                }
                 _query.setFirstResult(offset);
                 _query.setMaxResults(limit);
                 if (isCacheable != null) {
@@ -247,6 +252,9 @@ public abstract class Query<T> implements HibernateCallback {
                 }
                 return unique ? _query.uniqueResult() : _query.list();
             } else {
+                if (timeout != null) {
+                    _criteria.setTimeout(timeout);
+                }
                 _criteria.setFirstResult(offset);
                 _criteria.setMaxResults(limit);
                 if (isCacheable != null) {
@@ -294,6 +302,13 @@ public abstract class Query<T> implements HibernateCallback {
                     "This Query already has a Query set:" + _query);
         }
         _criteria = criteria;
+    }
+
+    /**
+     * @param seconds the timeout to set
+     */
+    public void setTimeout(int seconds) {
+        timeout = seconds;
     }
 
     /**

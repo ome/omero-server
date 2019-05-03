@@ -1,6 +1,4 @@
 /*
- *   $Id$
- *
  *   Copyright 2007 Glencoe Software, Inc. All rights reserved.
  *   Use is subject to license terms supplied in LICENSE.txt
  */
@@ -240,6 +238,9 @@ public class FullText extends SearchAction {
     private Criteria criteria(FullTextSession session) {
         final Class<?> cls = values.onlyTypes.get(0);
         Criteria criteria = session.createCriteria(cls);
+        if (timeout != null) {
+            criteria.setTimeout(timeout);
+        }
         AnnotationCriteria ann = new AnnotationCriteria(criteria,
                 values.fetchAnnotations);
 
@@ -327,6 +328,9 @@ public class FullText extends SearchAction {
 
         // Main query
         FullTextQuery ftQuery = session.createFullTextQuery(this.q, cls);
+        if (timeout != null) {
+            ftQuery.setTimeout(timeout);
+        }
         initializeQuery(ftQuery);
         List<?> result = ftQuery.list();
         int totalSize = ftQuery.getResultSize();

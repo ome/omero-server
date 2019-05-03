@@ -1,5 +1,5 @@
 /*
- *   Copyright 2006-2017 University of Dundee. All rights reserved.
+ *   Copyright 2006-2019 University of Dundee. All rights reserved.
  *   Use is subject to license terms supplied in LICENSE.txt
  */
 
@@ -26,6 +26,7 @@ import ome.services.SearchBean;
 import ome.services.query.Query;
 import ome.services.search.FullText;
 import ome.services.search.SearchValues;
+import ome.services.util.TimeoutSetter;
 import ome.tools.hibernate.QueryBuilder;
 
 import org.apache.lucene.analysis.Analyzer;
@@ -59,8 +60,16 @@ public class QueryImpl extends AbstractLevel1Service implements LocalQuery {
 
     protected Class<? extends Analyzer> analyzer;
 
+    protected TimeoutSetter timeoutSetter;
+
     public void setAnalyzer(Class<? extends Analyzer> analyzer) {
+        getBeanHelper().throwIfAlreadySet(this.analyzer, analyzer);
         this.analyzer = analyzer;
+    }
+
+    public void setTimeoutSetter(TimeoutSetter timeoutSetter) {
+        getBeanHelper().throwIfAlreadySet(this.timeoutSetter, timeoutSetter);
+        this.timeoutSetter = timeoutSetter;
     }
 
     public Class<? extends ServiceInterface> getServiceInterface() {
@@ -207,6 +216,7 @@ public class QueryImpl extends AbstractLevel1Service implements LocalQuery {
                     public Object doInHibernate(Session session)
                             throws HibernateException, SQLException {
                         Criteria c = session.createCriteria(klass);
+                        timeoutSetter.setTimeout(c::setTimeout);
                         c.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
                         parseFilter(c, filter);
                         return c.list();
@@ -225,6 +235,7 @@ public class QueryImpl extends AbstractLevel1Service implements LocalQuery {
 
                 try {
                     Criteria c = session.createCriteria(example.getClass());
+                    timeoutSetter.setTimeout(c::setTimeout);
                     c.add(Example.create(example));
                     return c.uniqueResult();
                 } catch (IncorrectResultSizeDataAccessException irsdae) {
@@ -250,6 +261,7 @@ public class QueryImpl extends AbstractLevel1Service implements LocalQuery {
                             throws HibernateException {
 
                         Criteria c = session.createCriteria(example.getClass());
+                        timeoutSetter.setTimeout(c::setTimeout);
                         c.add(Example.create(example));
                         parseFilter(c, filter);
                         return c.list();
@@ -270,6 +282,7 @@ public class QueryImpl extends AbstractLevel1Service implements LocalQuery {
 
                 try {
                     Criteria c = session.createCriteria(klass);
+                    timeoutSetter.setTimeout(c::setTimeout);
                     c.add(Restrictions.eq(fieldName, value));
                     return c.uniqueResult();
                 } catch (IncorrectResultSizeDataAccessException irsdae) {
@@ -297,6 +310,7 @@ public class QueryImpl extends AbstractLevel1Service implements LocalQuery {
                             throws HibernateException {
 
                         Criteria c = session.createCriteria(klass);
+                        timeoutSetter.setTimeout(c::setTimeout);
                         parseFilter(c, filter);
 
                         if (caseSensitive) {
@@ -326,6 +340,7 @@ public class QueryImpl extends AbstractLevel1Service implements LocalQuery {
         params.unique();
 
         final Query<T> q = getQueryFactory().<T>lookup(queryName, params);
+        timeoutSetter.setTimeout(q::setTimeout);
         if (params.isCache()) {
             q.enableQueryCache();
         }
@@ -365,6 +380,7 @@ public class QueryImpl extends AbstractLevel1Service implements LocalQuery {
     public <T extends IObject> List<T> findAllByQuery(String queryName,
             Parameters params) {
         Query<List<T>> q = getQueryFactory().lookup(queryName, params);
+        timeoutSetter.setTimeout(q::setTimeout);
         if (params != null && params.isCache()) {
             q.enableQueryCache();
         }
@@ -392,6 +408,7 @@ public class QueryImpl extends AbstractLevel1Service implements LocalQuery {
                         values.copy(params);
                         FullText fullText = new FullText(values, query,
                                 analyzer);
+                        timeoutSetter.setTimeout(fullText::setTimeout);
                         return (List<IObject>) fullText.doWork(session, null);
                     }
                 });
@@ -401,6 +418,7 @@ public class QueryImpl extends AbstractLevel1Service implements LocalQuery {
         }
 
         SearchBean search = new SearchBean();
+        search.setTimeoutSetter(timeoutSetter);
         search.addParameters(params);
         search.addResult(results);
         return search.results();
@@ -415,6 +433,7 @@ public class QueryImpl extends AbstractLevel1Service implements LocalQuery {
     public List<Object[]> projection(final String query, Parameters p) {
         final Parameters params = (p == null ? new Parameters() : p);
         final Query<List<Object>> q = getQueryFactory().lookup(query, params);
+        timeoutSetter.setTimeout(q::setTimeout);
         if (params.isCache()) {
             q.enableQueryCache();
         }
@@ -468,7 +487,9 @@ public class QueryImpl extends AbstractLevel1Service implements LocalQuery {
                 new HibernateCallback() {
                     public Object doInHibernate(Session session)
                             throws HibernateException, SQLException {
-                        return qb.query(session).uniqueResult();
+                        final org.hibernate.Query q = qb.query(session);
+                        timeoutSetter.setTimeout(q::setTimeout);
+                        return q.uniqueResult();
                     }
                 });
     }
@@ -497,7 +518,9 @@ public class QueryImpl extends AbstractLevel1Service implements LocalQuery {
                 new HibernateCallback() {
                     public Object doInHibernate(Session session)
                             throws HibernateException, SQLException {
-                        return qb.query(session).list();
+                        final org.hibernate.Query q = qb.query(session);
+                        timeoutSetter.setTimeout(q::setTimeout);
+                        return q.list();
                     }
                 });
 

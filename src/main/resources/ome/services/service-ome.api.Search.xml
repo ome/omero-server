@@ -2,8 +2,6 @@
 <!--
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
-# $Id$
-#
 # Copyright 2008 Glencoe Software, Inc. All rights reserved.
 # Use is subject to license terms supplied in LICENSE.txt
 #
@@ -24,6 +22,7 @@
         id="internal-ome.api.Search"
         class="ome.services.SearchBean" scope="prototype">
      <property name="executor" ref="executor"/>
+     <property name="timeoutSetter" ref="timeoutSetter"/>
      <property name="analyzer" value="${omero.search.analyzer}"/>
      <property name="maxClauseCount" value="${omero.search.maxclause}"/>
   </bean>

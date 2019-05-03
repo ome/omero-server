@@ -28,6 +28,7 @@ import ome.tools.hibernate.QueryBuilder;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.hibernate.Query;
 import org.hibernate.Session;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -236,6 +237,10 @@ public class AnnotatedWith extends SearchAction {
         }
 
         log.debug(qb.toString());
-        return qb.query(session).list();
+        final Query query = qb.query(session);
+        if (timeout != null) {
+            query.setTimeout(timeout);
+        }
+        return query.list();
     }
 }

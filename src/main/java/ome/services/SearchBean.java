@@ -33,6 +33,7 @@ import ome.services.search.SomeMustNone;
 import ome.services.search.TagsAndGroups;
 import ome.services.search.Union;
 import ome.services.util.Executor;
+import ome.services.util.TimeoutSetter;
 import ome.system.SelfConfigurableService;
 
 import org.slf4j.Logger;
@@ -62,9 +63,12 @@ public class SearchBean extends AbstractStatefulBean implements Search {
 
     private/* final */transient Executor executor;
 
+    private transient TimeoutSetter timeoutSetter;
+
     private/* final */transient Class<? extends Analyzer> analyzer;
 
     private/* final */transient Integer maxClauseCount;
+
 
     public SearchBean(Executor executor, Class<? extends Analyzer> analyzer) {
         this.executor = executor;
@@ -89,6 +93,11 @@ public class SearchBean extends AbstractStatefulBean implements Search {
      */
     public void setExecutor(Executor executor) {
         this.executor = executor;
+    }
+
+    public void setTimeoutSetter(TimeoutSetter timeoutSetter) {
+        getBeanHelper().throwIfAlreadySet(this.timeoutSetter, timeoutSetter);
+        this.timeoutSetter = timeoutSetter;
     }
 
     /**
@@ -269,6 +278,7 @@ public class SearchBean extends AbstractStatefulBean implements Search {
             return false;
         }
         SearchAction action = actions.popFirst();
+        timeoutSetter.setTimeout(action::setTimeout);
         List<IObject> list = (List<IObject>) executor.execute(null, action);
         results.add(list);
         return hasNext(); // recursive call
