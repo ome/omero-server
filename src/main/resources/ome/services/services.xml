@@ -205,6 +205,12 @@
     </property>
   </bean>
 
+  <bean id="timeoutSetter" class="ome.services.util.TimeoutSetter">
+    <constructor-arg ref="securitySystem"/>
+    <constructor-arg value="${omero.query.timeout}"/>
+    <constructor-arg value="${omero.query.timeout.admin}"/>
+  </bean>
+
 <!--
   JMX resources
   =======================================================================
