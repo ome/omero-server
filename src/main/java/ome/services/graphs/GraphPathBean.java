@@ -177,7 +177,7 @@ public class GraphPathBean extends OnContextRefreshedEventListener {
                     interfaceForProperty = interfaceFrom;
                 }
                 for (final Class<?> newInterface : interfaceFrom.getInterfaces()) {
-                    if (newInterface != IObject.class && IObject.class.isAssignableFrom(newInterface)) {
+                    if (IObject.class.isAssignableFrom(newInterface)) {
                         interfacesTo.add(newInterface.asSubclass(IObject.class));
                         classesBySimpleName.put(newInterface.getSimpleName(), newInterface.asSubclass(IObject.class));
                     }
