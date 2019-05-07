@@ -2,7 +2,7 @@
 <!--
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # 
-# Copyright 2006-2018 University of Dundee. All rights reserved.
+# Copyright 2006-2019 University of Dundee. All rights reserved.
 # Use is subject to license terms supplied in LICENSE.txt
 #
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -31,6 +31,7 @@
   <bean name="/OMERO/Pixels" class="ome.io.nio.PixelsService"
         parent="filesystem">
     <!-- note constructor-args from parent bean -->
+    <constructor-arg value="${omero.pixeldata.memoizer.dir}"/>
     <constructor-arg ref="MemoizerWait"/>
     <constructor-arg ref="omeroFilePathResolver"/>
     <constructor-arg ref="backOff"/>
