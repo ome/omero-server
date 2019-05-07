@@ -249,7 +249,7 @@ public class GraphPathReport {
                 }
                 if (!declarerName.equals(className)) {
                     out.write(" from " + linkTo(getSimpleName(declarerName)));
-                } else {
+                } else if (!propertyName.startsWith("details.")) {
                     final String interfaceName = model.getInterfaceImplemented(className, propertyName);
                     if (interfaceName != null) {
                         out.write(", see " + linkToJavadoc(interfaceName));
