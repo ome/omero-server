@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2017 University of Dundee & Open Microscopy Environment.
+ * Copyright (C) 2014-2019 University of Dundee & Open Microscopy Environment.
  * All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -22,7 +22,10 @@ package ome.services.graphs;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
+import java.lang.reflect.Method;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.SortedSet;
@@ -37,6 +40,7 @@ import org.hibernate.type.Type;
 import org.hibernate.usertype.UserType;
 
 import com.google.common.base.Joiner;
+import com.google.common.collect.ImmutableSet;
 
 import ome.model.units.GenericEnumType;
 import ome.model.units.Unit;
@@ -168,6 +172,47 @@ public class GraphPathReport {
     }
 
     /**
+     * Check if the given class has a {@code @Deprecated} annotation.
+     * @param className the name of a class
+     * @return if the class is deprecated
+     */
+    private static boolean isDeprecated(String className) {
+        final Class<?> clazz;
+        try {
+            clazz = Class.forName(className);
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException("failed to review " + className + " for deprecation", e);
+        }
+        return clazz.getAnnotation(Deprecated.class) != null;
+    }
+
+    /**
+     * Check if the given property's getter has a {@code @Deprecated} annotation.
+     * @param className the name of a class
+     * @param propertyName the name of one of the given class' properties
+     * @return if the property's getter is deprecated
+     */
+    private static boolean isDeprecated(String className, String propertyName) {
+        if (propertyName.startsWith("details.")) {
+            return false;
+        }
+        final String propertyNameCap = propertyName.substring(0, 1).toUpperCase(Locale.ENGLISH) + propertyName.substring(1);
+        final Collection<String> getterNames = ImmutableSet.of("is" + propertyNameCap, "get" + propertyNameCap);
+        final Class<?> clazz;
+        try {
+            clazz = Class.forName(className);
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException("failed to review " + className + " for deprecation", e);
+        }
+        for (final Method method : clazz.getMethods()) {
+            if (getterNames.contains(method.getName()) && method.getAnnotation(Deprecated.class) != null) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * Process the Hibernate domain object model and write a report of the mapped objects.
      * @throws IOException if there was a problem in writing to the output file
      */
@@ -233,6 +278,7 @@ public class GraphPathReport {
                     valueText.put(propertyName, reportType(superclassName, propertyName));
                 }
             }
+            int deprecatedPropertyCount = 0;
             for (final Map.Entry<String, String> propertyAndDeclarerNames : declaredBy.entrySet()) {
                 final String propertyName = propertyAndDeclarerNames.getKey();
                 final String declarerName = propertyAndDeclarerNames.getValue();
@@ -247,6 +293,10 @@ public class GraphPathReport {
                     out.write(" (multiple)");
                     break;
                 }
+                if (isDeprecated(className, propertyName)) {
+                    deprecatedPropertyCount++;
+                    out.write(" (deprecated)");
+                }
                 if (!declarerName.equals(className)) {
                     out.write(" from " + linkTo(getSimpleName(declarerName)));
                 } else if (!propertyName.startsWith("details.")) {
@@ -258,6 +308,13 @@ public class GraphPathReport {
                 out.write("\n");
             }
             out.write("\n");
+            if (isDeprecated(className)) {
+                out.write(".. warning:: This model object is deprecated.\n\n");
+            } else if (deprecatedPropertyCount == 1) {
+                out.write(".. warning:: This model object has a deprecated property.\n\n");
+            } else if (deprecatedPropertyCount > 1) {
+                out.write(".. warning:: This model object has deprecated properties.\n\n");
+            }
         }
     }
 
