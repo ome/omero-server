@@ -127,7 +127,7 @@ public class GraphPathReport {
      */
     private static String linkToJavadoc(String className) {
         final StringBuffer sb = new StringBuffer();
-        sb.append(":javadoc_model:");
+        sb.append(":javadoc:");
         sb.append('`');
         sb.append(getSimpleName(className));
         sb.append(' ');
