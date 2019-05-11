@@ -1,0 +1,27 @@
+plugins {
+    id "groovy"
+    id "java-gradle-plugin"
+}
+
+group = "org.openmicroscopy"
+
+repositories {
+    mavenLocal()
+    jcenter()
+    maven {
+        setUrl("https://artifacts.openmicroscopy.org/artifactory/maven/")
+    }
+}
+
+dependencies {
+    implementation "org.openmicroscopy.gradle.ice-builder:slice:1.5.0-SNAPSHOT"
+}
+
+gradlePlugin {
+    plugins {
+        serverPlugin {
+            id = "org.openmicroscopy.server"
+            implementationClass = "org.openmicroscopy.ServerPlugin"
+        }
+    }
+}

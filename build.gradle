@@ -1,7 +1,10 @@
+import com.zeroc.gradle.icebuilder.slice.DocsTask
+import org.openmicroscopy.ServerPlugin
+
 plugins {
     id "java-library"
+    id "org.openmicroscopy.server"
     id "org.openmicroscopy.project" version "5.5.0-SNAPSHOT"
-    id "org.openmicroscopy.gradle.ice-builder.slice" version "1.5.0-SNAPSHOT"
 }
 
 group = "org.openmicroscopy"
@@ -17,12 +20,6 @@ java {
     targetCompatibility = JavaVersion.VERSION_1_8
 }
 
-ext {
-    //the database type: must match the version set in omero-model
-    databaseType = "psql"
-    generatedDir = "src/${databaseType}"
-}
-
 dependencies {
     testImplementation("junit:junit:4.12")
     testImplementation("org.testng:testng:6.14.2")
@@ -32,11 +29,6 @@ dependencies {
     testImplementation('org.slf4j:slf4j-log4j12:1.5.0')
     configurations.testCompile.exclude(group: 'org.slf4j', module: 'jcl-over-slf4j')
 
-
-    // https://mvnrepository.com/artifact/org.apache.directory.shared/shared-ldap
-    // testCompile group: 'org.apache.directory.shared', name: 'shared-ldap-constants', version: '1.0.0-M1'
-    // testCompile group: 'org.apache.directory.shared', name: 'shared-ldap', version: '0.9.15'
-
     api('org.openmicroscopy:omero-renderer:5.5.0-m8')
 
     // Spring framework stuff
@@ -44,7 +36,7 @@ dependencies {
     implementation("org.springframework:spring-jms:4.3.14.RELEASE")
     implementation("org.springframework.security:spring-security-ldap:4.2.4.RELEASE")
 
-    if (databaseType.equals("psql")) {
+    if (ServerPlugin.databaseType == "psql") {
         // Postgres connect driver for java
         implementation 'org.postgresql:postgresql:42.2.1'
     }
@@ -73,7 +65,6 @@ dependencies {
     implementation("net.sf.ehcache:ehcache:2.10.4")
 }
 
-
 test {
     // enable TestNG support (default is JUnit)
     useTestNG() {
@@ -82,25 +73,7 @@ test {
 }
 
 clean {
-    delete generatedDir
-}
-
-if (slice.iceVersion.contains("3.7")) {
-    dependencies {
-        api "com.zeroc:ice:3.7.2"
-    }
-    sourceSets.main.java {
-        srcDirs "src/main/ice37", "$generatedDir/ice37"
-    }
-    slice.output = file("$generatedDir/ice37")
-} else if (slice.iceVersion.contains("3.6")) {
-    dependencies {
-        api "com.zeroc:ice:3.6.4"
-    }
-    sourceSets.main.java {
-        srcDirs "src/main/ice36", "$generatedDir/ice36"
-    }
-    slice.output = file("$generatedDir/ice36")
+    delete slice.output
 }
 
 jar {
@@ -114,7 +87,25 @@ processResources {
         from 'src/main/resources'
         // Set version
         filter { String line ->
-            line.startsWith('omero.version') ? 'omero.version='+version : line
+            line.startsWith('omero.version') ? 'omero.version=' + version : line
+        }
+    }
+}
+
+task compileIcedoc(type: DocsTask, dependsOn: "compileSlice") {
+    source = "src/main/slice"
+    outputDir = file("$buildDir/docs/icedoc")
+}
+
+task zipIcedoc(type: Zip) {
+    archiveClassifier.set("icedoc")
+    from compileIcedoc
+}
+
+publishing {
+    publications {
+        serverIcedoc(MavenPublication) {
+            artifact zipIcedoc
         }
     }
 }
