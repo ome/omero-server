@@ -1,6 +1,3 @@
-import com.zeroc.gradle.icebuilder.slice.DocsTask
-import org.openmicroscopy.ServerPlugin
-
 plugins {
     id "java-library"
     id "org.openmicroscopy.server"
@@ -36,7 +33,7 @@ dependencies {
     implementation("org.springframework:spring-jms:4.3.14.RELEASE")
     implementation("org.springframework.security:spring-security-ldap:4.2.4.RELEASE")
 
-    if (ServerPlugin.databaseType == "psql") {
+    if (org.openmicroscopy.ServerPlugin.databaseType == "psql") {
         // Postgres connect driver for java
         implementation 'org.postgresql:postgresql:42.2.1'
     }
@@ -92,7 +89,7 @@ processResources {
     }
 }
 
-task compileIcedoc(type: DocsTask, dependsOn: "compileSlice") {
+task compileIcedoc(type: org.openmicroscopy.tasks.IceDocsTask, dependsOn: "compileSlice") {
     source = "src/main/slice"
     outputDir = file("$buildDir/docs/icedoc")
 }
