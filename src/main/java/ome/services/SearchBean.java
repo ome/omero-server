@@ -64,8 +64,6 @@ public class SearchBean extends AbstractStatefulBean implements Search {
 
     private/* final */transient Class<? extends Analyzer> analyzer;
 
-    private/* final */transient Integer maxClauseCount;
-
     public SearchBean(Executor executor, Class<? extends Analyzer> analyzer) {
         this.executor = executor;
         this.analyzer = analyzer;
@@ -101,8 +99,9 @@ public class SearchBean extends AbstractStatefulBean implements Search {
     /**
      * Injector used by Spring.
      */
+    @Deprecated
     public void setMaxClauseCount(Integer maxClauseCount) {
-        this.maxClauseCount = maxClauseCount;
+        /* ignored */
     }
 
     // Lifecycle methods
