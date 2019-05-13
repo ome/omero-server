@@ -7,7 +7,7 @@ package ome.logic;
 
 import java.sql.SQLException;
 import java.util.Arrays;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,6 +29,7 @@ import ome.services.search.SearchValues;
 import ome.services.util.TimeoutSetter;
 import ome.tools.hibernate.QueryBuilder;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.lucene.analysis.Analyzer;
 import org.hibernate.Criteria;
 import org.hibernate.Hibernate;
@@ -40,6 +41,8 @@ import org.hibernate.criterion.Example;
 import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.metadata.ClassMetadata;
+import org.postgresql.util.PSQLException;
+import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.orm.hibernate3.HibernateCallback;
 import org.springframework.orm.hibernate3.HibernateTemplate;
@@ -139,7 +142,15 @@ public class QueryImpl extends AbstractLevel1Service implements LocalQuery {
     @RolesAllowed("user")
     @SuppressWarnings("unchecked")
     public <T> T execute(HibernateCallback callback) {
-        return (T) getHibernateTemplate().execute(callback);
+        try {
+            return (T) getHibernateTemplate().execute(callback);
+        } catch (DataAccessResourceFailureException e) {
+            if (e.getCause() instanceof PSQLException) {
+                throw new ApiUsageException("query failed: " + e.getCause());
+            } else {
+                throw e;
+            }
+        }
     }
 
     /**
@@ -148,7 +159,15 @@ public class QueryImpl extends AbstractLevel1Service implements LocalQuery {
     @RolesAllowed("user")
     @SuppressWarnings("unchecked")
     public <T> T execute(ome.services.query.Query<T> query) {
-        return (T) getHibernateTemplate().execute(query);
+        try {
+            return (T) getHibernateTemplate().execute(query);
+        } catch (DataAccessResourceFailureException e) {
+            if (e.getCause() instanceof PSQLException) {
+                throw new ApiUsageException("query failed: " + e.getCause());
+            } else {
+                throw e;
+            }
+        }
     }
 
     // ~ INTERFACE METHODS
@@ -211,7 +230,7 @@ public class QueryImpl extends AbstractLevel1Service implements LocalQuery {
             return getHibernateTemplate().loadAll(klass);
         }
 
-        return (List<T>) getHibernateTemplate().execute(
+        return (List<T>) execute(
                 new HibernateCallback() {
                     public Object doInHibernate(Session session)
                             throws HibernateException, SQLException {
@@ -229,7 +248,7 @@ public class QueryImpl extends AbstractLevel1Service implements LocalQuery {
     @SuppressWarnings("unchecked")
     public <T extends IObject> T findByExample(final T example)
             throws ApiUsageException {
-        return (T) getHibernateTemplate().execute(new HibernateCallback() {
+        return (T) execute(new HibernateCallback() {
             public Object doInHibernate(Session session)
                     throws HibernateException {
 
@@ -255,7 +274,7 @@ public class QueryImpl extends AbstractLevel1Service implements LocalQuery {
     @SuppressWarnings("unchecked")
     public <T extends IObject> List<T> findAllByExample(final T example,
             final Filter filter) {
-        return (List<T>) getHibernateTemplate().execute(
+        return (List<T>) execute(
                 new HibernateCallback() {
                     public Object doInHibernate(Session session)
                             throws HibernateException {
@@ -276,7 +295,7 @@ public class QueryImpl extends AbstractLevel1Service implements LocalQuery {
     public <T extends IObject> T findByString(final Class<T> klass,
             final String fieldName, final String value)
             throws ApiUsageException {
-        return (T) getHibernateTemplate().execute(new HibernateCallback() {
+        return (T) execute(new HibernateCallback() {
             public Object doInHibernate(Session session)
                     throws HibernateException {
 
@@ -295,6 +314,7 @@ public class QueryImpl extends AbstractLevel1Service implements LocalQuery {
 
             }
         });
+
     }
 
     @Override
@@ -304,7 +324,7 @@ public class QueryImpl extends AbstractLevel1Service implements LocalQuery {
             final String fieldName, final String value,
             final boolean caseSensitive, final Filter filter)
             throws ApiUsageException {
-        return (List<T>) getHibernateTemplate().execute(
+        return (List<T>) execute(
                 new HibernateCallback() {
                     public Object doInHibernate(Session session)
                             throws HibernateException {
@@ -398,7 +418,7 @@ public class QueryImpl extends AbstractLevel1Service implements LocalQuery {
                             + "Please use ome.api.Search instead.");
         }
 
-        List<IObject> results = (List<IObject>) getHibernateTemplate().execute(
+        final List<IObject> results = (List<IObject>) execute(
                 new HibernateCallback<List<IObject>>() {
                     @SuppressWarnings("rawtypes")
                     public List<IObject> doInHibernate(Session session)
@@ -413,8 +433,8 @@ public class QueryImpl extends AbstractLevel1Service implements LocalQuery {
                     }
                 });
 
-        if (results == null || results.size() == 0) {
-            return new ArrayList<T>();
+        if (CollectionUtils.isEmpty(results)) {
+            return Collections.emptyList();
         }
 
         SearchBean search = new SearchBean();
@@ -439,7 +459,7 @@ public class QueryImpl extends AbstractLevel1Service implements LocalQuery {
         }
 
         @SuppressWarnings("rawtypes")
-        final List rv = (List) getHibernateTemplate().execute(q);
+        final List rv = (List) execute(q);
         final int size = rv.size();
         Object obj = null;
         for (int i = 0; i < size; i++) {
@@ -483,7 +503,7 @@ public class QueryImpl extends AbstractLevel1Service implements LocalQuery {
         final QueryBuilder qb = new QueryBuilder();
         qb.select(agg + "("+field+")").append(query);
         qb.params(params);
-        return (Long) getHibernateTemplate().execute(
+        return (Long) execute(
                 new HibernateCallback() {
                     public Object doInHibernate(Session session)
                             throws HibernateException, SQLException {
@@ -514,7 +534,7 @@ public class QueryImpl extends AbstractLevel1Service implements LocalQuery {
         qb.select(mapKey, agg + "(" + field + ")").append(query);
         qb.append(" group by " + mapKey);
         qb.params(params);
-        List<Object[]> list = (List<Object[]>) getHibernateTemplate().execute(
+        final List<Object[]> list = (List<Object[]>) execute(
                 new HibernateCallback() {
                     public Object doInHibernate(Session session)
                             throws HibernateException, SQLException {

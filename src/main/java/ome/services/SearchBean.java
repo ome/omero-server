@@ -39,6 +39,8 @@ import ome.system.SelfConfigurableService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.apache.lucene.analysis.Analyzer;
+import org.postgresql.util.PSQLException;
+import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -279,7 +281,17 @@ public class SearchBean extends AbstractStatefulBean implements Search {
         }
         SearchAction action = actions.popFirst();
         timeoutSetter.setTimeout(action::setTimeout);
-        List<IObject> list = (List<IObject>) executor.execute(null, action);
+        final List<IObject> list;
+        try {
+            list = (List<IObject>) executor.execute(null, action);
+        } catch (DataAccessResourceFailureException e) {
+            /* see QueryImpl.execute */
+            if (e.getCause() instanceof PSQLException) {
+                throw new ApiUsageException("query failed: " + e.getCause());
+            } else {
+                throw e;
+            }
+        }
         results.add(list);
         return hasNext(); // recursive call
     }
@@ -323,7 +335,7 @@ public class SearchBean extends AbstractStatefulBean implements Search {
             if (current.size() > 0) {
                 rv.add((T) pop(current));
             } else {
-                // If batches aren't merged, we can exist now.
+                // If batches aren't merged, we can exit now.
                 if (!values.mergedBatches) {
                     break;
                 }
