@@ -41,7 +41,6 @@ import org.hibernate.criterion.Example;
 import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.metadata.ClassMetadata;
-import org.postgresql.util.PSQLException;
 import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.orm.hibernate3.HibernateCallback;
@@ -137,6 +136,19 @@ public class QueryImpl extends AbstractLevel1Service implements LocalQuery {
     }
 
     /**
+     * @param exception a wrapped query exception
+     * @return if the exception probably was caused by a timeout
+     */
+    public static boolean isProbablyTimeout(DataAccessResourceFailureException exception) {
+        if (exception.getCause() instanceof SQLException) {
+            final SQLException cause = (SQLException) exception.getCause();
+            final String message = cause.getMessage();
+            return message != null && message.endsWith(" user request");
+        }
+        return false;
+    }
+
+    /**
      * @see LocalQuery#execute(HibernateCallback)
      */
     @RolesAllowed("user")
@@ -145,8 +157,8 @@ public class QueryImpl extends AbstractLevel1Service implements LocalQuery {
         try {
             return (T) getHibernateTemplate().execute(callback);
         } catch (DataAccessResourceFailureException e) {
-            if (e.getCause() instanceof PSQLException) {
-                throw new ApiUsageException("query failed: " + e.getCause());
+            if (isProbablyTimeout(e)) {
+                throw new ApiUsageException("query failed, probable timeout");
             } else {
                 throw e;
             }
@@ -162,8 +174,8 @@ public class QueryImpl extends AbstractLevel1Service implements LocalQuery {
         try {
             return (T) getHibernateTemplate().execute(query);
         } catch (DataAccessResourceFailureException e) {
-            if (e.getCause() instanceof PSQLException) {
-                throw new ApiUsageException("query failed: " + e.getCause());
+            if (isProbablyTimeout(e)) {
+                throw new ApiUsageException("query failed, probable timeout");
             } else {
                 throw e;
             }

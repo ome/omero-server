@@ -17,6 +17,7 @@ import ome.api.Search;
 import ome.api.ServiceInterface;
 import ome.conditions.ApiUsageException;
 import ome.conditions.InternalException;
+import ome.logic.QueryImpl;
 import ome.model.IObject;
 import ome.model.annotations.Annotation;
 import ome.model.internal.Details;
@@ -39,7 +40,6 @@ import ome.system.SelfConfigurableService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.apache.lucene.analysis.Analyzer;
-import org.postgresql.util.PSQLException;
 import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -284,9 +284,8 @@ public class SearchBean extends AbstractStatefulBean implements Search {
         try {
             list = (List<IObject>) executor.execute(null, action);
         } catch (DataAccessResourceFailureException e) {
-            /* see QueryImpl.execute */
-            if (e.getCause() instanceof PSQLException) {
-                throw new ApiUsageException("query failed: " + e.getCause());
+            if (QueryImpl.isProbablyTimeout(e)) {
+                throw new ApiUsageException("query failed, probable timeout");
             } else {
                 throw e;
             }
