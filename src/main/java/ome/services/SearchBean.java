@@ -71,7 +71,6 @@ public class SearchBean extends AbstractStatefulBean implements Search {
 
     private/* final */transient Integer maxClauseCount;
 
-
     public SearchBean(Executor executor, Class<? extends Analyzer> analyzer) {
         this.executor = executor;
         this.analyzer = analyzer;

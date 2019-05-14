@@ -314,7 +314,6 @@ public class QueryImpl extends AbstractLevel1Service implements LocalQuery {
 
             }
         });
-
     }
 
     @Override
