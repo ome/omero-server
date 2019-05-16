@@ -18,6 +18,7 @@ import ome.api.IQuery;
 import ome.api.ServiceInterface;
 import ome.api.local.LocalQuery;
 import ome.conditions.ApiUsageException;
+import ome.conditions.OverUsageException;
 import ome.conditions.ValidationException;
 import ome.model.IObject;
 import ome.parameters.Filter;
@@ -158,7 +159,7 @@ public class QueryImpl extends AbstractLevel1Service implements LocalQuery {
             return (T) getHibernateTemplate().execute(callback);
         } catch (DataAccessResourceFailureException e) {
             if (isProbablyTimeout(e)) {
-                throw new ApiUsageException("query failed, probable timeout");
+                throw new OverUsageException("query failed, probable timeout");
             } else {
                 throw e;
             }
@@ -175,7 +176,7 @@ public class QueryImpl extends AbstractLevel1Service implements LocalQuery {
             return (T) getHibernateTemplate().execute(query);
         } catch (DataAccessResourceFailureException e) {
             if (isProbablyTimeout(e)) {
-                throw new ApiUsageException("query failed, probable timeout");
+                throw new OverUsageException("query failed, probable timeout");
             } else {
                 throw e;
             }

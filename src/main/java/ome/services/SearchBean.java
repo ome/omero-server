@@ -17,6 +17,7 @@ import ome.api.Search;
 import ome.api.ServiceInterface;
 import ome.conditions.ApiUsageException;
 import ome.conditions.InternalException;
+import ome.conditions.OverUsageException;
 import ome.logic.QueryImpl;
 import ome.model.IObject;
 import ome.model.annotations.Annotation;
@@ -285,7 +286,7 @@ public class SearchBean extends AbstractStatefulBean implements Search {
             list = (List<IObject>) executor.execute(null, action);
         } catch (DataAccessResourceFailureException e) {
             if (QueryImpl.isProbablyTimeout(e)) {
-                throw new ApiUsageException("query failed, probable timeout");
+                throw new OverUsageException("query failed, probable timeout");
             } else {
                 throw e;
             }
