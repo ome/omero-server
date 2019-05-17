@@ -81,10 +81,6 @@ test {
     }
 }
 
-clean {
-    delete generatedDir
-}
-
 if (slice.iceVersion.contains("3.7")) {
     dependencies {
         api "com.zeroc:ice:3.7.2"
