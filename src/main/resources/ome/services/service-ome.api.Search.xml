@@ -25,7 +25,6 @@
         class="ome.services.SearchBean" scope="prototype">
      <property name="executor" ref="executor"/>
      <property name="analyzer" value="${omero.search.analyzer}"/>
-     <property name="maxClauseCount" value="${omero.search.maxclause}"/>
   </bean>
 
   <bean id="managed-ome.api.Search" parent="selfManagingService" scope="prototype">
