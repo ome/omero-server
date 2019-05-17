@@ -1,6 +1,4 @@
 /*
- *   $Id$
- *
  *   Copyright 2007 Glencoe Software, Inc. All rights reserved.
  *   Use is subject to license terms supplied in LICENSE.txt
  */
@@ -82,6 +80,9 @@ public class TagsAndGroups extends SearchAction {
         }
 
         Query query = qb.query(session);
+        if (timeout != null) {
+            query.setTimeout(timeout);
+        }
 
         List<IObject> rv = new ArrayList<IObject>();
         List<String> tags = query.list();

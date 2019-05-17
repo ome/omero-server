@@ -17,6 +17,8 @@ import ome.api.Search;
 import ome.api.ServiceInterface;
 import ome.conditions.ApiUsageException;
 import ome.conditions.InternalException;
+import ome.conditions.OverUsageException;
+import ome.logic.QueryImpl;
 import ome.model.IObject;
 import ome.model.annotations.Annotation;
 import ome.model.internal.Details;
@@ -33,11 +35,13 @@ import ome.services.search.SomeMustNone;
 import ome.services.search.TagsAndGroups;
 import ome.services.search.Union;
 import ome.services.util.Executor;
+import ome.services.util.TimeoutSetter;
 import ome.system.SelfConfigurableService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.apache.lucene.analysis.Analyzer;
+import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -61,6 +65,8 @@ public class SearchBean extends AbstractStatefulBean implements Search {
     private final List<List<IObject>> results = new ArrayList<List<IObject>>();
 
     private/* final */transient Executor executor;
+
+    private transient TimeoutSetter timeoutSetter;
 
     private/* final */transient Class<? extends Analyzer> analyzer;
 
@@ -87,6 +93,11 @@ public class SearchBean extends AbstractStatefulBean implements Search {
      */
     public void setExecutor(Executor executor) {
         this.executor = executor;
+    }
+
+    public void setTimeoutSetter(TimeoutSetter timeoutSetter) {
+        getBeanHelper().throwIfAlreadySet(this.timeoutSetter, timeoutSetter);
+        this.timeoutSetter = timeoutSetter;
     }
 
     /**
@@ -268,7 +279,17 @@ public class SearchBean extends AbstractStatefulBean implements Search {
             return false;
         }
         SearchAction action = actions.popFirst();
-        List<IObject> list = (List<IObject>) executor.execute(null, action);
+        timeoutSetter.setTimeout(action::setTimeout);
+        final List<IObject> list;
+        try {
+            list = (List<IObject>) executor.execute(null, action);
+        } catch (DataAccessResourceFailureException e) {
+            if (QueryImpl.isProbablyTimeout(e)) {
+                throw new OverUsageException("query failed, probable timeout");
+            } else {
+                throw e;
+            }
+        }
         results.add(list);
         return hasNext(); // recursive call
     }
@@ -312,7 +333,7 @@ public class SearchBean extends AbstractStatefulBean implements Search {
             if (current.size() > 0) {
                 rv.add((T) pop(current));
             } else {
-                // If batches aren't merged, we can exist now.
+                // If batches aren't merged, we can exit now.
                 if (!values.mergedBatches) {
                     break;
                 }

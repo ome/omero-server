@@ -1,5 +1,5 @@
 /*
- *   Copyright 2006 University of Dundee. All rights reserved.
+ *   Copyright 2006-2019 University of Dundee. All rights reserved.
  *   Use is subject to license terms supplied in LICENSE.txt
  */
 
@@ -16,6 +16,7 @@ import org.jmock.Mock;
 import org.jmock.MockObjectTestCase;
 import org.springframework.aop.framework.ProxyFactory;
 import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -25,9 +26,12 @@ import ome.logic.QueryImpl;
 import ome.model.IObject;
 import ome.model.containers.Project;
 import ome.parameters.Filter;
+import ome.security.SecuritySystem;
 import ome.security.basic.CurrentDetails;
 import ome.server.itests.LoginInterceptor;
 import ome.services.util.ServiceHandler;
+import ome.services.util.TimeoutSetter;
+import ome.system.EventContext;
 import ome.system.Principal;
 
 /**
@@ -42,6 +46,18 @@ public class IQueryMockSessionTest extends MockObjectTestCase {
     protected QueryImpl impl;
 
     protected Mock mockSession, mockFactory;
+
+    protected TimeoutSetter timeoutSetter;
+
+    @BeforeClass
+    public void createMockTimeoutSetter() {
+        final Mock ec = mock(EventContext.class);
+        ec.stubs().method("isCurrentUserAdmin").will(returnValue(false));
+        ec.stubs().method("getCurrentUserId").will(returnValue(1L));
+        final Mock sec = mock(SecuritySystem.class);
+        sec.stubs().method("getEventContext").will(returnValue(ec.proxy()));
+        timeoutSetter = new TimeoutSetter((SecuritySystem) sec.proxy(), 10, 20);
+    }
 
     @Override
     @BeforeMethod(alwaysRun=true)
@@ -71,6 +87,7 @@ public class IQueryMockSessionTest extends MockObjectTestCase {
         mockFactory = mock(SessionFactory.class);
         
         impl.setSessionFactory((SessionFactory) mockFactory.proxy());
+        impl.setTimeoutSetter(timeoutSetter);
 
         ome.model.meta.Session session = new ome.model.meta.Session();
         session.setStarted(new Timestamp(System.currentTimeMillis()));
@@ -86,6 +103,7 @@ public class IQueryMockSessionTest extends MockObjectTestCase {
 
     protected Mock criteriaUniqueResultCall(Object obj) {
         Mock mockCriteria = mock(Criteria.class);
+        mockCriteria.stubs().method("setTimeout").with(eq(10));
         mockCriteria.expects(once()).method("uniqueResult").will(
                 returnValue(obj));
         return mockCriteria;
@@ -93,6 +111,7 @@ public class IQueryMockSessionTest extends MockObjectTestCase {
 
     protected Mock criteriaListCall(List blank) {
         Mock mockCriteria = mock(Criteria.class);
+        mockCriteria.stubs().method("setTimeout").with(eq(10));
         mockCriteria.expects(once()).method("list").will(returnValue(blank));
         return mockCriteria;
     }
@@ -202,7 +221,6 @@ public class IQueryMockSessionTest extends MockObjectTestCase {
         mockCriteria.expects(once()).method("add");
         mockCriteria.expects(once()).method("setFirstResult");
         mockCriteria.expects(once()).method("setMaxResults");
-
         mockSession.expects(once()).method("createCriteria").will(
                 returnValue(mockCriteria.proxy())).id("test");
         Object retVal = iQuery.findAllByExample(test, new Filter().page(1, 10));

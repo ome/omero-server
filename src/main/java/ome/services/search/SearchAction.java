@@ -40,6 +40,8 @@ public abstract class SearchAction implements Serializable,
 
     protected final SearchValues values = new SearchValues();
 
+    protected Integer timeout;
+
     /**
      * List of {@link IObject} instances which have currently been found. This
      * {@link SearchAction} may want to take these values into account if
@@ -53,6 +55,10 @@ public abstract class SearchAction implements Serializable,
                     "SearchValues argument must not be null");
         }
         this.values.copy(values);
+    }
+
+    public void setTimeout(int timeout) {
+        this.timeout = timeout;
     }
 
     /**

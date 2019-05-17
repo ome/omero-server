@@ -1,5 +1,5 @@
 /*
- *   Copyright 2006 University of Dundee. All rights reserved.
+ *   Copyright 2006-2019 University of Dundee. All rights reserved.
  *   Use is subject to license terms supplied in LICENSE.txt
  */
 
@@ -12,17 +12,22 @@ import java.util.List;
 import ome.model.IObject;
 import ome.model.annotations.TagAnnotation;
 import ome.model.core.Image;
+import ome.security.SecuritySystem;
 import ome.services.SearchBean;
 import ome.services.fulltext.FullTextAnalyzer;
 import ome.services.search.SearchAction;
 import ome.services.search.SearchValues;
 import ome.services.util.Executor;
+import ome.services.util.TimeoutSetter;
+import ome.system.EventContext;
 import ome.system.Principal;
 import ome.system.ServiceFactory;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.hibernate.Session;
+import org.jmock.Mock;
 import org.jmock.MockObjectTestCase;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 public class SearchBeanTest extends MockObjectTestCase {
@@ -37,9 +42,22 @@ public class SearchBeanTest extends MockObjectTestCase {
 
     protected SearchBean bean;
 
+    protected TimeoutSetter timeoutSetter;
+
+    @BeforeClass
+    public void createMockTimeoutSetter() {
+        final Mock ec = mock(EventContext.class);
+        ec.stubs().method("isCurrentUserAdmin").will(returnValue(false));
+        ec.stubs().method("getCurrentUserId").will(returnValue(1L));
+        final Mock sec = mock(SecuritySystem.class);
+        sec.stubs().method("getEventContext").will(returnValue(ec.proxy()));
+        timeoutSetter = new TimeoutSetter((SecuritySystem) sec.proxy(), 10, 20);
+    }
+
     @Test
     public void testDefaults() {
         bean = new SearchBean(executor, analyzer);
+        bean.setTimeoutSetter(timeoutSetter);
         assertDefaults();
     }
 
@@ -55,6 +73,7 @@ public class SearchBeanTest extends MockObjectTestCase {
     @Test
     public void testBasicUsage() {
         bean = new SearchBean(executor, analyzer);
+        bean.setTimeoutSetter(timeoutSetter);
         bean.onlyType(Image.class);
         bean.onlyAnnotatedWith(TagAnnotation.class);
         bean.byFullText("Here's my query");
@@ -63,6 +82,7 @@ public class SearchBeanTest extends MockObjectTestCase {
     @Test
     public void testHasNextWithResults() {
         bean = new SearchBean(executor, analyzer);
+        bean.setTimeoutSetter(timeoutSetter);
         assertFalse(bean.hasNext());
         List<IObject> list = new ArrayList<IObject>();
         list.add(new Image());
@@ -73,6 +93,7 @@ public class SearchBeanTest extends MockObjectTestCase {
     @Test
     public void testHasNextWithAction() {
         bean = new SearchBean(executor, analyzer);
+        bean.setTimeoutSetter(timeoutSetter);
         assertFalse(bean.hasNext());
         addActionWithResultOfSize_n(1);
         assertTrue(bean.hasNext());
@@ -81,6 +102,7 @@ public class SearchBeanTest extends MockObjectTestCase {
     @Test
     public void testActiveQueries() {
         bean = new SearchBean(executor, analyzer);
+        bean.setTimeoutSetter(timeoutSetter);
         addActionWithResultOfSize_n(1);
         assertTrue(bean.activeQueries() == 1);
         assertNotNull(bean.next());
@@ -91,6 +113,7 @@ public class SearchBeanTest extends MockObjectTestCase {
     @Test
     public void testBatchSizeRollOver() {
         bean = new SearchBean(executor, analyzer);
+        bean.setTimeoutSetter(timeoutSetter);
         addActionWithResultOfSize_n(4);
         bean.setBatchSize(3);
         assertEquals(3, bean.getBatchSize());
@@ -101,6 +124,7 @@ public class SearchBeanTest extends MockObjectTestCase {
     @Test
     public void testMergedBatches() {
         bean = new SearchBean(executor, analyzer);
+        bean.setTimeoutSetter(timeoutSetter);
         addActionWithResultOfSize_n(3);
         addActionWithResultOfSize_n(1);
         bean.setBatchSize(5);
@@ -110,6 +134,7 @@ public class SearchBeanTest extends MockObjectTestCase {
     @Test
     public void testUnloaded() {
         bean = new SearchBean(executor, analyzer);
+        bean.setTimeoutSetter(timeoutSetter);
         addActionWithResultOfSize_n(1);
         bean.setReturnUnloaded(true);
         IObject i = bean.next();
@@ -119,6 +144,7 @@ public class SearchBeanTest extends MockObjectTestCase {
     @Test
     public void testResetDefaults() {
         bean = new SearchBean(executor, analyzer);
+        bean.setTimeoutSetter(timeoutSetter);
         bean.setBatchSize(4);
         bean.setCaseSensitive(false);
         bean.setMergedBatches(true);
@@ -131,6 +157,7 @@ public class SearchBeanTest extends MockObjectTestCase {
     @Test
     public void testClearingQueries() {
         bean = new SearchBean(executor, analyzer);
+        bean.setTimeoutSetter(timeoutSetter);
         bean.onlyType(Image.class);
         bean.byFullText("a");
         assertTrue(bean.activeQueries() == 1);
@@ -153,6 +180,7 @@ public class SearchBeanTest extends MockObjectTestCase {
     @Test
     public void testCanSearchForObjectsWhichArentAnnotated() {
         bean = new SearchBean(executor, analyzer);
+        bean.setTimeoutSetter(timeoutSetter);
         bean.onlyAnnotatedWith((java.lang.Class[]) null);
     }
 
