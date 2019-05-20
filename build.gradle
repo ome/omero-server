@@ -20,7 +20,7 @@ java {
 ext {
     //the database type: must match the version set in omero-model
     databaseType = "psql"
-    generatedDir = "src/${databaseType}"
+    generatedDir = "build/${databaseType}"
 }
 
 dependencies {
@@ -79,10 +79,6 @@ test {
     useTestNG() {
         suites "src/test/resources/unit.testng.xml"
     }
-}
-
-clean {
-    delete generatedDir
 }
 
 if (slice.iceVersion.contains("3.7")) {
