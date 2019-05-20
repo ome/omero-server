@@ -19,6 +19,7 @@
 
 package ome.services.query;
 
+import java.util.AbstractMap;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -32,7 +33,6 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableMap.Builder;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
-import com.google.common.collect.Maps;
 import com.google.common.collect.SetMultimap;
 import com.google.common.collect.Sets;
 
@@ -58,35 +58,36 @@ public class HierarchyNavigator {
     static {
         /* note that there is not yet any treatment of PlateAcquisition or WellSample */
         final Builder<Map.Entry<String, String>, String> builder = ImmutableMap.builder();
-        builder.put(Maps.immutableEntry("Folder", "Folder"),  /* cannot distinguish ascent from descent, guess the latter */
+        builder.put(new AbstractMap.SimpleImmutableEntry<>("Folder", "Folder"),
+                /* cannot distinguish ascent from descent, guess the latter */
                 "SELECT parentFolder.id, id FROM Folder WHERE parentFolder.id IN (:" + Parameters.IDS + ")");
-        builder.put(Maps.immutableEntry("Folder", "Image"),
+        builder.put(new AbstractMap.SimpleImmutableEntry<>("Folder", "Image"),
                 "SELECT parent.id, child.id FROM FolderImageLink WHERE parent.id IN (:" + Parameters.IDS + ")");
-        builder.put(Maps.immutableEntry("Project", "Dataset"),
+        builder.put(new AbstractMap.SimpleImmutableEntry<>("Project", "Dataset"),
                 "SELECT parent.id, child.id FROM ProjectDatasetLink WHERE parent.id IN (:" + Parameters.IDS + ")");
-        builder.put(Maps.immutableEntry("Dataset", "Image"),
+        builder.put(new AbstractMap.SimpleImmutableEntry<>("Dataset", "Image"),
                 "SELECT parent.id, child.id FROM DatasetImageLink WHERE parent.id IN (:" + Parameters.IDS + ")");
-        builder.put(Maps.immutableEntry("Screen", "Plate"),
+        builder.put(new AbstractMap.SimpleImmutableEntry<>("Screen", "Plate"),
                 "SELECT parent.id, child.id FROM ScreenPlateLink WHERE parent.id IN (:" + Parameters.IDS + ")");
-        builder.put(Maps.immutableEntry("Plate", "Well"),
+        builder.put(new AbstractMap.SimpleImmutableEntry<>("Plate", "Well"),
                 "SELECT plate.id, id FROM Well WHERE plate.id IN (:" + Parameters.IDS + ")");
-        builder.put(Maps.immutableEntry("Well", "Image"),
+        builder.put(new AbstractMap.SimpleImmutableEntry<>("Well", "Image"),
                 "SELECT well.id, image.id FROM WellSample WHERE well.id IN (:" + Parameters.IDS + ")");
-        builder.put(Maps.immutableEntry("Fileset", "Image"),
+        builder.put(new AbstractMap.SimpleImmutableEntry<>("Fileset", "Image"),
                 "SELECT fileset.id, id FROM Image WHERE fileset.id IN (:" + Parameters.IDS + ")");
-        builder.put(Maps.immutableEntry("Image", "Fileset"),
+        builder.put(new AbstractMap.SimpleImmutableEntry<>("Image", "Fileset"),
                 "SELECT id, fileset.id FROM Image WHERE fileset.id IS NOT NULL AND id IN (:" + Parameters.IDS + ")");
-        builder.put(Maps.immutableEntry("Image", "Well"),
+        builder.put(new AbstractMap.SimpleImmutableEntry<>("Image", "Well"),
                 "SELECT image.id, well.id FROM WellSample WHERE image.id IN (:" + Parameters.IDS + ")");
-        builder.put(Maps.immutableEntry("Well", "Plate"),
+        builder.put(new AbstractMap.SimpleImmutableEntry<>("Well", "Plate"),
                 "SELECT id, plate.id FROM Well WHERE id IN (:" + Parameters.IDS + ")");
-        builder.put(Maps.immutableEntry("Plate", "Screen"),
+        builder.put(new AbstractMap.SimpleImmutableEntry<>("Plate", "Screen"),
                 "SELECT child.id, parent.id FROM ScreenPlateLink WHERE child.id IN (:" + Parameters.IDS + ")");
-        builder.put(Maps.immutableEntry("Image", "Dataset"),
+        builder.put(new AbstractMap.SimpleImmutableEntry<>("Image", "Dataset"),
                 "SELECT child.id, parent.id FROM DatasetImageLink WHERE child.id IN (:" + Parameters.IDS + ")");
-        builder.put(Maps.immutableEntry("Dataset", "Project"),
+        builder.put(new AbstractMap.SimpleImmutableEntry<>("Dataset", "Project"),
                 "SELECT child.id, parent.id FROM ProjectDatasetLink WHERE child.id IN (:" + Parameters.IDS + ")");
-        builder.put(Maps.immutableEntry("Image", "Folder"),
+        builder.put(new AbstractMap.SimpleImmutableEntry<>("Image", "Folder"),
                 "SELECT child.id, parent.id FROM FolderImageLink WHERE child.id IN (:" + Parameters.IDS + ")");
         hqlFromTo = builder.build();
     }
@@ -113,7 +114,7 @@ public class HierarchyNavigator {
      * @return pairs of database IDs: of the query object, and an object to which it relates
      */
     private List<Object[]> doQuery(String toType, String fromType, Collection<Long> fromIds) {
-        final String queryString = hqlFromTo.get(Maps.immutableEntry(fromType, toType));
+        final String queryString = hqlFromTo.get(new AbstractMap.SimpleImmutableEntry<>(fromType, toType));
         if (queryString == null) {
             throw new IllegalArgumentException("not implemented for " + fromType + " to " + toType);
         }
