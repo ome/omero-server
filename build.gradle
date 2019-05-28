@@ -1,7 +1,7 @@
 plugins {
     id "java-library"
     id "org.openmicroscopy.project" version "5.5.1"
-    id "org.openmicroscopy.gradle.ice-builder.slice" version "1.5.0"
+    id "org.openmicroscopy.gradle.ice-builder.slice" version "1.5.1-SNAPSHOT"
 }
 
 group = "org.openmicroscopy"
@@ -23,6 +23,14 @@ ext {
     generatedDir = "build/${databaseType}"
 }
 
+if (slice.iceVersion.contains("3.7")) {
+    slice.output = file("$generatedDir/ice37")
+    sourceSets.main.java.srcDirs("src/main/ice37", slice.output)
+} else if (slice.iceVersion.contains("3.6")) {
+    slice.output = file("$generatedDir/ice36")
+    sourceSets.main.java.srcDirs("src/main/ice36", slice.output)
+}
+
 dependencies {
     testImplementation("junit:junit:4.12")
     testImplementation("org.testng:testng:6.14.2")
@@ -38,6 +46,8 @@ dependencies {
     // testCompile group: 'org.apache.directory.shared', name: 'shared-ldap', version: '0.9.15'
 
     api('org.openmicroscopy:omero-renderer:5.5.2')
+
+    implementation("com.zeroc:ice")
 
     // Spring framework stuff
     implementation("org.springframework:spring-context-support:4.3.14.RELEASE")
@@ -73,7 +83,6 @@ dependencies {
     implementation("net.sf.ehcache:ehcache:2.10.4")
 }
 
-
 test {
     // enable TestNG support (default is JUnit)
     useTestNG() {
@@ -81,23 +90,10 @@ test {
     }
 }
 
-if (slice.iceVersion.contains("3.7")) {
-    dependencies {
-        api "com.zeroc:ice:3.7.2"
-    }
-    sourceSets.main.java {
-        srcDirs "src/main/ice37", "$generatedDir/ice37"
-    }
-    slice.output = file("$generatedDir/ice37")
-} else if (slice.iceVersion.contains("3.6")) {
-    dependencies {
-        api "com.zeroc:ice:3.6.4"
-    }
-    sourceSets.main.java {
-        srcDirs "src/main/ice36", "$generatedDir/ice36"
-    }
-    slice.output = file("$generatedDir/ice36")
+clean {
+    delete generatedDir
 }
+
 
 jar {
     manifest {
@@ -110,7 +106,26 @@ processResources {
         from 'src/main/resources'
         // Set version
         filter { String line ->
-            line.startsWith('omero.version') ? 'omero.version='+version : line
+            line.startsWith('omero.version') ? 'omero.version=' + version : line
         }
+    }
+}
+
+task compileIcedoc(type: org.openmicroscopy.tasks.IceDocsTask, dependsOn: "compileSlice") {
+    source = "src/main/slice"
+    outputDir = file("$buildDir/docs/icedoc")
+}
+
+task zipIcedoc(type: Zip) {
+    archiveClassifier.set("icedoc")
+    destinationDirectory.set(layout.buildDirectory.dir("libs"))
+    from compileIcedoc
+}
+
+publishing {
+    publications.getByName("omeroServer") { MavenPublication pub ->
+        // Ensure ice docs is the last element in maven-metadata.xml
+        // (located in .m2/org/openmicroscopy/omero-server)
+        pub.artifact zipIcedoc
     }
 }
