@@ -549,6 +549,7 @@ public class FullTextIndexer2 {
                     }
                 }
             }
+            fullTextSession.flushToIndexes();
             transaction.commit();
             toIndex.clear();
         } catch (UnresolvableObjectException uoe) {
@@ -622,6 +623,7 @@ public class FullTextIndexer2 {
                     purgeCounts.put(entityClass, entityIds.size() + (count == null ? 0 : count));
                 }
             }
+            fullTextSession.flushToIndexes();
             transaction.commit();
             toPurge.clear();
         } catch (UnresolvableObjectException uoe) {
@@ -715,6 +717,7 @@ public class FullTextIndexer2 {
                     }
                 }
             }
+            fullTextSession.flushToIndexes();
             transaction.commit();
         } finally {
             session.close();
