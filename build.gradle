@@ -37,7 +37,7 @@ dependencies {
     testImplementation('org.slf4j:slf4j-log4j12:1.5.0')
     configurations.testCompile.exclude(group: 'org.slf4j', module: 'jcl-over-slf4j')
 
-    api('org.openmicroscopy:omero-renderer:5.5.0')
+    api('org.openmicroscopy:omero-renderer:5.5.1-SNAPSHOT')
 
     // Ice dependency - version resolved in SlicePlugin
     implementation("com.zeroc:ice")
