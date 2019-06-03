@@ -1,7 +1,7 @@
 plugins {
     id "java-library"
-    id "org.openmicroscopy.project" version "5.5.1"
-    id "org.openmicroscopy.gradle.ice-builder.slice" version "1.5.1-SNAPSHOT"
+    id "org.openmicroscopy.project" version "5.5.2-SNAPSHOT"
+    id "org.openmicroscopy.gradle.ice-builder.slice" version "1.5.2-SNAPSHOT"
 }
 
 group = "org.openmicroscopy"
@@ -20,15 +20,12 @@ java {
 ext {
     //the database type: must match the version set in omero-model
     databaseType = "psql"
-    generatedDir = "build/${databaseType}"
 }
 
 if (slice.iceVersion.contains("3.7")) {
-    slice.output = file("$generatedDir/ice37")
-    sourceSets.main.java.srcDirs("src/main/ice37", slice.output)
+    sourceSets.main.java.srcDirs("src/main/ice37")
 } else if (slice.iceVersion.contains("3.6")) {
-    slice.output = file("$generatedDir/ice36")
-    sourceSets.main.java.srcDirs("src/main/ice36", slice.output)
+    sourceSets.main.java.srcDirs("src/main/ice36")
 }
 
 dependencies {
@@ -89,11 +86,6 @@ test {
         suites "src/test/resources/unit.testng.xml"
     }
 }
-
-clean {
-    delete generatedDir
-}
-
 
 jar {
     manifest {
