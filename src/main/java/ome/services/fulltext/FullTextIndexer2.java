@@ -95,6 +95,7 @@ import org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean;
  * <li>From the event log note a batch of new activity.
  * <li>Then if there are new objects to index then trigger <tt>INDEX</tt>.
  * <li>Else if objects were deleted then trigger <tt>PURGE</tt>.
+ * <li>Else if new event log entries were reviewed then trigger <tt>NOTE</tt>.
  * <li>Else if much purging has been done of some object type since its previous <tt>OPTIMIZE</tt> then trigger another.
  * <li>Else schedule <tt>PREPARE</tt> for delayed execution.
  * </ol></dd>
@@ -410,6 +411,7 @@ public class FullTextIndexer2 {
     public void prepare() {
         final Session session = sessionFactory.openSession();
         HibernateException hibernateQueryError = null;
+        boolean isNothingNew = false;
         try {
             LOGGER.debug("adding any new REINDEX entries");
             session.setFlushMode(FlushMode.COMMIT);
@@ -455,7 +457,8 @@ public class FullTextIndexer2 {
             query.setParameterList("actions", actions);
             @SuppressWarnings("unchecked")
             final List<EventLog> logEntries = (List<EventLog>) query.list();
-            if (logEntries.isEmpty()) {
+            isNothingNew = logEntries.isEmpty();
+            if (isNothingNew) {
                 LOGGER.debug("no new event log entries");
             } else {
                 LOGGER.debug("reviewing {} event log entries", logEntries.size());
@@ -488,6 +491,8 @@ public class FullTextIndexer2 {
                 register(Step.INDEX);
             } else if (!toPurge.isEmpty()) {
                 register(Step.PURGE);
+            } else if (!isNothingNew) {
+                register(Step.NOTE);
             } else {
                 boolean isOptimize = false;
                 for (final int count : purgeCounts.values()) {
