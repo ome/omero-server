@@ -1,3 +1,10 @@
+5.5.2 (June 2019)
+-----------------
+
+- Bump omero-renderer and omero-common-test version.
+- Ensure progress with indexer batch is always recorded.
+
+
 5.5.1 (May 2019)
 ----------------
 
