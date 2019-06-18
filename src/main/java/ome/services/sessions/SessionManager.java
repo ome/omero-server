@@ -137,8 +137,10 @@ public interface SessionManager {
      * session or throw an exception if it has been removed.
      */
     SessionStats getSessionStats(String uuid);
-    
+
     /**
+     * Finds a {@link Session} and update the last access time.
+     *
      * @param uuid
      * @return A current session.
      * @throws SessionTimeoutException
@@ -149,6 +151,20 @@ public interface SessionManager {
      *             if a previous call already excised this session
      */
     Session find(String uuid);
+
+    /**
+     * Finds a {@link Session} without updating the last access time.
+     *
+     * @param uuid
+     * @return A current session.
+     * @throws SessionTimeoutException
+     *             if the session has timed out during this call. It will then
+     *             be removed and subsequent calls will throw a
+     *             {@link RemovedSessionException}
+     * @throws RemovedSessionException
+     *             if a previous call already excised this session
+     */
+    Session findQuietly(String uuid);
 
     /**
      * Returns a non-null, possibly empty list of session instances belonging
