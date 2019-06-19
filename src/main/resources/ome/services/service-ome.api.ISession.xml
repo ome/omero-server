@@ -37,6 +37,7 @@
     <property name="proxyInterfaces">
       <list>
         <value>ome.api.ISession</value>
+        <value>ome.api.local.LocalSession</value>
       </list>
     </property>
     <property name="target" ref="internal-ome.api.ISession"/>

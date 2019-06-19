@@ -61,12 +61,12 @@ public class SessionBean implements LocalSession {
         this.cd = cd;
         this.adminPrivileges = adminPrivileges;
     }
-    
+
     // ~ Injectors
     // =========================================================================
 
     public Class<? extends ServiceInterface> getServiceInterface() {
-        return ISession.class;
+        return LocalSession.class;
     }
 
     // ~ Session lifecycle
