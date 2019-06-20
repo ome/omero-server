@@ -23,8 +23,7 @@ import ome.model.annotations.TagAnnotation;
 import ome.model.annotations.TextAnnotation;
 import ome.model.annotations.TermAnnotation;
 import ome.model.containers.Folder;
-import ome.model.core.Image;
-import ome.model.core.OriginalFile;
+import ome.model.core.*;
 import ome.model.fs.Fileset;
 import ome.model.fs.FilesetEntry;
 import ome.model.internal.Details;
@@ -131,6 +130,7 @@ public class FullTextBridge extends BridgeHelper {
 
         set_file(name, object, document, opts);
         set_annotations(name, object, document, opts);
+        set_acquisition(name, object, document, opts);
         set_details(name, object, document, opts);
         set_fileset(name, object, document, opts);
         set_folders(name, object, document, opts);
@@ -245,6 +245,35 @@ public class FullTextBridge extends BridgeHelper {
         } else if (object instanceof MapAnnotation) {
             MapAnnotation mapAnnotation = (MapAnnotation) object;
             handleMapAnnotation(document, opts, mapAnnotation);
+        }
+    }
+
+    /**
+     * Walks the acquisition related metadata including channel names.
+     *
+     * @param name
+     * @param object
+     * @param document
+     * @param opts
+     */
+    public void set_acquisition(final String name, final IObject object,
+                                final Document document, final LuceneOptions opts) {
+        if (object instanceof Image) {
+            final Image image = (Image) object;
+            final Pixels pixels = image.getPrimaryPixels();
+            final Iterator<Channel> channelIterator = pixels.iterateChannels();
+            while (channelIterator.hasNext()) {
+                final Channel channel = channelIterator.next();
+                final LogicalChannel logical = channel.getLogicalChannel();
+                if (logical != null) {
+                    add(document, "channel.name", logical.getName(), opts);
+                    add(document, "channel.fluor", logical.getFluor(), opts);
+                    add(document, "channel.mode", logical.getMode().getValue(), opts);
+                    add(document, "channel.photoetricInterpretation",
+                            logical.getPhotometricInterpretation().getValue(), opts);
+                    // TODO: how to represent Length
+                }
+            }
         }
     }
 
