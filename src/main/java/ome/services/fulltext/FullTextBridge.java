@@ -25,6 +25,8 @@ import ome.model.annotations.TermAnnotation;
 import ome.model.containers.Folder;
 import ome.model.core.Image;
 import ome.model.core.OriginalFile;
+import ome.model.fs.Fileset;
+import ome.model.fs.FilesetEntry;
 import ome.model.internal.Details;
 import ome.model.internal.NamedValue;
 import ome.model.internal.Permissions;
@@ -130,6 +132,7 @@ public class FullTextBridge extends BridgeHelper {
         set_file(name, object, document, opts);
         set_annotations(name, object, document, opts);
         set_details(name, object, document, opts);
+        set_fileset(name, object, document, opts);
         set_folders(name, object, document, opts);
         set_custom(name, object, document, opts);
 
@@ -326,6 +329,26 @@ public class FullTextBridge extends BridgeHelper {
                     final Folder folder = folderIterator.next();
                     add(document, "roi.folder.name", folder.getName(), opts);
                 }
+            }
+        }
+    }
+
+    /**
+     * Walks the {@link Fileset} instances attached to and Image
+     * so users can use the original clientpath for search.
+     */
+    public void set_fileset(final String name, final IObject object,
+                            final Document document, final LuceneOptions opts) {
+        if (object instanceof Image) {
+            final Image image = (Image) object;
+            final Fileset fileset = image.getFileset();
+            final Iterator<FilesetEntry> entryIterator = fileset.iterateUsedFiles();
+            while (entryIterator.hasNext()) {
+                final FilesetEntry entry = entryIterator.next();
+                add(document, "fileset.entry.clientPath", entry.getClientPath(), opts);
+                add(document, "fileset.entry.name", entry.getOriginalFile().getName(), opts);
+                // TODO: entry.hash? fileset.templatePrefix?
+                // TODO: update docs table
             }
         }
     }
