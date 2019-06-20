@@ -266,11 +266,11 @@ public class FullTextBridge extends BridgeHelper {
                 final Channel channel = channelIterator.next();
                 final LogicalChannel logical = channel.getLogicalChannel();
                 if (logical != null) {
-                    add(document, "channel.name", logical.getName(), opts);
-                    add(document, "channel.fluor", logical.getFluor(), opts);
-                    add(document, "channel.mode", logical.getMode().getValue(), opts);
-                    add(document, "channel.photoetricInterpretation",
-                            logical.getPhotometricInterpretation().getValue(), opts);
+                    addIfNotNull(document, "channel.name", logical.getName(), opts);
+                    addIfNotNull(document, "channel.fluor", logical.getFluor(), opts);
+                    addEnumIfNotNull(document, "channel.mode", logical.getMode(), opts);
+                    addEnumIfNotNull(document, "channel.photoetricInterpretation",
+                            logical.getPhotometricInterpretation(), opts);
                     // TODO: how to represent Length
                 }
             }
