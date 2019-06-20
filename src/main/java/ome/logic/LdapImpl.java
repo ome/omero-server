@@ -197,37 +197,54 @@ public class LdapImpl extends AbstractLevel2Service implements ILdap,
         List<Experimenter> p = ldap.search("", filter.encode(),
                 mapper.getControls(), mapper);
 
-        if (p.size() == 1 && p.get(0) != null) {
-            Experimenter e = p.get(0);
-            if (provider.isIgnoreCaseLookup()) {
-                if (e.getOmeName().equalsIgnoreCase(username)) {
-                    return p.get(0);
-                }
-            } else {
-                if (e.getOmeName().equals(username)) {
-                    return p.get(0);
-                }
-            }
+        if (p.size() != 1) {
+            throw new ApiUsageException(
+                    "Cannot find unique user DistinguishedName: found=" + p.size());
         }
-        throw new ApiUsageException(
-                "Cannot find unique user DistinguishedName: found=" + p.size());
+
+        if (p.get(0) == null) {
+            throw new ApiUsageException(
+                    "Returned Experiment is null!");
+        }
+
+        final boolean ignoreCase = provider.isIgnoreCaseLookup();
+        final Experimenter e = p.get(0);
+        if (ignoreCase && e.getOmeName().equalsIgnoreCase(username)) {
+                return p.get(0);
+        } else if (!ignoreCase && e.getOmeName().equals(username)) {
+                return p.get(0);
+        }
+        throw new ApiUsageException(String.format(
+                "omeName(%s) != username(%s). ignoreCase=%s",
+                    e.getOmeName(), username, ignoreCase));
     }
 
     @SuppressWarnings("unchecked")
     private ExperimenterGroup mapGroupName(String groupname,
             GroupContextMapper mapper) {
+
         Filter filter = config.groupnameFilter(groupname);
         List<ExperimenterGroup> g = ldap.search("", filter.encode(),
                 mapper.getControls(), mapper);
 
-        if (g.size() == 1 && g.get(0) != null) {
-            ExperimenterGroup grp = g.get(0);
-            if (grp.getName().equals(groupname)) {
-                return g.get(0);
-            }
+        if (g.size() != 1) {
+            throw new ApiUsageException(
+                    "Cannot find unique group DistinguishedName: found=" + g.size());
         }
-        throw new ApiUsageException(
-                "Cannot find unique group DistinguishedName: found=" + g.size());
+
+        if (g.get(0) == null) {
+            throw new ApiUsageException(
+                    "Returned Group is null!");
+        }
+
+        final ExperimenterGroup grp = g.get(0);
+        if (grp.getName().equals(groupname)) {
+            return g.get(0);
+        }
+
+        throw new ApiUsageException(String.format(
+                "name(%s) != groupname(%s)",
+                grp.getName(), groupname));
     }
 
     @RolesAllowed("system")
