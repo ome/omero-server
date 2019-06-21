@@ -275,7 +275,7 @@ public class FullTextBridge extends BridgeHelper {
                     addIfNotNull(document, "channel.name", logical.getName(), opts);
                     addIfNotNull(document, "channel.fluor", logical.getFluor(), opts);
                     addEnumIfNotNull(document, "channel.mode", logical.getMode(), opts);
-                    addEnumIfNotNull(document, "channel.photoetricInterpretation",
+                    addEnumIfNotNull(document, "channel.photometricInterpretation",
                             logical.getPhotometricInterpretation(), opts);
                     // TODO: how to represent Length
                 }
