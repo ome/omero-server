@@ -204,7 +204,7 @@ public class LdapImpl extends AbstractLevel2Service implements ILdap,
 
         if (p.get(0) == null) {
             throw new ApiUsageException(
-                    "Returned Experiment is null!");
+                    "Returned Experimenter is null!");
         }
 
         final boolean ignoreCase = provider.isIgnoreCaseLookup();
