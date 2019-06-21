@@ -260,7 +260,13 @@ public class FullTextBridge extends BridgeHelper {
                                 final Document document, final LuceneOptions opts) {
         if (object instanceof Image) {
             final Image image = (Image) object;
+            if (image.sizeOfPixels() == 0) {
+                return;
+            }
             final Pixels pixels = image.getPrimaryPixels();
+            if (pixels == null) {
+                return;
+            }
             final Iterator<Channel> channelIterator = pixels.iterateChannels();
             while (channelIterator.hasNext()) {
                 final Channel channel = channelIterator.next();
@@ -371,6 +377,9 @@ public class FullTextBridge extends BridgeHelper {
         if (object instanceof Image) {
             final Image image = (Image) object;
             final Fileset fileset = image.getFileset();
+            if (fileset == null) {
+                return;
+            }
             final Iterator<FilesetEntry> entryIterator = fileset.iterateUsedFiles();
             while (entryIterator.hasNext()) {
                 final FilesetEntry entry = entryIterator.next();
