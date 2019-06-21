@@ -133,7 +133,7 @@ public abstract class BridgeHelper implements FieldBridge,
      *            this value is null, then the "value" will only be added to the
      *            {@link #COMBINED} field.
      * @param value
-     *            {@link IEnum} whose {@link IEnum#getValue()} method will be alled.
+     *            {@link IEnum} whose {@link IEnum#getValue()} method will be called.
      *            If null, then this is a no-op.
      * @param opts
      *            LuceneOptions, passed in from the runtime. If overriding on
