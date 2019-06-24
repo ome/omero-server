@@ -198,13 +198,13 @@ public class LdapImpl extends AbstractLevel2Service implements ILdap,
                 mapper.getControls(), mapper);
 
         if (p.size() != 1) {
-            throw new ApiUsageException(
-                    "Cannot find unique user DistinguishedName: found=" + p.size());
+            throw new ApiUsageException(String.format(
+                    "Cannot find unique user DistinguishedName: found=%s (%s)", p.size(), username));
         }
 
         if (p.get(0) == null) {
-            throw new ApiUsageException(
-                    "Returned Experimenter is null!");
+            throw new ApiUsageException(String.format(
+                    "Returned Experimenter is null! (%s)", username));
         }
 
         final boolean ignoreCase = provider.isIgnoreCaseLookup();
@@ -228,13 +228,13 @@ public class LdapImpl extends AbstractLevel2Service implements ILdap,
                 mapper.getControls(), mapper);
 
         if (g.size() != 1) {
-            throw new ApiUsageException(
-                    "Cannot find unique group DistinguishedName: found=" + g.size());
+            throw new ApiUsageException(String.format(
+                    "Cannot find unique group DistinguishedName: found=%s (%s)", g.size(), groupname));
         }
 
         if (g.get(0) == null) {
-            throw new ApiUsageException(
-                    "Returned Group is null!");
+            throw new ApiUsageException(String.format(
+                    "Returned Group is null! (%s)", groupname));
         }
 
         final ExperimenterGroup grp = g.get(0);
