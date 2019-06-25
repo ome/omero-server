@@ -114,7 +114,10 @@ public class FullTextBridge extends BridgeHelper {
      * method which calls
      * {@link #set_file(String, IObject, Document, LuceneOptions)}
      * {@link #set_annotations(String, IObject, Document, LuceneOptions)},
+     * {@link #set_acquisition(String, IObject, Document, LuceneOptions)},
      * {@link #set_details(String, IObject, Document, LuceneOptions)},
+     * {@link #set_fileset(String, IObject, Document, LuceneOptions)},
+     * {@link #set_folders(String, IObject, Document, LuceneOptions)},
      * and finally
      * {@link #set_custom(String, IObject, Document, LuceneOptions)}.
      * as well as all {@link Annotation annotations}.
@@ -143,7 +146,7 @@ public class FullTextBridge extends BridgeHelper {
      * to get a {@link Reader} for the given
      * file which is then passed to
      * {@link #addContents(Document, String, OriginalFile, OriginalFilesService, Map, LuceneOptions)}
-     * using the field name "file".
+     * using the field name "file.contents".
      *
      * @param name
      * @param object
@@ -249,7 +252,12 @@ public class FullTextBridge extends BridgeHelper {
     }
 
     /**
-     * Walks the acquisition related metadata including channel names.
+     * Walks the acquisition related metadata including channel names. This includes:
+     *
+     * - channel.name
+     * - channel.fluor
+     * - channel.mode
+     * - channel.photometricInterpretation
      *
      * @param name
      * @param object
@@ -369,8 +377,10 @@ public class FullTextBridge extends BridgeHelper {
     }
 
     /**
-     * Walks the {@link Fileset} instances attached to and Image
-     * so users can use the original clientpath for search.
+     * Walks the {@link Fileset} instances attached to an Image. Fields that are added include:
+     *
+     * - fileset.entry.clientPath
+     * - fileset.entry.name
      */
     public void set_fileset(final String name, final IObject object,
                             final Document document, final LuceneOptions opts) {
