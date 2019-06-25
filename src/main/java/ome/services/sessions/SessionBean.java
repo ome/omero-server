@@ -17,6 +17,7 @@ import ome.annotations.RolesAllowed;
 import ome.system.EventContext;
 import ome.api.ISession;
 import ome.api.ServiceInterface;
+import ome.api.local.LocalSession;
 import ome.conditions.AuthenticationException;
 import ome.conditions.RootException;
 import ome.conditions.SecurityViolation;
@@ -42,7 +43,7 @@ import org.springframework.transaction.annotation.Transactional;
  * @since 3.0-Beta3
  */
 @Transactional
-public class SessionBean implements ISession {
+public class SessionBean implements LocalSession {
 
     private final static Logger log = LoggerFactory.getLogger(SessionBean.class);
 
@@ -60,12 +61,12 @@ public class SessionBean implements ISession {
         this.cd = cd;
         this.adminPrivileges = adminPrivileges;
     }
-    
+
     // ~ Injectors
     // =========================================================================
 
     public Class<? extends ServiceInterface> getServiceInterface() {
-        return ISession.class;
+        return LocalSession.class;
     }
 
     // ~ Session lifecycle
@@ -190,7 +191,12 @@ public class SessionBean implements ISession {
     public Session getSession(@NotNull String sessionUuid) {
         return mgr.find(sessionUuid);
     }
-    
+
+    @RolesAllowed( { "user", "guest" })
+    public Session getSessionQuietly(@NotNull String sessionUuid) {
+        return mgr.findQuietly(sessionUuid);
+    }
+
     @RolesAllowed( { "user", "guest" })
     public int getReferenceCount(@NotNull String sessionUuid) {
         return mgr.getReferenceCount(sessionUuid);

@@ -567,6 +567,13 @@ public class SessionManagerImpl implements SessionManager, SessionCache.StaleCac
         return (sessionContext == null) ? null : sessionContext.getSession();
     }
 
+    @Override
+    public Session findQuietly(String uuid) {
+        SessionContext sessionContext = cache.getSessionContext(uuid, true);
+        checkIfShare(sessionContext);
+        return (sessionContext == null) ? null : sessionContext.getSession();
+    }
+
     private void checkIfShare(SessionContext sessionContext) {
         if (sessionContext.getSession() instanceof Share) {
             final Long id = sessionContext.getSession().getId();
