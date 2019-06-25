@@ -1,3 +1,9 @@
+5.5.3 (June 2019)
+-----------------
+
+- Add LocalSession.getSessionQuietly to permit session timeouts (#56)
+- Improve LDAP exception messages (#58)
+
 5.5.2 (June 2019)
 -----------------
 
