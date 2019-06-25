@@ -278,15 +278,19 @@ public class FullTextBridge extends BridgeHelper {
             final Iterator<Channel> channelIterator = pixels.iterateChannels();
             while (channelIterator.hasNext()) {
                 final Channel channel = channelIterator.next();
-                final LogicalChannel logical = channel.getLogicalChannel();
-                if (logical != null) {
-                    addIfNotNull(document, "channel.name", logical.getName(), opts);
-                    addIfNotNull(document, "channel.fluor", logical.getFluor(), opts);
-                    addEnumIfNotNull(document, "channel.mode", logical.getMode(), opts);
-                    addEnumIfNotNull(document, "channel.photometricInterpretation",
-                            logical.getPhotometricInterpretation(), opts);
-                    // TODO: how to represent Length
+                if (channel == null) {
+                    continue;
                 }
+                final LogicalChannel logical = channel.getLogicalChannel();
+                if (logical == null) {
+                    continue;
+                }
+                addIfNotNull(document, "channel.name", logical.getName(), opts);
+                addIfNotNull(document, "channel.fluor", logical.getFluor(), opts);
+                addEnumIfNotNull(document, "channel.mode", logical.getMode(), opts);
+                addEnumIfNotNull(document, "channel.photometricInterpretation",
+                        logical.getPhotometricInterpretation(), opts);
+                // TODO: how to represent Length
             }
         }
     }
@@ -393,6 +397,9 @@ public class FullTextBridge extends BridgeHelper {
             final Iterator<FilesetEntry> entryIterator = fileset.iterateUsedFiles();
             while (entryIterator.hasNext()) {
                 final FilesetEntry entry = entryIterator.next();
+                if (entry == null) {
+                    continue;
+                }
                 add(document, "fileset.entry.clientPath", entry.getClientPath(), opts);
                 add(document, "fileset.entry.name", entry.getOriginalFile().getName(), opts);
                 // TODO: entry.hash? fileset.templatePrefix?
