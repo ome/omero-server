@@ -416,7 +416,7 @@ public class RenderingBean implements RenderingEngine, Serializable {
             // Loading last to try to ensure that the buffer will get closed.
             PixelBuffer buffer = getPixelBuffer();
             renderer = new Renderer(quantumFactory, renderingModels, pixelsObj,
-                    rendDefObj, buffer, lutProvider);
+                    rendDefObj, buffer, lutProvider, this.ex.getService());
         } finally {
             rwl.writeLock().unlock();
         }
