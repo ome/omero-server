@@ -14,10 +14,13 @@ before_install:
   - sudo apt-add-repository "deb http://zeroc.com/download/apt/ubuntu14.04 stable main"
   - sudo apt-get update -q
   - sudo apt-get install libzeroc-ice-java -y
+  - pushd /tmp && wget https://github.com/ome/build-infra/archive/master.zip && unzip -j master.zip && popd
 
 install:
   - DIR=$PWD; (cd /tmp; gradle wrapper --gradle-version=5.2.1; mv .gradle gradle gradlew $DIR)
 
 script:
+  # Uncomment to perform a quick build
+  - env PATH=$PATH:/tmp quick-build /tmp/properties && cat /tmp/properties
   - ./gradlew publishToMavenLocal
   - ./gradlew test
