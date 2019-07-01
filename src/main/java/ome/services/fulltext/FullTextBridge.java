@@ -5,11 +5,6 @@
 
 package ome.services.fulltext;
 
-import java.io.Reader;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
 import ome.io.nio.OriginalFilesService;
 import ome.model.IAnnotated;
 import ome.model.ILink;
@@ -20,10 +15,14 @@ import ome.model.annotations.FileAnnotation;
 import ome.model.annotations.LongAnnotation;
 import ome.model.annotations.MapAnnotation;
 import ome.model.annotations.TagAnnotation;
-import ome.model.annotations.TextAnnotation;
 import ome.model.annotations.TermAnnotation;
+import ome.model.annotations.TextAnnotation;
 import ome.model.containers.Folder;
-import ome.model.core.*;
+import ome.model.core.Channel;
+import ome.model.core.Image;
+import ome.model.core.LogicalChannel;
+import ome.model.core.OriginalFile;
+import ome.model.core.Pixels;
 import ome.model.fs.Fileset;
 import ome.model.fs.FilesetEntry;
 import ome.model.internal.Details;
@@ -35,7 +34,6 @@ import ome.model.meta.ExperimenterGroup;
 import ome.model.roi.Roi;
 import ome.util.DetailsFieldBridge;
 import ome.util.Utils;
-
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.Field.Index;
@@ -44,6 +42,11 @@ import org.hibernate.proxy.HibernateProxy;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.LuceneOptions;
 import org.hibernate.search.bridge.builtin.DateBridge;
+
+import java.io.Reader;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Primary definition of what will be indexed via Hibernate Search. This class
