@@ -1,3 +1,9 @@
+5.5.4 (July 2019)
+-----------------
+
+- Bump OMERO dependencies via renderer 5.5.2
+- Minor full text bridge stability fix (#60)
+
 5.5.3 (June 2019)
 -----------------
 
