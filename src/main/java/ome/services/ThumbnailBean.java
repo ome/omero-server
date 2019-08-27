@@ -1525,7 +1525,7 @@ public class ThumbnailBean extends AbstractLevel2Service
         catch (ConcurrencyException mpe)
         {
             inProgress = true;
-            log.info("ConcurrencyException on settingsSerice.resetDefaults");
+            log.info("ConcurrencyException on settingsService.resetDefaults");
         }
     }
 
