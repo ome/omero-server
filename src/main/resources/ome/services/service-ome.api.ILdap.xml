@@ -81,6 +81,12 @@
 		<property name="referral" value="${omero.ldap.referral}" />
 		<property name="dirObjectFactory"
 			value="org.springframework.ldap.core.support.DefaultDirObjectFactory" />
+        <property name="baseEnvironmentProperties">
+			<entry key="com.sun.jndi.ldap.connect.timeout"
+			       value="${omero.ldap.connect_timeout}" />
+			<entry key="com.sun.jndi.ldap.read.timeout"
+			       value="${omero.ldap.read_timeout}" />
+        </property>
 	</bean>
 
 </beans>
