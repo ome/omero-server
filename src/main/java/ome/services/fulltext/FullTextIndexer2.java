@@ -548,16 +548,7 @@ public class FullTextIndexer2 {
                     final Class<? extends IObject> entityClass = Hibernate.getClass(entity);
                     if (isIncluded(entityClass)) {
                         LOGGER.debug("indexing {}:{}", entityType, ((IObject) entity).getId());
-                        try {
-                            fullTextSession.index(entity);
-                        } catch (BridgeException be) {
-                            /* Handle buggy bridge implementation. */
-                            if (be.getCause() instanceof NullPointerException) {
-                                LOGGER.warn("failed to index {}:{}", entityType, ((IObject) entity).getId(), be.getCause());
-                            } else {
-                                throw be;
-                            }
-                        }
+                        fullTextSession.index(entity);
                     } else {
                         LOGGER.debug("skipping {}:{}", entityType, ((IObject) entity).getId());
                     }
