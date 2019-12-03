@@ -90,13 +90,14 @@ public class SessionBean implements LocalSession {
             currentSession = null;
         }
 
+        final String agent = cd.getContext().get("omero.agent");
         try {
             final Principal principal = principal(defaultGroup, user);
             Future<Session> future = ex.submit(new Callable<Session>(){
                 public Session call() throws Exception {
                     final CreationRequest req = new CreationRequest();
                     req.principal = principal;
-                    req.agent = "createSession";
+                    req.agent = agent == null ? "createSession" : agent;
                     if (currentSession != null) {
                         final Experimenter sudoer = currentSession.getSudoer();
                         if (sudoer != null) {
@@ -112,7 +113,6 @@ public class SessionBean implements LocalSession {
         } catch (Exception e) {
             throw creationExceptionHandler(e);
         }
-
     }
 
     @RolesAllowed("user" /* group owner */)
@@ -149,12 +149,13 @@ public class SessionBean implements LocalSession {
             groupsLed = context.getLeaderOfGroupsList();
         }
 
+        final String agent = cd.getContext().get("omero.agent");
         try {
             Future<Session> future = ex.submit(new Callable<Session>(){
                 public Session call() throws Exception {
                     SessionManager.CreationRequest req = new SessionManager.CreationRequest();
                     req.principal = principal;
-                    req.agent = "OMERO.sudo";
+                    req.agent = agent == null ? "OMERO.sudo" : agent;
                     req.groupsLed = groupsLed;
                     req.timeToIdle = timeToIdleMilliseconds;
                     req.timeToLive = timeToLiveMilliseconds;
@@ -177,10 +178,13 @@ public class SessionBean implements LocalSession {
     @RolesAllowed( { "user", "guest" })
     public Session createSession(@NotNull Principal principal,
             @Hidden String credentials) {
-
         Session session = null;
         try {
-            session = mgr.createWithAgent(principal, credentials, "createSession", null);
+            String agent = cd.getContext().get("omero.agent");
+            if (agent == null) {
+                agent = "createSession";
+            }
+            session = mgr.createWithAgent(principal, credentials, agent, null);
         } catch (Exception e) {
             throw creationExceptionHandler(e);
         }

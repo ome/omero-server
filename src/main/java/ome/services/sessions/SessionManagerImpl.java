@@ -168,17 +168,18 @@ public class SessionManagerImpl implements SessionManager, SessionCache.StaleCac
 
     public void setDefaultTimeToIdle(long defaultTimeToIdle) {
         this.defaultTimeToIdle = defaultTimeToIdle;
-        this.maxUserTimeToIdle = Math.min(Long.MAX_VALUE / 10,
-                defaultTimeToIdle);
-        this.maxUserTimeToIdle *= 10;
+    }
+
+    public void setMaxUserTimeToIdle(long maxUserTimeToIdle) {
+        this.maxUserTimeToIdle = maxUserTimeToIdle;
     }
 
     public void setDefaultTimeToLive(long defaultTimeToLive) {
         this.defaultTimeToLive = defaultTimeToLive;
-        this.maxUserTimeToLive = Math.min(Long.MAX_VALUE / 10,
-                defaultTimeToLive);
-        this.maxUserTimeToLive *= 10;
+    }
 
+    public void setMaxUserTimeToLive(long maxUserTimeToLive) {
+        this.maxUserTimeToLive = maxUserTimeToLive ;
     }
 
     public void setPrincipalHolder(PrincipalHolder principal) {
