@@ -293,7 +293,7 @@ public class FullTextBridge extends BridgeHelper {
                 addEnumIfNotNull(document, "channel.mode", logical.getMode(), opts);
                 addEnumIfNotNull(document, "channel.photometricInterpretation",
                         logical.getPhotometricInterpretation(), opts);
-                // TODO: how to represent Length
+                // Note: length items omitted due to difficulty of handling units
             }
         }
     }
@@ -405,8 +405,7 @@ public class FullTextBridge extends BridgeHelper {
                 }
                 add(document, "fileset.entry.clientPath", entry.getClientPath(), opts);
                 add(document, "fileset.entry.name", entry.getOriginalFile().getName(), opts);
-                // TODO: entry.hash? fileset.templatePrefix?
-                // TODO: update docs table
+                add(document, "fileset.templatePrefix", fileset.getTemplatePrefix(), opts);
             }
         }
     }
