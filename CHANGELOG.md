@@ -1,3 +1,11 @@
+5.5.5 (December 2019)
+---------------------
+
+- Bump omero-renderer version to 5.5.3
+- Retry failed full text indexing steps (#67)
+- Index Channel and Fileset metadata (#57)
+- Handle LDAP timeouts gracefully (#66)
+
 5.5.4 (July 2019)
 -----------------
 
