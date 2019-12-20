@@ -14,6 +14,7 @@ import java.util.Map;
 
 import ome.conditions.ApiUsageException;
 import ome.io.nio.OriginalFilesService;
+import ome.model.IEnum;
 import ome.model.IObject;
 import ome.model.core.OriginalFile;
 import ome.services.messages.ReindexMessage;
@@ -95,6 +96,66 @@ public abstract class BridgeHelper implements FieldBridge,
      * {@link #COMBINED} cases using a {@link StringReader} to allow Lucene to
      * tokenize the {@link String}.
      * 
+     * @param d
+     *            Document as passed to the set method. Do not modify.
+     * @param field
+     *            Field name which probably <em/>should</em> be modified. If
+     *            this value is null, then the "value" will only be added to the
+     *            {@link #COMBINED} field.
+     * @param value
+     *            Value which has been parsed out for this field. If null, then
+     *            this is a no-op.
+     * @param opts
+     *            LuceneOptions, passed in from the runtime. If overriding on
+     *            the interface values is required, see {@link SimpleLuceneOptions}
+     */
+    protected void addIfNotNull(Document d, String field, String value, LuceneOptions opts) {
+        if (value != null) {
+            add(d, field, value, opts);
+        }
+    }
+
+    /**
+     * Helper method which takes the parameters from the
+     * {@link #set(String, Object, Document, LuceneOptions)}
+     * method (possibly modified) as well as the {@link IEnum} value
+     * which should be added to the index, and adds two fields. One with the
+     * given field name and another to the {@link #COMBINED} field which is the
+     * default search provided to users. In addition to storing the value as is,
+     * another {@link Field} will be added for both the named and
+     * {@link #COMBINED} cases using a {@link StringReader} to allow Lucene to
+     * tokenize the {@link String}.
+     *
+     * @param d
+     *            Document as passed to the set method. Do not modify.
+     * @param field
+     *            Field name which probably <em/>should</em> be modified. If
+     *            this value is null, then the "value" will only be added to the
+     *            {@link #COMBINED} field.
+     * @param value
+     *            {@link IEnum} whose {@link IEnum#getValue()} method will be called.
+     *            If null, then this is a no-op.
+     * @param opts
+     *            LuceneOptions, passed in from the runtime. If overriding on
+     *            the interface values is required, see {@link SimpleLuceneOptions}
+     */
+    protected void addEnumIfNotNull(Document d, String field, IEnum value, LuceneOptions opts) {
+        if (value != null) {
+            add(d, field, value.getValue(), opts);
+        }
+    }
+
+    /**
+     * Helper method which takes the parameters from the
+     * {@link #set(String, Object, Document, LuceneOptions)}
+     * method (possibly modified) as well as the parsed {@link String} value
+     * which should be added to the index, and adds two fields. One with the
+     * given field name and another to the {@link #COMBINED} field which is the
+     * default search provided to users. In addition to storing the value as is,
+     * another {@link Field} will be added for both the named and
+     * {@link #COMBINED} cases using a {@link StringReader} to allow Lucene to
+     * tokenize the {@link String}.
+     *
      * @param d
      *            Document as passed to the set method. Do not modify.
      * @param field

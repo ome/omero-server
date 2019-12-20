@@ -5,11 +5,6 @@
 
 package ome.services.fulltext;
 
-import java.io.Reader;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
 import ome.io.nio.OriginalFilesService;
 import ome.model.IAnnotated;
 import ome.model.ILink;
@@ -20,11 +15,16 @@ import ome.model.annotations.FileAnnotation;
 import ome.model.annotations.LongAnnotation;
 import ome.model.annotations.MapAnnotation;
 import ome.model.annotations.TagAnnotation;
-import ome.model.annotations.TextAnnotation;
 import ome.model.annotations.TermAnnotation;
+import ome.model.annotations.TextAnnotation;
 import ome.model.containers.Folder;
+import ome.model.core.Channel;
 import ome.model.core.Image;
+import ome.model.core.LogicalChannel;
 import ome.model.core.OriginalFile;
+import ome.model.core.Pixels;
+import ome.model.fs.Fileset;
+import ome.model.fs.FilesetEntry;
 import ome.model.internal.Details;
 import ome.model.internal.NamedValue;
 import ome.model.internal.Permissions;
@@ -34,7 +34,6 @@ import ome.model.meta.ExperimenterGroup;
 import ome.model.roi.Roi;
 import ome.util.DetailsFieldBridge;
 import ome.util.Utils;
-
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.Field.Index;
@@ -43,6 +42,11 @@ import org.hibernate.proxy.HibernateProxy;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.LuceneOptions;
 import org.hibernate.search.bridge.builtin.DateBridge;
+
+import java.io.Reader;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Primary definition of what will be indexed via Hibernate Search. This class
@@ -113,7 +117,10 @@ public class FullTextBridge extends BridgeHelper {
      * method which calls
      * {@link #set_file(String, IObject, Document, LuceneOptions)}
      * {@link #set_annotations(String, IObject, Document, LuceneOptions)},
+     * {@link #set_acquisition(String, IObject, Document, LuceneOptions)},
      * {@link #set_details(String, IObject, Document, LuceneOptions)},
+     * {@link #set_fileset(String, IObject, Document, LuceneOptions)},
+     * {@link #set_folders(String, IObject, Document, LuceneOptions)},
      * and finally
      * {@link #set_custom(String, IObject, Document, LuceneOptions)}.
      * as well as all {@link Annotation annotations}.
@@ -129,7 +136,9 @@ public class FullTextBridge extends BridgeHelper {
 
         set_file(name, object, document, opts);
         set_annotations(name, object, document, opts);
+        set_acquisition(name, object, document, opts);
         set_details(name, object, document, opts);
+        set_fileset(name, object, document, opts);
         set_folders(name, object, document, opts);
         set_custom(name, object, document, opts);
 
@@ -140,7 +149,7 @@ public class FullTextBridge extends BridgeHelper {
      * to get a {@link Reader} for the given
      * file which is then passed to
      * {@link #addContents(Document, String, OriginalFile, OriginalFilesService, Map, LuceneOptions)}
-     * using the field name "file".
+     * using the field name "file.contents".
      *
      * @param name
      * @param object
@@ -246,6 +255,50 @@ public class FullTextBridge extends BridgeHelper {
     }
 
     /**
+     * Walks the acquisition related metadata including channel names. This includes:
+     *
+     * - channel.name
+     * - channel.fluor
+     * - channel.mode
+     * - channel.photometricInterpretation
+     *
+     * @param name
+     * @param object
+     * @param document
+     * @param opts
+     */
+    public void set_acquisition(final String name, final IObject object,
+                                final Document document, final LuceneOptions opts) {
+        if (object instanceof Image) {
+            final Image image = (Image) object;
+            if (image.sizeOfPixels() == 0) {
+                return;
+            }
+            final Pixels pixels = image.getPrimaryPixels();
+            if (pixels == null) {
+                return;
+            }
+            final Iterator<Channel> channelIterator = pixels.iterateChannels();
+            while (channelIterator.hasNext()) {
+                final Channel channel = channelIterator.next();
+                if (channel == null) {
+                    continue;
+                }
+                final LogicalChannel logical = channel.getLogicalChannel();
+                if (logical == null) {
+                    continue;
+                }
+                addIfNotNull(document, "channel.name", logical.getName(), opts);
+                addIfNotNull(document, "channel.fluor", logical.getFluor(), opts);
+                addEnumIfNotNull(document, "channel.mode", logical.getMode(), opts);
+                addEnumIfNotNull(document, "channel.photometricInterpretation",
+                        logical.getPhotometricInterpretation(), opts);
+                // Note: length items omitted due to difficulty of handling units
+            }
+        }
+    }
+
+    /**
      * Parses all ownership and time-based details to the index for the given
      * object.
      *
@@ -326,6 +379,33 @@ public class FullTextBridge extends BridgeHelper {
                     final Folder folder = folderIterator.next();
                     add(document, "roi.folder.name", folder.getName(), opts);
                 }
+            }
+        }
+    }
+
+    /**
+     * Walks the {@link Fileset} instances attached to an Image. Fields that are added include:
+     *
+     * - fileset.entry.clientPath
+     * - fileset.entry.name
+     */
+    public void set_fileset(final String name, final IObject object,
+                            final Document document, final LuceneOptions opts) {
+        if (object instanceof Image) {
+            final Image image = (Image) object;
+            final Fileset fileset = image.getFileset();
+            if (fileset == null) {
+                return;
+            }
+            final Iterator<FilesetEntry> entryIterator = fileset.iterateUsedFiles();
+            while (entryIterator.hasNext()) {
+                final FilesetEntry entry = entryIterator.next();
+                if (entry == null) {
+                    continue;
+                }
+                add(document, "fileset.entry.clientPath", entry.getClientPath(), opts);
+                add(document, "fileset.entry.name", entry.getOriginalFile().getName(), opts);
+                add(document, "fileset.templatePrefix", fileset.getTemplatePrefix(), opts);
             }
         }
     }
