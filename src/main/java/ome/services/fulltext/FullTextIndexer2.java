@@ -35,6 +35,8 @@ import ome.model.IObject;
 import ome.model.meta.EventLog;
 import ome.util.DetailsFieldBridge;
 
+import com.google.common.base.CaseFormat;
+import com.google.common.base.Converter;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.SetMultimap;
@@ -102,7 +104,15 @@ import org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean;
  * <dt><tt>INDEX</tt></dt>
  * <dd><ol>
  * <li>If locking the field bridge fails then schedule <tt>INDEX</tt> for delayed execution then finish.
- * <li>Index a batch of objects.
+ * <li>Index a batch of objects all in the same transaction.
+ * <li>If a field bridge fails then trigger <tt>INDEX_RETRY</tt> to retry one object at a time.
+ * <li>Then if objects were deleted then trigger <tt>PURGE</tt>.
+ * <li>Else trigger <tt>NOTE</tt>.
+ * </ol></dd>
+ * <dt><tt>INDEX_RETRY</tt></dt>
+ * <dd><ol>
+ * <li>If locking the field bridge fails then schedule <tt>INDEX_RETRY</tt> for delayed execution then finish.
+ * <li>Index a batch of objects each in its own transaction.
  * <li>Then if objects were deleted then trigger <tt>PURGE</tt>.
  * <li>Else trigger <tt>NOTE</tt>.
  * </ol></dd>
@@ -136,6 +146,8 @@ public class FullTextIndexer2 {
         PREPARE,
         /* Index a batch of model objects. */
         INDEX,
+        /* Index a batch of model objects, second attempt. */
+        INDEX_RETRY,
         /* Purge a batch of model objects. */
         PURGE,
         /* Note the progress made by the indexer. */
@@ -306,13 +318,14 @@ public class FullTextIndexer2 {
             return;
         }
         LOGGER.info("starting indexer");
+        final Converter<String, String> nameConverter = CaseFormat.UPPER_UNDERSCORE.converterTo(CaseFormat.LOWER_CAMEL);
         try {
             for (final Step step : Step.values()) {
                 final MethodInvokingJobDetailFactoryBean factory = new MethodInvokingJobDetailFactoryBean();
                 factory.setGroup(JOB_GROUP);
                 factory.setName(step.toString());
                 factory.setTargetObject(this);
-                factory.setTargetMethod(step.name().toLowerCase());
+                factory.setTargetMethod(nameConverter.convert(step.name()));
                 factory.setConcurrent(false);
                 factory.afterPropertiesSet();
                 final JobDetail jobDetail = factory.getObject();
@@ -513,7 +526,7 @@ public class FullTextIndexer2 {
     }
 
     /**
-     * Index a batch of model objects.
+     * Index a batch of model objects all at once.
      */
     public void index() {
         LOGGER.info("indexing objects: count = {}", toIndex.size());
@@ -531,6 +544,7 @@ public class FullTextIndexer2 {
         final ParserSession parserSession = new ParserSession();
         final Session session = sessionFactory.openSession();
         HibernateException hibernateQueryError = null;
+        Throwable bridgeException = null;
         try {
             final FullTextSession fullTextSession = Search.getFullTextSession(session);
             fullTextSession.setCacheMode(CacheMode.IGNORE);
@@ -548,16 +562,7 @@ public class FullTextIndexer2 {
                     final Class<? extends IObject> entityClass = Hibernate.getClass(entity);
                     if (isIncluded(entityClass)) {
                         LOGGER.debug("indexing {}:{}", entityType, ((IObject) entity).getId());
-                        try {
-                            fullTextSession.index(entity);
-                        } catch (BridgeException be) {
-                            /* Handle buggy bridge implementation. */
-                            if (be.getCause() instanceof NullPointerException) {
-                                LOGGER.warn("failed to index {}:{}", entityType, ((IObject) entity).getId(), be.getCause());
-                            } else {
-                                throw be;
-                            }
-                        }
+                        fullTextSession.index(entity);
                     } else {
                         LOGGER.debug("skipping {}:{}", entityType, ((IObject) entity).getId());
                     }
@@ -568,11 +573,84 @@ public class FullTextIndexer2 {
         } catch (UnresolvableObjectException uoe) {
             hibernateQueryError = uoe;
         } catch (BridgeException be) {
-            if (be.getCause() instanceof UnresolvableObjectException) {
-                hibernateQueryError = (UnresolvableObjectException) be.getCause();
+            bridgeException = be.getCause();
+            LOGGER.info("bridge failed, will retry indexing", bridgeException);
+        } finally {
+            DetailsFieldBridge.unlock();
+            session.close();
+            parserSession.closeParsedFiles();
+        }
+        try {
+            if (hibernateQueryError != null) {
+                toIndex.clear();
+                toPurge.clear();
+                LOGGER.info("Hibernate query failed, aborting this indexer run", hibernateQueryError);
+                register(Step.PREPARE, Event.HIBERNATE_QUERY_ERROR);
+            } else if (bridgeException != null) {
+                register(Step.INDEX_RETRY);
+            } else if (!toPurge.isEmpty()) {
+                register(Step.PURGE);
             } else {
-                throw be;
+                register(Step.NOTE);
             }
+        } catch (Throwable t) {
+            LOGGER.error("failed to continue indexer", t);
+        }
+    }
+
+    /**
+     * Index a batch of model objects one by one.
+     */
+    public void indexRetry() {
+        LOGGER.info("indexing objects: count = {} (retry)", toIndex.size());
+        if (DetailsFieldBridge.tryLock()) {
+            DetailsFieldBridge.setFieldBridge(bridge);
+        } else {
+            LOGGER.info("failed to lock field bridge so will wait awhile");
+            try {
+                register(Step.INDEX_RETRY, Event.FIELD_BRIDGE_CONTENTION);
+            } catch (Throwable t) {
+                LOGGER.error("failed to continue indexer", t);
+            }
+            return;
+        }
+        final ParserSession parserSession = new ParserSession();
+        final Session session = sessionFactory.openSession();
+        HibernateException hibernateQueryError = null;
+        try {
+            final FullTextSession fullTextSession = Search.getFullTextSession(session);
+            fullTextSession.setCacheMode(CacheMode.IGNORE);
+            fullTextSession.setFlushMode(FlushMode.COMMIT);
+            for (final Map.Entry<String, Collection<Long>> typeAndIds : toIndex.asMap().entrySet()) {
+                final String entityType = typeAndIds.getKey();
+                final Collection<Long> entityIds = typeAndIds.getValue();
+                for (final long entityId : entityIds) {
+                    final Transaction transaction = fullTextSession.beginTransaction();
+                    final String hql = "FROM " + entityType + " WHERE id = :id";
+                    final Query query = fullTextSession.createQuery(hql);
+                    query.setLong("id", entityId);
+                    query.setReadOnly(true);
+                    final Object entity = query.uniqueResult();
+                    if (entity != null) {
+                        @SuppressWarnings("unchecked")
+                        final Class<? extends IObject> entityClass = Hibernate.getClass(entity);
+                        if (isIncluded(entityClass)) {
+                            LOGGER.debug("indexing {}:{}", entityType, ((IObject) entity).getId());
+                            try {
+                                fullTextSession.index(entity);
+                            } catch (BridgeException be) {
+                                LOGGER.warn("failed to index {}:{}", entityType, ((IObject) entity).getId(), be.getCause());
+                            }
+                        } else {
+                            LOGGER.debug("skipping {}:{}", entityType, ((IObject) entity).getId());
+                        }
+                    }
+                    transaction.commit();
+                }
+            }
+            toIndex.clear();
+        } catch (UnresolvableObjectException uoe) {
+            hibernateQueryError = uoe;
         } finally {
             DetailsFieldBridge.unlock();
             session.close();
