@@ -46,9 +46,6 @@ public class DBEnumCheck extends BaseDBCheck {
             String name = formatReader.getClass().getSimpleName();
             if (name.endsWith("Reader")) {
                 name = name.substring(0, name.length() - 6);
-                if ("Fake".equals(name)) {
-                    continue;
-                }
                 formatNames.add(name);
                 if (formatReader.hasCompanionFiles()) {
                     formatNames.add("Companion/" + name);
