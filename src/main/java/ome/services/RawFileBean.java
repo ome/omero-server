@@ -223,7 +223,9 @@ public class RawFileBean extends AbstractStatefulBean implements RawFileStore {
             final String path = buffer.getPath();
 
             try {
-                buffer.flush(true);
+                if (!buffer.getMode().equals("r")) {
+                    buffer.flush(true);
+                }
             } catch (IOException ie) {
                 final String msg = "cannot flush " + path + ": " + ie;
                 log.warn(msg);
