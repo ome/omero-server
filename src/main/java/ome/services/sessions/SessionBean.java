@@ -180,7 +180,10 @@ public class SessionBean implements LocalSession {
             @Hidden String credentials) {
         Session session = null;
         try {
-            String agent = cd.getContext().get("omero.agent");
+            String agent = null;
+            if (cd.size() > 0) {
+                agent = cd.getContext().get("omero.agent");
+            }
             if (agent == null) {
                 agent = "createSession";
             }
