@@ -102,6 +102,9 @@ public class SessMgrUnitTest extends MockObjectTestCase {
     // State
     final Long TTL = 300 * 1000L;
     final Long TTI = 100 * 1000L;
+    final Long maxUserTTL = TTL;
+    final Long maxUserTTI = TTI;
+
     Session session = new Session();
     Principal principal = new Principal("u", "g", "Test");
     String credentials = "password";
@@ -145,6 +148,8 @@ public class SessMgrUnitTest extends MockObjectTestCase {
         mgr.setApplicationContext(ctx);
         mgr.setDefaultTimeToIdle(TTI);
         mgr.setDefaultTimeToLive(TTL);
+        mgr.setMaxUserTimeToIdle(maxUserTTI);
+        mgr.setMaxUserTimeToLive(maxUserTTL);
         mgr.setSessionProvider(new SessionProviderInDb(roles, nodeProvider, executor));
 
         session = mgr.doDefine();
@@ -514,7 +519,7 @@ public class SessMgrUnitTest extends MockObjectTestCase {
 
     }
 
-    @Test
+    @Test(expectedExceptions = SecurityViolation.class)
     public void testTimeoutUpdatesTooBig() throws Exception {
 
         testTimeoutDefaults();
@@ -525,9 +530,6 @@ public class SessMgrUnitTest extends MockObjectTestCase {
         s.setTimeToLive(Long.MAX_VALUE);
         s.setTimeToIdle(Long.MAX_VALUE);
         s = mgr.update(s);
-
-        assertEquals(3000000, s.getTimeToLive().longValue());
-        assertEquals(1000000, s.getTimeToIdle().longValue());
 
     }
 
