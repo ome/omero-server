@@ -380,7 +380,6 @@ public class BasicSecuritySystem implements SecuritySystem,
             final ome.model.meta.Session session = ((SessionContext) ec).getSession();
             Experimenter sudoer = session.getSudoer();
             if (!(sudoer == null || sudoer.isLoaded())) {
-                // Could be in read-only mode.
                 sudoer = admin.userProxy(sudoer.getId());
                 session.setSudoer(sudoer);
             }
