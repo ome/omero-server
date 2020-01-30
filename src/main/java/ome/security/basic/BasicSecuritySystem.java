@@ -1,5 +1,5 @@
 /*
- *   Copyright 2006-2018 University of Dundee. All rights reserved.
+ *   Copyright 2006-2019 University of Dundee. All rights reserved.
  *   Use is subject to license terms supplied in LICENSE.txt
  */
 
@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Set;
 
 import ome.system.EventContext;
+import ome.api.IQuery;
 import ome.api.local.LocalAdmin;
 import ome.api.local.LocalQuery;
 import ome.conditions.ApiUsageException;
@@ -33,6 +34,7 @@ import ome.model.meta.EventLog;
 import ome.model.meta.Experimenter;
 import ome.model.meta.ExperimenterGroup;
 import ome.model.meta.GroupExperimenterMap;
+import ome.parameters.Parameters;
 import ome.security.ACLVoter;
 import ome.security.AdminAction;
 import ome.security.EventProvider;
@@ -45,6 +47,7 @@ import ome.security.policy.DefaultPolicyService;
 import ome.security.policy.PolicyService;
 import ome.services.messages.EventLogMessage;
 import ome.services.messages.EventLogsMessage;
+import ome.services.sessions.SessionContext;
 import ome.services.sessions.SessionManager;
 import ome.services.sessions.SessionProvider;
 import ome.services.sessions.SessionProviderInMemory;
@@ -372,6 +375,23 @@ public class BasicSecuritySystem implements SecuritySystem,
                 throw ste;
             }
             ec = (EventContext) ste.sessionContext;
+        }
+
+        // Ensure that sudoer has name loaded for SimpleEventContext.copy
+        if (ec instanceof SessionContext) {
+            final ome.model.meta.Session session = ((SessionContext) ec).getSession();
+            Experimenter sudoer = session.getSudoer();
+            if (!(sudoer == null || sudoer.isLoaded())) {
+                final Long sudoerId = sudoer.getId();
+                final IQuery iQuery = sf.getQueryService();
+                final String hql = "SELECT omeName FROM Experimenter WHERE id = :id";
+                final Parameters params = new Parameters().addId(sudoerId);
+                final List<Object[]> result = iQuery.projection(hql, params);
+                final String sudoerName = (String) result.get(0)[0];
+                sudoer = new Experimenter(sudoerId, true);
+                sudoer.setOmeName(sudoerName);
+                session.setSudoer(sudoer);
+            }
         }
 
         // Refill current details
