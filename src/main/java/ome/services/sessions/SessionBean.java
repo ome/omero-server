@@ -90,7 +90,8 @@ public class SessionBean implements LocalSession {
             currentSession = null;
         }
 
-        final String agent = cd.getContext().get("omero.agent");
+        final String agent =
+            cd.size() > 0 ? cd.getContext().get("omero.agent") : null;
         try {
             final Principal principal = principal(defaultGroup, user);
             Future<Session> future = ex.submit(new Callable<Session>(){
@@ -149,7 +150,8 @@ public class SessionBean implements LocalSession {
             groupsLed = context.getLeaderOfGroupsList();
         }
 
-        final String agent = cd.getContext().get("omero.agent");
+        final String agent =
+            cd.size() > 0 ? cd.getContext().get("omero.agent") : null;
         try {
             Future<Session> future = ex.submit(new Callable<Session>(){
                 public Session call() throws Exception {
