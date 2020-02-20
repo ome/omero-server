@@ -168,17 +168,18 @@ public class SessionManagerImpl implements SessionManager, SessionCache.StaleCac
 
     public void setDefaultTimeToIdle(long defaultTimeToIdle) {
         this.defaultTimeToIdle = defaultTimeToIdle;
-        this.maxUserTimeToIdle = Math.min(Long.MAX_VALUE / 10,
-                defaultTimeToIdle);
-        this.maxUserTimeToIdle *= 10;
+    }
+
+    public void setMaxUserTimeToIdle(long maxUserTimeToIdle) {
+        this.maxUserTimeToIdle = maxUserTimeToIdle;
     }
 
     public void setDefaultTimeToLive(long defaultTimeToLive) {
         this.defaultTimeToLive = defaultTimeToLive;
-        this.maxUserTimeToLive = Math.min(Long.MAX_VALUE / 10,
-                defaultTimeToLive);
-        this.maxUserTimeToLive *= 10;
+    }
 
+    public void setMaxUserTimeToLive(long maxUserTimeToLive) {
+        this.maxUserTimeToLive = maxUserTimeToLive ;
     }
 
     public void setPrincipalHolder(PrincipalHolder principal) {
@@ -1019,21 +1020,18 @@ public class SessionManagerImpl implements SessionManager, SessionCache.StaleCac
             Session session, boolean trusted) {
 
         if (timeToLive != null) {
-
             if (trusted) {
                 session.setTimeToLive(timeToLive);
             } else {
-
-                // Let users set a value within reasons
-                long activeTTL = Math.min(maxUserTimeToLive, timeToLive);
-
-                // But if the value is 0, then the default must also be 0
-                if (activeTTL == 0 && defaultTimeToLive != 0) {
-                    throw new SecurityViolation("Cannot disable timeToLive. "
-                            + "Value must be between 1 and "
+                // Let users set a value within limit but if the value is 0,
+                // then the maximum must also be 0
+                if (maxUserTimeToLive != 0
+                    && (timeToLive > maxUserTimeToLive || timeToLive == 0)) {
+                    throw new SecurityViolation(
+                            "Cannot modify timeToLive beyond maximum: "
                             + maxUserTimeToLive);
                 }
-                session.setTimeToLive(activeTTL);
+                session.setTimeToLive(timeToLive);
             }
         }
 
@@ -1042,13 +1040,15 @@ public class SessionManagerImpl implements SessionManager, SessionCache.StaleCac
             if (trusted) {
                 session.setTimeToIdle(timeToIdle);
             } else {
-                long activeTTI = Math.min(maxUserTimeToIdle, timeToIdle);
-                if (activeTTI == 0 && defaultTimeToIdle != 0) {
-                    throw new SecurityViolation("Cannot disable timeToIdle. "
-                            + "Value must be between 1 and "
+                // Let users set a value within limit but if the value is 0,
+                // then the maximum must also be 0
+                if (maxUserTimeToLive != 0
+                    && (timeToIdle > maxUserTimeToIdle || timeToIdle == 0)) {
+                    throw new SecurityViolation(
+                            "Cannot modify timeToIdle beyond maximum: "
                             + maxUserTimeToIdle);
                 }
-                session.setTimeToIdle(activeTTI);
+                session.setTimeToIdle(timeToIdle);
             }
         }
     }

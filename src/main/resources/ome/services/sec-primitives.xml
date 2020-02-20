@@ -154,6 +154,8 @@
     <property name="executor"        ref="executor"/>
     <property name="defaultTimeToIdle" value="${omero.sessions.timeout}"/>
     <property name="defaultTimeToLive" value="${omero.sessions.maximum}"/>
+    <property name="maxUserTimeToIdle" value="${omero.sessions.max_user_time_to_idle}"/>
+    <property name="maxUserTimeToLive" value="${omero.sessions.max_user_time_to_live}"/>
     <property name="counterFactory"  ref="sessionCounterFactory"/>
     <property name="readOnly"        ref="readOnlyStatus"/>
     <property name="sessionProvider" ref="sessionProvider"/>
