@@ -75,10 +75,14 @@ dependencies {
 
 
 test {
+    testLogging {
+        events "passed", "skipped", "failed", "standardOut", "standardError"
+    }
     // enable TestNG support (default is JUnit)
     useTestNG() {
         suites "src/test/resources/unit.testng.xml"
     }
+    dependsOn cleanTest
 }
 
 if (slice.iceVersion.contains("3.7")) {
