@@ -1372,6 +1372,34 @@ public class SessionManagerImpl implements SessionManager, SessionCache.StaleCac
     }
 
     /**
+     * Check if the given user configuration indicates that any of the named administrator privileges are restricted for that user.
+     * @param userConfig a user's configuration, see {@link Experimenter#getConfig()}, may be {@code null}
+     * @param privilegeNames the names of some administrator privileges, see {@link AdminPrivilege#getValue()}
+     * @return if any of the named privileges are restricted
+     */
+    private boolean isAnyPrivilegeRestricted(List<NamedValue> userConfig, String... privilegeNames) {
+        if (userConfig == null) {
+            return false;
+        }
+        final Set<String> configNamesRestricted = new HashSet<>();
+        for (final NamedValue configProperty : userConfig) {
+            final String configName = configProperty.getName();
+            final String configValue = configProperty.getValue();
+            if (!Boolean.parseBoolean(configValue)) {
+                configNamesRestricted.add(configName);
+            }
+        }
+        for (final String privilegeName : privilegeNames) {
+            final AdminPrivilege privilege = adminPrivileges.getPrivilege(privilegeName);
+            final String privilegeConfigName = adminPrivileges.getConfigNameForPrivilege(privilege);
+            if (configNamesRestricted.contains(privilegeConfigName)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * Returns a List of state for creating a new {@link SessionContext}. If an
      * exception is thrown, return nulls since throwing an exception within the
      * Work will set our transaction to rollback only.
@@ -1403,22 +1431,9 @@ public class SessionManagerImpl implements SessionManager, SessionCache.StaleCac
             if (sudoer != null) {
                 final List<Long> leaderOfGroupsIdsSudoer = admin.getLeaderOfGroupIds(sudoer);
                 final List<Long> memberOfGroupsIdsSudoer = admin.getMemberOfGroupIds(sudoer);
-                boolean hasSudoPrivilegeSudoer;
+                final boolean hasSudoPrivilegeSudoer;
                 if (memberOfGroupsIdsSudoer.contains(roles.getSystemGroupId())) {
-                    hasSudoPrivilegeSudoer = true;
-                    final List<NamedValue> sudoerConfig = sudoer.getConfig();
-                    if (sudoerConfig != null) {
-                        final String sudoPrivilegeConfigName =
-                                adminPrivileges.getConfigNameForPrivilege(adminPrivileges.getPrivilege(AdminPrivilege.VALUE_SUDO));
-                        for (final NamedValue configProperty : sudoerConfig) {
-                            final String configName = configProperty.getName();
-                            final String configValue = configProperty.getValue();
-                            if (sudoPrivilegeConfigName.equals(configName) && !Boolean.parseBoolean(configValue)) {
-                                hasSudoPrivilegeSudoer = false;
-                                break;
-                            }
-                        }
-                    }
+                    hasSudoPrivilegeSudoer = !isAnyPrivilegeRestricted(sudoer.getConfig(), AdminPrivilege.VALUE_SUDO);
                 } else {
                     hasSudoPrivilegeSudoer = false;
                     hasAdminPrivileges = false;
