@@ -126,6 +126,13 @@
     <constructor-arg><null/></constructor-arg>
   </bean>
 
+  <bean id="basicSecuritySystemSubstituter" class="ome.services.util.BeanInstantiationSubstituter">
+    <constructor-arg ref="readOnlyStatus"/>
+    <constructor-arg value="basicSecuritySystem"/>
+    <constructor-arg value="ome.security.basic.BasicSecuritySystemReadOnly"/>
+    <property name="isWriteDb" value="true"/>  <!-- see SessionProviderInDb.isReadOnly -->
+  </bean>
+
   <bean id="eventHandler" class="ome.security.basic.NullEventHandler">
     <description>
     Scope: private
