@@ -552,12 +552,7 @@ public class BasicSecuritySystem implements SecuritySystem,
 
         }
 
-        final ome.model.meta.Session session;
-        if (isReadOnly) {
-            session = new ome.model.meta.Session(sessionId, false);
-        } else {
-            session = sessionProvider.findSessionById(sessionId, sf);
-        }
+        final ome.model.meta.Session session = sessionProvider.findSessionById(sessionId, sf);
 
         tokenHolder.setToken(callGroup.getGraphHolder());
 
