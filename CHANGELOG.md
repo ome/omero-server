@@ -1,3 +1,19 @@
+5.5.6 (March 2020)
+------------------
+
+- Allow sudo sessions on read-only servers
+  ([#71](https://github.com/ome/omero-server/pull/71))
+- Allow "Fake" to be added to the database format table of image readers
+  ([#75](https://github.com/ome/omero-server/pull/75))
+- Have raw file store skip flush when in read-only mode
+  ([#78](https://github.com/ome/omero-server/pull/78))
+- For sessions allow setting agent, also system maximum for timeouts
+  ([#79](https://github.com/ome/omero-server/pull/79))
+- Display unit test output instead of caching it
+  ([#81](https://github.com/ome/omero-server/pull/81))
+- Bump omero-renderer version to 5.5.5
+- Bump omero-common-test version to 5.5.5
+
 5.5.5 (December 2019)
 ---------------------
 
