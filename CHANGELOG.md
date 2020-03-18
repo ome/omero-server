@@ -12,6 +12,7 @@
 - Display unit test output instead of caching it
   ([#81](https://github.com/ome/omero-server/pull/81))
 - Bump omero-renderer version to 5.5.5
+- Bump omero-common-test version to 5.5.5
 
 5.5.5 (December 2019)
 ---------------------
