@@ -34,6 +34,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.ImmutableList;
 
+import ome.api.IQuery;
 import ome.model.meta.Experimenter;
 import ome.model.meta.Node;
 import ome.model.meta.Session;
@@ -75,6 +76,7 @@ public class SessionProviderInMemory implements SessionProvider, ReadOnlyStatus.
     @Override
     public Session executeUpdate(ServiceFactory sf, Session session, String uuid,
             long userId, Long sudoerId) {
+        final IQuery iQuery = sf.getQueryService();
         Node node = nodeProvider.getManagerByUuid(uuid, sf);
         if (node == null) {
             node = new Node(0L, false); // Using default node.
@@ -83,11 +85,11 @@ public class SessionProviderInMemory implements SessionProvider, ReadOnlyStatus.
             session.setId(executeNextSessionId());
         }
         session.setNode(node);
-        session.setOwner(new Experimenter(userId, false));
+        session.setOwner(iQuery.get(Experimenter.class, userId));
         if (sudoerId == null) {
             session.setSudoer(null);
         } else {
-            session.setSudoer(new Experimenter(sudoerId, false));
+            session.setSudoer(iQuery.get(Experimenter.class, sudoerId));
         }
         /* put before remove so that the session is never missing altogether */
         if (session.getClosed() == null) {
@@ -98,6 +100,8 @@ public class SessionProviderInMemory implements SessionProvider, ReadOnlyStatus.
             openSessions.remove(session.getUuid());
         }
         log.debug("Registered Session:{} ({})", session.getId(), session.getUuid());
+        /* Match how Hibernate nulls transient properties in persisting the instance. */
+        session.setUserIP(null);
         return session;
     }
 

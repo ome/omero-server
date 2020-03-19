@@ -66,6 +66,7 @@ import ome.system.EventContext;
 import ome.system.Roles;
 import ome.tools.hibernate.ExtendedMetadata;
 import ome.tools.hibernate.HibernateUtils;
+import ome.tools.hibernate.SqlQueryTransformer;
 import ome.tools.lsid.LsidUtils;
 import ome.util.SqlAction;
 
@@ -78,10 +79,11 @@ import ome.util.SqlAction;
  *
  * @author Josh Moore, josh.moore at gmx.de
  * @see EmptyInterceptor
+ * @see SqlQueryInterceptor
  * @see Interceptor
  * @since 3.0-M3
  */
-public class OmeroInterceptor implements Interceptor {
+public class OmeroInterceptor extends SqlQueryInterceptor {
 
     static volatile String last = null;
 
@@ -93,8 +95,6 @@ public class OmeroInterceptor implements Interceptor {
     private static final String IDX_FILE_REPO = LsidUtils.parseField(OriginalFile.REPO);
     private static final String IDX_FILE_PATH = LsidUtils.parseField(OriginalFile.PATH);
     private static final String IDX_FILE_NAME = LsidUtils.parseField(OriginalFile.NAME);
-
-    private final Interceptor EMPTY = EmptyInterceptor.INSTANCE;
 
     private final SystemTypes sysTypes;
 
@@ -117,7 +117,9 @@ public class OmeroInterceptor implements Interceptor {
 
     public OmeroInterceptor(Roles roles, SystemTypes sysTypes, ExtendedMetadata em,
             CurrentDetails cd, TokenHolder tokenHolder, SessionStats stats,
-            LightAdminPrivileges adminPrivileges, SqlAction sqlAction, Set<String> managedRepoUuids, Set<String> scriptRepoUuids) {
+            LightAdminPrivileges adminPrivileges, SqlAction sqlAction, SqlQueryTransformer sqlQueryTransformer,
+            Set<String> managedRepoUuids, Set<String> scriptRepoUuids) {
+        super(sqlQueryTransformer);
         Assert.notNull(tokenHolder);
         Assert.notNull(sysTypes);
         // Assert.notNull(em); Permitting null for testing
@@ -144,7 +146,7 @@ public class OmeroInterceptor implements Interceptor {
             Serializable id) throws CallbackException {
 
         debug("Intercepted instantiate.");
-        return EMPTY.instantiate(entityName, entityMode, id);
+        return super.instantiate(entityName, entityMode, id);
 
     }
 
@@ -154,7 +156,7 @@ public class OmeroInterceptor implements Interceptor {
 
         debug("Intercepted load.");
         this.stats.loadedObjects(1);
-        return EMPTY.onLoad(entity, id, state, propertyNames, types);
+        return super.onLoad(entity, id, state, propertyNames, types);
 
     }
 
@@ -163,7 +165,7 @@ public class OmeroInterceptor implements Interceptor {
             Object[] currentState, Object[] previousState,
             String[] propertyNames, Type[] types) {
         debug("Intercepted dirty check.");
-        return EMPTY.findDirty(entity, id, currentState, previousState,
+        return super.findDirty(entity, id, currentState, previousState,
                 propertyNames, types);
     }
 
@@ -254,7 +256,7 @@ public class OmeroInterceptor implements Interceptor {
     public void onDelete(Object entity, Serializable id, Object[] state,
             String[] propertyNames, Type[] types) throws CallbackException {
         debug("Intercepted delete.");
-        EMPTY.onDelete(entity, id, state, propertyNames, types);
+        super.onDelete(entity, id, state, propertyNames, types);
     }
 
     // ~ Collections (of interest)
@@ -348,7 +350,7 @@ public class OmeroInterceptor implements Interceptor {
     // =========================================================================
     public void preFlush(Iterator entities) throws CallbackException {
         debug("Intercepted preFlush.");
-        EMPTY.preFlush(entities);
+        super.preFlush(entities);
     }
 
     public void postFlush(Iterator entities) throws CallbackException {
@@ -391,19 +393,20 @@ public class OmeroInterceptor implements Interceptor {
 
     public Object getEntity(String entityName, Serializable id)
             throws CallbackException {
-        return EMPTY.getEntity(entityName, id);
+        return super.getEntity(entityName, id);
     }
 
     public String getEntityName(Object object) throws CallbackException {
-        return EMPTY.getEntityName(object);
+        return super.getEntityName(object);
     }
 
     public Boolean isTransient(Object entity) {
-        return EMPTY.isTransient(entity);
+        return super.isTransient(entity);
     }
 
     public String onPrepareStatement(String sql) {
         // start
+        sql = super.onPrepareStatement(sql);
         if (!log.isDebugEnabled()) {
             return sql;
         }

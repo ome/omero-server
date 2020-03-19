@@ -37,6 +37,7 @@ import ome.model.annotations.TextAnnotation;
 import ome.model.enums.AdminPrivilege;
 import ome.model.enums.EventType;
 import ome.model.internal.Details;
+import ome.model.internal.NamedValue;
 import ome.model.internal.Permissions;
 import ome.model.meta.Experimenter;
 import ome.model.meta.ExperimenterGroup;
@@ -1400,7 +1401,33 @@ public class SessionManagerImpl implements SessionManager, SessionCache.StaleCac
             final Experimenter sudoer = reloaded.getSudoer();
             boolean hasAdminPrivileges = memberOfGroupsIds.contains(roles.getSystemGroupId());
             if (sudoer != null) {
-                hasAdminPrivileges = hasAdminPrivileges && admin.getMemberOfGroupIds(sudoer).contains(roles.getSystemGroupId());
+                final List<Long> leaderOfGroupsIdsSudoer = admin.getLeaderOfGroupIds(sudoer);
+                final List<Long> memberOfGroupsIdsSudoer = admin.getMemberOfGroupIds(sudoer);
+                boolean hasSudoPrivilegeSudoer;
+                if (memberOfGroupsIdsSudoer.contains(roles.getSystemGroupId())) {
+                    hasSudoPrivilegeSudoer = true;
+                    final List<NamedValue> sudoerConfig = sudoer.getConfig();
+                    if (sudoerConfig != null) {
+                        final String sudoPrivilegeConfigName =
+                                adminPrivileges.getConfigNameForPrivilege(adminPrivileges.getPrivilege(AdminPrivilege.VALUE_SUDO));
+                        for (final NamedValue configProperty : sudoerConfig) {
+                            final String configName = configProperty.getName();
+                            final String configValue = configProperty.getValue();
+                            if (sudoPrivilegeConfigName.equals(configName) && !Boolean.parseBoolean(configValue)) {
+                                hasSudoPrivilegeSudoer = false;
+                                break;
+                            }
+                        }
+                    }
+                } else {
+                    hasSudoPrivilegeSudoer = false;
+                    hasAdminPrivileges = false;
+                }
+                if (!hasSudoPrivilegeSudoer) {
+                    /* Reduce group permissions to reflect a group-owner sudo. */
+                    leaderOfGroupsIds.retainAll(leaderOfGroupsIdsSudoer);
+                    memberOfGroupsIds.retainAll(memberOfGroupsIdsSudoer);
+                }
             }
             list.add(exp);
             list.add(grp);

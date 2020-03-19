@@ -9,6 +9,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -21,6 +22,8 @@ import ome.conditions.InternalException;
 import ome.conditions.SecurityViolation;
 import ome.conditions.SessionTimeoutException;
 import ome.model.IObject;
+import ome.model.annotations.Annotation;
+import ome.model.annotations.CommentAnnotation;
 import ome.model.enums.AdminPrivilege;
 import ome.model.enums.EventType;
 import ome.model.internal.Details;
@@ -49,6 +52,7 @@ import ome.services.messages.EventLogMessage;
 import ome.services.messages.EventLogsMessage;
 import ome.services.sessions.SessionContext;
 import ome.services.sessions.SessionManager;
+import ome.services.sessions.SessionManagerImpl;
 import ome.services.sessions.SessionProvider;
 import ome.services.sessions.SessionProviderInMemory;
 import ome.services.sessions.events.UserGroupUpdateEvent;
@@ -61,8 +65,10 @@ import ome.system.Principal;
 import ome.system.Roles;
 import ome.system.ServiceFactory;
 import ome.tools.hibernate.ExtendedMetadata;
+import ome.tools.hibernate.SqlQueryTransformer;
 
 import org.hibernate.HibernateException;
+import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.proxy.HibernateProxy;
 import org.slf4j.Logger;
@@ -74,6 +80,7 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.orm.hibernate3.HibernateCallback;
 import org.springframework.util.Assert;
 
+import com.google.common.base.Splitter;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 
@@ -140,7 +147,7 @@ public class BasicSecuritySystem implements SecuritySystem,
         final OmeroInterceptor oi = new OmeroInterceptor(roles,
                 st, new ExtendedMetadata.Impl(),
                 cd, th, new PerSessionStats(cd),
-                new LightAdminPrivileges(roles), null, new HashSet<String>(), new HashSet<String>());
+                new LightAdminPrivileges(roles), null, new SqlQueryTransformer(), new HashSet<>(), new HashSet<>());
         SecurityFilterHolder holder = new SecurityFilterHolder(
                 cd, new OneGroupSecurityFilter(roles),
                 new AllGroupsSecurityFilter(null, roles),
@@ -347,6 +354,69 @@ public class BasicSecuritySystem implements SecuritySystem,
         return cd.isGraphCritical(details);
     }
 
+    /**
+     * Check the given group context using the database.
+     * @param sessionId a session ID
+     * @param groupId a group ID
+     * @return if the group context is permitted for the given session
+     */
+    private boolean isGroupContextPermittedReadWrite(long sessionId, long groupId) {
+        final LocalQuery query = (LocalQuery) sf.getQueryService();
+        return query.execute(new HibernateCallback<Boolean>() {
+            public Boolean doInHibernate(Session session) {
+                final SQLQuery query = session.createSQLQuery(
+                        "SELECT a.textValue FROM sessionannotationlink l, annotation a " +
+                        "WHERE l.parent = ? AND l.child = a.id AND a.owner_id = ? AND a.ns = ? AND a.discriminator = ?");
+                query.setLong(0, sessionId);
+                query.setLong(1, roles.getRootId());
+                query.setString(2, SessionManagerImpl.GROUP_SUDO_NS);
+                query.setString(3, "/basic/text/comment/");
+                for (final Object permittedGroupIds : query.list()) {
+                    if (!isGroupContextPermitted(groupId, (String) permittedGroupIds)) {
+                        return false;
+                    }
+                }
+                return true;
+            }
+        });
+    }
+
+    /**
+     * Check the given group context using the session provider.
+     * @param sessionId a session ID
+     * @param groupId a group ID
+     * @return if the group context is permitted for the given session
+     */
+    private boolean isGroupContextPermittedReadOnly(long sessionId, long groupId) {
+        final ome.model.meta.Session session = sessionProvider.findSessionById(sessionId, sf);
+        final Iterator<Annotation> sessionAnnotations = session.linkedAnnotationIterator();
+        while (sessionAnnotations.hasNext()) {
+            final Annotation sessionAnnotation = sessionAnnotations.next();
+            if (sessionAnnotation instanceof CommentAnnotation &&
+                    SessionManagerImpl.GROUP_SUDO_NS.equals(sessionAnnotation.getNs()) &&
+                    roles.isRootUser(sessionAnnotation.getDetails().getOwner()) &&
+                    !isGroupContextPermitted(groupId, ((CommentAnnotation) sessionAnnotation).getTextValue())) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * @param groupId a group ID
+     * @param permittedGroupIds a comma-separated string of group IDs
+     * @return if the string of IDs contains the given group
+     */
+    private boolean isGroupContextPermitted(long groupId, String permittedGroupIds) {
+        final String requiredGroupId = Long.toString(groupId);
+        for (final String permittedGroupId : Splitter.on(',').split(permittedGroupIds)) {
+            if (requiredGroupId.equals(permittedGroupId)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public void loadEventContext(boolean isReadOnly) {
         loadEventContext(isReadOnly, false);
     }
@@ -397,6 +467,15 @@ public class BasicSecuritySystem implements SecuritySystem,
         // Refill current details
         cd.checkAndInitialize(ec, admin, store);
         ec = cd.getCurrentEventContext(); // Replace with callContext
+        final long groupId = ec.getCurrentGroupId();
+        final long sessionId = ec.getCurrentSessionId();
+
+        // Check that group context is consistent with any group sudo.
+        if (sessionProvider instanceof SessionProviderInMemory ?
+                !isGroupContextPermittedReadOnly(sessionId, groupId) :
+                !isGroupContextPermittedReadWrite(sessionId, groupId)) {
+            throw new SecurityViolation("Group-sudo session cannot change context!");
+        }
 
         // Experimenter
         Experimenter exp;
@@ -438,7 +517,6 @@ public class BasicSecuritySystem implements SecuritySystem,
         //
         // Joined with public group block (ticket:1940)
         Long shareId = ec.getCurrentShareId();
-        Long groupId = ec.getCurrentGroupId();
         ExperimenterGroup callGroup = null;
         ExperimenterGroup eventGroup = null;
         long eventGroupId;
@@ -474,12 +552,11 @@ public class BasicSecuritySystem implements SecuritySystem,
 
         }
 
-        final Long sessionId = ec.getCurrentSessionId();
-        final ome.model.meta.Session sess;
+        final ome.model.meta.Session session;
         if (isReadOnly) {
-            sess = new ome.model.meta.Session(sessionId, false);
+            session = new ome.model.meta.Session(sessionId, false);
         } else {
-            sess = sessionProvider.findSessionById(sessionId, sf);
+            session = sessionProvider.findSessionById(sessionId, sf);
         }
 
         tokenHolder.setToken(callGroup.getGraphHolder());
@@ -495,7 +572,7 @@ public class BasicSecuritySystem implements SecuritySystem,
         }
         EventType type = new EventType(t);
         tokenHolder.setToken(type.getGraphHolder());
-        Event event = cd.newEvent(sess, type, tokenHolder);
+        final Event event = cd.newEvent(session, type, tokenHolder);
         tokenHolder.setToken(event.getGraphHolder());
 
         // If this event is not read only, then let's save this event to prevent

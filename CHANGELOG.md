@@ -11,6 +11,11 @@
   ([#79](https://github.com/ome/omero-server/pull/79))
 - Display unit test output instead of caching it
   ([#81](https://github.com/ome/omero-server/pull/81))
+- Security vulnerability fixes for
+  [2019-SV2](https://www.openmicroscopy.org/security/advisories/2019-SV2-group-permissions/),
+  [2019-SV3](https://www.openmicroscopy.org/security/advisories/2019-SV3-user-privacy/),
+  [2019-SV5](https://www.openmicroscopy.org/security/advisories/2019-SV5-bypass-filters/) and
+  [2019-SV6](https://www.openmicroscopy.org/security/advisories/2019-SV6-group-owner-context/)
 - Bump omero-renderer version to 5.5.5
 - Bump omero-common-test version to 5.5.5
 

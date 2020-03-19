@@ -37,6 +37,7 @@ import java.util.TreeSet;
 import ome.system.EventContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.apache.commons.beanutils.PropertyUtils;
 import org.hibernate.Hibernate;
 import org.hibernate.Query;
 import org.hibernate.QueryException;
@@ -47,15 +48,19 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Objects;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import com.google.common.collect.SetMultimap;
 import com.google.common.collect.Sets;
 
 import ome.model.IObject;
 import ome.model.core.OriginalFile;
+import ome.model.internal.NamedValue;
 import ome.model.internal.Permissions;
 import ome.model.meta.Experimenter;
 import ome.model.meta.ExperimenterGroup;
+import ome.model.meta.GroupExperimenterMap;
 import ome.security.ACLVoter;
 import ome.security.basic.LightAdminPrivileges;
 import ome.services.graphs.GraphPathBean.PropertyKind;
@@ -187,7 +192,7 @@ public class GraphTraversal {
         IObject toIObject() throws GraphException {
             try {
                 final Class<? extends IObject> actualClass = (Class<? extends IObject>) Class.forName(className);
-                return actualClass.getConstructor(Long.class, boolean.class).newInstance(id, false);
+                return actualClass.getConstructor(Long.class, boolean.class).newInstance(id, true);
             } catch (IllegalArgumentException | ReflectiveOperationException | SecurityException e) {
                 throw new GraphException(
                         "no invocable constructor for: new " + className + "(Long.valueOf(" + id + "L), false)");
@@ -393,6 +398,7 @@ public class GraphTraversal {
         final Map<CI, Set<CI>> blockedBy = new HashMap<CI, Set<CI>>();
         /* permissions, unused for system users */
         final Map<CI, ome.model.internal.Details> detailsNoted = new HashMap<CI, ome.model.internal.Details>();
+        final Map<Long, ExperimenterGroup> fakeGroups = new HashMap<>();
         final Set<CI> mayUpdate = new HashSet<CI>();
         final Set<CI> mayDelete = new HashSet<CI>();
         final Set<CI> mayChmod = new HashSet<CI>();
@@ -710,21 +716,52 @@ public class GraphTraversal {
                 file.setMimetype((String) result[0]);
                 file.setRepo((String) result[1]);
                 objectInstance = file;
+                /* Without a properly loaded OriginalFile we should bypass the BinaryAccessPolicy.isRestricted checks. */
+                final ExperimenterGroup objectGroup = objectDetails.getGroup();
+                ExperimenterGroup objectGroupFake = planning.fakeGroups.get(objectGroup.getId());
+                if (objectGroupFake == null) {
+                    /* Prepare the property values for a copy of the file's group ... */
+                    final NamedValue nv = new NamedValue("omero.policy.binary_access", "-write");
+                    final Iterator<GroupExperimenterMap> membershipIterator = objectGroup.iterateGroupExperimenterMap();
+                    /* ... then use them in constructing the copy. */
+                    objectGroupFake = new ExperimenterGroup(objectGroup.getId(), true);
+                    objectGroupFake.putAt(ExperimenterGroup.CONFIG, Lists.newArrayList(nv));
+                    objectGroupFake.putAt(ExperimenterGroup.DETAILS, objectGroup.getDetails());
+                    objectGroupFake.putAt(ExperimenterGroup.GROUPEXPERIMENTERMAP, ImmutableSet.copyOf(membershipIterator));
+                    objectGroupFake.putAt(ExperimenterGroup.NAME, objectGroup.getName());
+                    planning.fakeGroups.put(objectGroup.getId(), objectGroupFake);
+                }
+                objectDetails.setGroup(objectGroupFake);
             }
 
             /* allowLoad ensures that BasicEventContext.groupPermissionsMap is populated */
             aclVoter.allowLoad(session, objectInstance.getClass(), objectDetails, object.id);
 
-            if (aclVoter.allowUpdate(objectInstance, objectDetails)) {
+            /* get the proper permissions context for the skeleton model object */
+            Permissions permissions;
+            try {
+                final ome.model.internal.Details details =
+                        (ome.model.internal.Details) PropertyUtils.getProperty(objectInstance, "details");
+                details.setOwner(objectDetails.getOwner());
+                details.setGroup(objectDetails.getGroup());
+                details.setPermissions(objectDetails.getPermissions());
+                aclVoter.postProcess(objectInstance);
+                permissions = objectInstance.getDetails().getPermissions();
+            } catch (ReflectiveOperationException roe) {
+                log.warn("failed to get details of " + object, roe);
+                permissions = objectDetails.getPermissions();
+            }
+
+            if (!permissions.isDisallowEdit()) {
                 planning.mayUpdate.add(object);
             }
-            if (aclVoter.allowDelete(objectInstance, objectDetails)) {
+            if (!permissions.isDisallowDelete()) {
                 planning.mayDelete.add(object);
             }
-            if (!objectDetails.getPermissions().isDisallowChgrp()) {
+            if (!permissions.isDisallowChgrp()) {
                 planning.mayChgrp.add(object);
             }
-            if (!objectDetails.getPermissions().isDisallowChown()) {
+            if (!permissions.isDisallowChown()) {
                 planning.mayChown.add(object);
             }
             if (objectInstance instanceof ExperimenterGroup) {

@@ -97,6 +97,7 @@
     <constructor-arg ref="delegatingStats"/>
     <constructor-arg ref="adminPrivileges"/>
     <constructor-arg ref="simpleSqlAction"/>
+    <constructor-arg ref="sqlQueryTransformer"/>
     <constructor-arg ref="managedRepoUuids"/>
     <constructor-arg ref="scriptRepoUuids"/>
   </bean>

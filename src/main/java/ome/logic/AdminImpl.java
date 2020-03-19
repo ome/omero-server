@@ -443,7 +443,12 @@ public class AdminImpl extends AbstractLevel2Service implements LocalAdmin,
     public void updateSelf(@NotNull
     Experimenter e) {
         EventContext ec = getSecuritySystem().getEventContext();
-        final Experimenter self = getExperimenter(ec.getCurrentUserId());
+        final Long userId = ec.getCurrentUserId();
+        final Long sudoerId = ec.getCurrentSudoerId();
+        final Experimenter self = getExperimenter(userId);
+        if (!(sudoerId == null || sudoerId.equals(userId))) {
+            adminOfUser(self);
+        }
         self.setFirstName(e.getFirstName());
         self.setMiddleName(e.getMiddleName());
         self.setLastName(e.getLastName());
@@ -528,7 +533,7 @@ public class AdminImpl extends AbstractLevel2Service implements LocalAdmin,
     Experimenter experimenter) {
 
         try {
-            adminOrPiOfUser(experimenter);
+            adminOfUser(experimenter);
             String name = experimenter.getOmeName();
             copyAndSaveExperimenter(experimenter);
             getBeanHelper().getLogger().info("Updated user info for " + name);
@@ -551,7 +556,7 @@ public class AdminImpl extends AbstractLevel2Service implements LocalAdmin,
     @Transactional(readOnly = false)
     public void updateExperimenterWithPassword(@NotNull final
     Experimenter experimenter, final String password) {
-        adminOrPiOfUser(experimenter);
+        adminOfUser(experimenter);
         copyAndSaveExperimenter(experimenter);
         final Experimenter orig = userProxy(experimenter.getId());
         String name = orig.getOmeName();
@@ -693,7 +698,7 @@ public class AdminImpl extends AbstractLevel2Service implements LocalAdmin,
 
         long uid = roleProvider.createExperimenter(experimenter, defaultGroup, otherGroups);
         // If this method passes, then the Experimenter is valid.
-        changeUserPassword(experimenter.getOmeName(), " ");
+        changeUserPassword(experimenter.getOmeName(), " ", true);
 
         assertNoPrivilegeElevation(new Experimenter(uid, false), Collections.<AdminPrivilege>emptySet());
 
@@ -714,7 +719,7 @@ public class AdminImpl extends AbstractLevel2Service implements LocalAdmin,
         long uid = roleProvider.createExperimenter(experimenter,
                         defaultGroup, otherGroups);
         // If this method passes, then the Experimenter is valid.
-        changeUserPassword(experimenter.getOmeName(), password);
+        changeUserPassword(experimenter.getOmeName(), password, true);
 
         assertNoPrivilegeElevation(new Experimenter(uid, false), Collections.<AdminPrivilege>emptySet());
 
@@ -951,7 +956,7 @@ public class AdminImpl extends AbstractLevel2Service implements LocalAdmin,
     @Transactional(readOnly = false)
     public void deleteExperimenter(Experimenter user) {
 
-        adminOrPiOfUser(user);
+        adminOfUser(user);
 
         final Experimenter e = userProxy(user.getId());
         int count = sql.removePassword(e.getId());
@@ -1253,8 +1258,16 @@ public class AdminImpl extends AbstractLevel2Service implements LocalAdmin,
     @RolesAllowed({"user", "HasPassword"})
     @Transactional(readOnly = false)
     public void changeUserPassword(final String user, final String newPassword) {
+        changeUserPassword(user, newPassword, false);
+    }
+
+    private void changeUserPassword(final String user, final String newPassword, boolean isNewUser) {
         final Experimenter targetUser = userProxy(user);
-        adminOrPiOfUser(targetUser);
+        if (isNewUser) {
+            adminOrPiOfUser(targetUser);
+        } else {
+            adminOfUser(targetUser);
+        }
         final Set<AdminPrivilege> myPrivileges = getCurrentAdminPrivilegesForSession();
         for (final AdminPrivilege targetPrivilege : getAdminPrivileges(targetUser)) {
             if (!myPrivileges.contains(targetPrivilege)) {
@@ -1567,10 +1580,22 @@ public class AdminImpl extends AbstractLevel2Service implements LocalAdmin,
         return piOf.contains(group.getId());
     }
 
+    private void throwNonAdmin() {
+        final String msg = "Current user is not admin for the given user(s)";
+        throw new SecurityViolation(msg);
+    }
+
     private void throwNonAdminOrPi() {
         String msg = "Current user is neither admin nor group-leader for " +
             "the given user(s)/group(s)";
         throw new SecurityViolation(msg);
+    }
+
+    private void adminOfUser(Experimenter user) {
+        if (!(isAdmin() && getCurrentAdminPrivilegesForSession().contains(
+                adminPrivileges.getPrivilege(AdminPrivilege.VALUE_MODIFY_USER)))) {
+            throwNonAdmin();
+        }
     }
 
     private void adminOrPiOfUser(Experimenter user) {

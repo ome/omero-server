@@ -75,6 +75,17 @@
     <constructor-arg ref="roles"/>
   </bean>
 
+  <bean id="initPropertyFilters" class="ome.security.basic.PropertyFilterInitializer">
+    <constructor-arg ref="adminPrivileges"/>
+    <constructor-arg ref="currentDetails"/>
+    <constructor-arg ref="dataSource"/>
+    <constructor-arg ref="roles"/>
+  </bean>
+
+  <bean id="sqlQueryTransformer" class="ome.tools.hibernate.SqlQueryTransformer" depends-on="initPropertyFilters">
+    <constructor-arg ref="dataSource"/>
+  </bean>
+
   <alias name="${omero.security.chmod_strategy}" alias="chmodStrategy"/>
 
   <bean id="groupChmodStrategy" class="ome.security.basic.GroupChmodStrategy">
@@ -200,6 +211,7 @@
           <constructor-arg ref="roles"/>
           <constructor-arg ref="nodeProvider"/>
           <constructor-arg ref="executor"/>
+          <constructor-arg ref="sqlActionWrapper"/>
         </bean>
         <bean class="ome.services.sessions.SessionProviderInMemory">
           <constructor-arg ref="roles"/>
@@ -218,6 +230,7 @@
       <list>
         <bean class="ome.services.sessions.SessionProviderInDb">
           <constructor-arg ref="roles"/>
+          <constructor-arg><null/></constructor-arg>
           <constructor-arg><null/></constructor-arg>
           <constructor-arg><null/></constructor-arg>
         </bean>

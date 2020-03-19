@@ -53,10 +53,13 @@ public class SessionProviderInDb implements SessionProvider, ReadOnlyStatus.IsAw
 
     private final Executor executor;
 
-    public SessionProviderInDb(Roles roles, NodeProvider nodeProvider, Executor executor) {
+    private final SqlAction sqlAction;
+
+    public SessionProviderInDb(Roles roles, NodeProvider nodeProvider, Executor executor, SqlAction sqlAction) {
         this.roles = roles;
         this.nodeProvider = nodeProvider;
         this.executor = executor;
+        this.sqlAction = sqlAction;
     }
 
     // Executor methods
@@ -76,7 +79,11 @@ public class SessionProviderInDb implements SessionProvider, ReadOnlyStatus.IsAw
         } else {
             session.setSudoer(new Experimenter(sudoerId, false));
         }
+        final String userIP = session.getUserIP();  // saving "session" unloads it
         Session rv = sf.getUpdateService().saveAndReturnObject(session);
+        if (userIP != null) {
+            sqlAction.updateSessionUserIP(rv.getId(), userIP);
+        }
         rv.putAt("#2733", session.retrieve("#2733"));
         return rv;
     }

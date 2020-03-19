@@ -72,9 +72,9 @@
   </bean>
 
   <!-- used by session factory -->
-  <bean id="org.hibernate.EmptyInterceptor.INSTANCE"
-    class="org.springframework.beans.factory.config.FieldRetrievingFactoryBean"/>
-  <alias name="org.hibernate.EmptyInterceptor.INSTANCE" alias="omeroInterceptor"/>
+  <bean id="omeroInterceptor" class="ome.security.basic.SqlQueryInterceptor">
+    <constructor-arg ref="sqlQueryTransformer"/>
+  </bean>
 
   <bean id="oneGroupSecurityFilter" class="ome.security.basic.OneGroupSecurityFilter">
     <property name="defaultFilterCondition" value="true"/>
