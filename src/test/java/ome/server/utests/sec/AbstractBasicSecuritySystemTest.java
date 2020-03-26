@@ -253,14 +253,16 @@ public abstract class AbstractBasicSecuritySystemTest extends
     }
 
     protected void doReadOnly(boolean readOnly) {
-        sf.mockAdmin.expects(once()).method("groupProxy").will(
+        sf.mockAdmin.expects(atMostOnce()).method("groupProxy").will(
                 returnValue(group));
+        sf.mockQuery.expects(atMostOnce()).method("execute").will(
+                returnValue(true));
         if (!readOnly) {
-            sf.mockQuery.expects(once()).method("findByQuery").will(
+            sf.mockQuery.expects(atMostOnce()).method("findByQuery").will(
                     returnValue(event.getSession()));
-            sf.mockQuery.expects(once()).method("find").will(
+            sf.mockQuery.expects(atMostOnce()).method("find").will(
                     returnValue(event.getSession()));
-            sf.mockAdmin.expects(once()).method("userProxy").will(
+            sf.mockAdmin.expects(atMostOnce()).method("userProxy").will(
                     returnValue(user));
             sf.mockUpdate.expects(once()).method("saveAndReturnObject").will(
                     returnValue(event));
