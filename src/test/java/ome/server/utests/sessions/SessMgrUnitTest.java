@@ -44,6 +44,7 @@ import ome.system.OmeroContext;
 import ome.system.Principal;
 import ome.system.Roles;
 import ome.testing.MockServiceFactory;
+import ome.util.SqlAction;
 
 import org.jmock.Mock;
 import org.jmock.MockObjectTestCase;
@@ -139,6 +140,10 @@ public class SessMgrUnitTest extends MockObjectTestCase {
         final Executor executor = new DummyExecutor(s, sf);
         final NodeProvider nodeProvider = new NodeProviderInDb("", executor);
 
+        final Mock mockSqlAction = mock(SqlAction.class);
+        mockSqlAction.expects(once()).method("updateSessionUserIP").will(returnValue(1));
+        final SqlAction sqlAction = (SqlAction) mockSqlAction.proxy();
+
         mgr = new TestManager();
         mgr.setCounterFactory(new CounterFactory());
         mgr.setRoles(roles);
@@ -150,7 +155,7 @@ public class SessMgrUnitTest extends MockObjectTestCase {
         mgr.setDefaultTimeToLive(TTL);
         mgr.setMaxUserTimeToIdle(maxUserTTI);
         mgr.setMaxUserTimeToLive(maxUserTTL);
-        mgr.setSessionProvider(new SessionProviderInDb(roles, nodeProvider, executor));
+        mgr.setSessionProvider(new SessionProviderInDb(roles, nodeProvider, executor, sqlAction));
 
         session = mgr.doDefine();
         session.setId(1L);
