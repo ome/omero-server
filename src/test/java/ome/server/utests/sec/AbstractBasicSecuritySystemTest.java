@@ -257,13 +257,14 @@ public abstract class AbstractBasicSecuritySystemTest extends
                 returnValue(group));
         sf.mockQuery.expects(atMostOnce()).method("execute").will(
                 returnValue(true));
+        sf.mockQuery.expects(atMostOnce()).method("findByQuery").will(
+                returnValue(event.getSession()));
+        sf.mockQuery.expects(atMostOnce()).method("find").will(
+                returnValue(event.getSession()));
+        sf.mockAdmin.expects(atMostOnce()).method("userProxy").will(
+                returnValue(user));
+
         if (!readOnly) {
-            sf.mockQuery.expects(atMostOnce()).method("findByQuery").will(
-                    returnValue(event.getSession()));
-            sf.mockQuery.expects(atMostOnce()).method("find").will(
-                    returnValue(event.getSession()));
-            sf.mockAdmin.expects(atMostOnce()).method("userProxy").will(
-                    returnValue(user));
             sf.mockUpdate.expects(once()).method("saveAndReturnObject").will(
                     returnValue(event));
         }
