@@ -1,5 +1,5 @@
 /*
- *   Copyright 2006-2018 University of Dundee. All rights reserved.
+ *   Copyright 2006-2020 University of Dundee. All rights reserved.
  *   Use is subject to license terms supplied in LICENSE.txt
  */
 
@@ -46,6 +46,7 @@ import ome.system.Principal;
 import ome.system.Roles;
 import ome.testing.MockServiceFactory;
 import ome.tools.hibernate.ExtendedMetadata;
+import ome.tools.hibernate.SqlQueryTransformer;
 
 import org.jmock.Mock;
 import org.jmock.MockObjectTestCase;
@@ -115,11 +116,11 @@ public abstract class AbstractBasicSecuritySystemTest extends
             }
         };
         final Executor executor = new DummyExecutor(null, sf);
-        final SessionProvider sessionProvider = new SessionProviderInDb(roles, new NodeProviderInDb("", executor), executor);
+        final SessionProvider sessionProvider = new SessionProviderInDb(roles, new NodeProviderInDb("", executor), executor, null);
         OmeroInterceptor oi = new OmeroInterceptor(roles,
                 st, new ExtendedMetadata.Impl(),
                 cd, th, new NullSessionStats(),
-                mockAdminPrivileges, null, new HashSet<String>(), new HashSet<String>());
+                mockAdminPrivileges, null, new SqlQueryTransformer(), new HashSet<String>(), new HashSet<String>());
         SecurityFilter filter = new OneGroupSecurityFilter();
         sec = new BasicSecuritySystem(oi, st, cd, mgr, sessionProvider, new EventProviderInDb(sf), roles, sf,
                 th, Collections.singletonList(filter), new DefaultPolicyService(), aclVoter);
@@ -252,14 +253,16 @@ public abstract class AbstractBasicSecuritySystemTest extends
     }
 
     protected void doReadOnly(boolean readOnly) {
-        sf.mockAdmin.expects(once()).method("groupProxy").will(
+        sf.mockAdmin.expects(atMostOnce()).method("groupProxy").will(
                 returnValue(group));
+        sf.mockQuery.expects(atMostOnce()).method("execute").will(
+                returnValue(true));
         if (!readOnly) {
-            sf.mockQuery.expects(once()).method("findByQuery").will(
+            sf.mockQuery.expects(atMostOnce()).method("findByQuery").will(
                     returnValue(event.getSession()));
-            sf.mockQuery.expects(once()).method("find").will(
+            sf.mockQuery.expects(atMostOnce()).method("find").will(
                     returnValue(event.getSession()));
-            sf.mockAdmin.expects(once()).method("userProxy").will(
+            sf.mockAdmin.expects(atMostOnce()).method("userProxy").will(
                     returnValue(user));
             sf.mockUpdate.expects(once()).method("saveAndReturnObject").will(
                     returnValue(event));

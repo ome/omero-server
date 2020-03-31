@@ -347,7 +347,7 @@ public class SecuritySystemTest extends AbstractBasicSecuritySystemTest {
     }
 
     @Test
-    public void testDisblingSubSystems() throws Exception {
+    public void testDisablingSubSystems() throws Exception {
         prepareMocksWithUserDetails(false);
         sec.loadEventContext(false);
         assertFalse(sec.isDisabled("foo"));

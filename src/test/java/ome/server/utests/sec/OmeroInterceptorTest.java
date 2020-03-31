@@ -1,5 +1,5 @@
 /*
- *   Copyright 2006-2016 University of Dundee. All rights reserved.
+ *   Copyright 2006-2020 University of Dundee. All rights reserved.
  *   Use is subject to license terms supplied in LICENSE.txt
  */
 package ome.server.utests.sec;
@@ -16,6 +16,7 @@ import ome.services.sessions.SessionManager;
 import ome.services.sessions.stats.NullSessionStats;
 import ome.system.Roles;
 import ome.testing.MockServiceFactory;
+import ome.tools.hibernate.SqlQueryTransformer;
 
 import org.jmock.MockObjectTestCase;
 import org.testng.annotations.BeforeMethod;
@@ -36,7 +37,7 @@ public class OmeroInterceptorTest extends MockObjectTestCase {
         TokenHolder tokenHolder = new TokenHolder();
         final Roles roles = new Roles();
         oi = new OmeroInterceptor(roles, new SystemTypes(), null, null, tokenHolder, new NullSessionStats(),
-                new LightAdminPrivileges(roles), null, new HashSet<String>(), new HashSet<String>());
+                new LightAdminPrivileges(roles), null, new SqlQueryTransformer(), new HashSet<String>(), new HashSet<String>());
     }
 
     // ~ TESTS
