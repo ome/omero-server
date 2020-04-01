@@ -41,7 +41,10 @@ import com.google.common.collect.ImmutableMap;
  * light administrator's privileges.
  * @author m.t.b.carroll@dundee.ac.uk
  * @since 5.4.0
+ * @deprecated because the 2019-SV5 fix addresses {@link ome.model.meta.Session}
+ * privacy no less than this, see {@link ome.util.PrivilegedStringType}
  */
+@Deprecated
 public class LightAdminPrivilegesSecurityFilter extends AbstractSecurityFilter {
 
     private static final ImmutableMap<String, String> PARAMETER_TYPES =
