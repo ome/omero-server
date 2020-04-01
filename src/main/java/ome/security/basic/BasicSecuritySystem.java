@@ -37,6 +37,7 @@ import ome.model.meta.EventLog;
 import ome.model.meta.Experimenter;
 import ome.model.meta.ExperimenterGroup;
 import ome.model.meta.GroupExperimenterMap;
+import ome.model.meta.Share;
 import ome.parameters.Parameters;
 import ome.security.ACLVoter;
 import ome.security.AdminAction;
@@ -448,6 +449,7 @@ public class BasicSecuritySystem implements SecuritySystem,
         }
 
         // Ensure that sudoer has name loaded for SimpleEventContext.copy
+        final boolean isShare;
         if (ec instanceof SessionContext) {
             final ome.model.meta.Session session = ((SessionContext) ec).getSession();
             Experimenter sudoer = session.getSudoer();
@@ -462,6 +464,9 @@ public class BasicSecuritySystem implements SecuritySystem,
                 sudoer.setOmeName(sudoerName);
                 session.setSudoer(sudoer);
             }
+            isShare = session instanceof Share;
+        } else {
+            isShare = false;
         }
 
         // Refill current details
@@ -553,7 +558,8 @@ public class BasicSecuritySystem implements SecuritySystem,
         }
 
         final ome.model.meta.Session session;
-        if (isReadOnly) {
+        if (isShare) {
+            /* Cannot read annotations on session. */
             session = new ome.model.meta.Session(sessionId, false);
         } else {
             session = sessionProvider.findSessionById(sessionId, sf);
