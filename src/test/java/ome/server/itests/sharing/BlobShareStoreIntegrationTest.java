@@ -22,6 +22,7 @@ import ome.server.itests.AbstractManagedContextTest;
 import org.hibernate.Session;
 import org.springframework.orm.hibernate3.HibernateTemplate;
 import org.springframework.transaction.annotation.Transactional;
+import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -64,8 +65,8 @@ public class BlobShareStoreIntegrationTest extends AbstractManagedContextTest {
                         Arrays.asList(1L, 2L), Arrays.asList("example@example.com"),
                         true);
                 ShareData data = store.get(2L);
-                assertEquals(2L, data.id);
-                assertEquals("example@example.com", data.guests.get(0));
+                Assert.assertEquals(2L, data.id);
+                Assert.assertEquals("example@example.com", data.guests.get(0));
                 return null;
             }
         });

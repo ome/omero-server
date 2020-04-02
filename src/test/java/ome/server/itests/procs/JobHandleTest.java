@@ -9,7 +9,6 @@ import java.lang.reflect.Field;
 import java.sql.Timestamp;
 import java.util.UUID;
 
-import junit.framework.TestCase;
 import ome.api.IQuery;
 import ome.api.JobHandle;
 import ome.conditions.SecurityViolation;
@@ -32,6 +31,7 @@ import org.hibernate.Session;
 import org.quartz.JobDetail;
 import org.quartz.Scheduler;
 import org.springframework.transaction.annotation.Transactional;
+import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -41,17 +41,15 @@ import org.testng.annotations.Test;
  * @since 3.0-Beta3
  */
 @Test(groups = { "jobs", "integration", "broken" })
-public class JobHandleTest extends TestCase {
+public class JobHandleTest {
 
     protected ManagedContextFixture fixture;
     protected long id;
     protected JobHandle jh;
     protected PManager mgr;
 
-    @Override
     @BeforeMethod
     protected void setUp() throws Exception {
-        super.setUp();
         fixture = new ManagedContextFixture();
         mgr = new PManager(new P(fixture.internalSf.getQueryService()),
                 fixture.mgr, fixture.security, fixture.ex);
@@ -67,13 +65,6 @@ public class JobHandleTest extends TestCase {
         sched.addJob(manual, true);
     }
 
-    @Override
-    @AfterMethod
-    protected void tearDown() throws Exception {
-        super.tearDown();
-
-    }
-
     @Test
     public void testJobIsSavedToDatabase() throws Exception {
         ScriptJob job = new ScriptJob();
@@ -81,7 +72,7 @@ public class JobHandleTest extends TestCase {
         job.setMessage(uuid);
         jh = fixture.managedSf.createJobHandle();
         id = jh.submit(job);
-        assertTrue(id > 0L);
+        Assert.assertTrue(id > 0L);
     }
 
     @Test(expectedExceptions = SecurityViolation.class)
@@ -102,14 +93,14 @@ public class JobHandleTest extends TestCase {
         testJobIsSavedToDatabase();
         JobHandle attach = fixture.managedSf.createJobHandle();
         JobStatus status = attach.attach(id);
-        assertTrue(status != null && status.getValue() != null);
+        Assert.assertTrue(status != null && status.getValue() != null);
     }
 
     @Test
     public void testUserCanRetrieveJob() throws Exception {
         testJobIsSavedToDatabase();
         Job job = jh.getJob();
-        assertTrue(job != null && job.isLoaded());
+        Assert.assertTrue(job != null && job.isLoaded());
     }
 
     @Test
@@ -129,57 +120,57 @@ public class JobHandleTest extends TestCase {
 
         fixture.setCurrentUser(user1);
         JobStatus cancelled = attach1.jobStatus();
-        assertEquals(JobHandle.CANCELLED, cancelled.getValue());
+        Assert.assertEquals(JobHandle.CANCELLED, cancelled.getValue());
     }
 
     @Test
     public void testProcessManagerIsNotified() throws Exception {
         testJobIsSavedToDatabase();
         Thread.sleep(1000L);
-        assertTrue(mgr.called);
+        Assert.assertTrue(mgr.called);
     }
 
     @Test
     public void testJobSwitchedToWaitingIfNoProcessorTakesIt() throws Exception {
         testJobIsSavedToDatabase();
         mgr.run();
-        assertEquals(JobHandle.WAITING, jh.jobStatus().getValue());
+        Assert.assertEquals(JobHandle.WAITING, jh.jobStatus().getValue());
     }
 
     @Test
     public void testPassiviationWorksProperly() throws Exception {
-        fail("NYI");
+        Assert.fail("NYI");
     }
 
     @Test
     public void testCancelJobWorks() throws Exception {
-        fail("NYI");
+        Assert.fail("NYI");
     }
 
     @Test
     public void testProcessCancelsJobWorks() throws Exception {
-        fail("NYI");
+        Assert.fail("NYI");
     }
 
     @Test
     public void testServiceNotifiedOfServiceCompletionByProcess()
             throws Exception {
-        fail("NYI");
+        Assert.fail("NYI");
     }
 
     @Test
     public void testUserForgetsToUploadScript() throws Exception {
-        fail("NYI");
+        Assert.fail("NYI");
     }
 
     @Test
     public void testCheckAndRegisterNoticesFinishedProcesses() throws Exception {
-        fail("NYI");
+        Assert.fail("NYI");
     }
 
     @Test
     public void testJobRetrievalCanBeSpecifiedViaQuery() throws Exception {
-        fail("NYI");
+        Assert.fail("NYI");
         // Job job = iQuery.findByQuery("job.query."+job.getClass(),idParams);
     }
 

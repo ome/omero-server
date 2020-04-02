@@ -10,6 +10,7 @@ import java.util.Date;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import ome.model.containers.Project;
@@ -59,7 +60,7 @@ public class EventStateChangeTest extends AbstractManagedContextTest {
         p.setName(p.getName() + " updated.");
         p = this.iUpdate.saveAndReturnObject(p);
         Experimenter e2 = getExperimenter(expName);
-        assertTrue(expVersion.equals(e2.getVersion()));
+        Assert.assertTrue(expVersion.equals(e2.getVersion()));
     }
 
     // ~ Helpers

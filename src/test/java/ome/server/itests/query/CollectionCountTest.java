@@ -12,6 +12,7 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import ome.conditions.ApiUsageException;
@@ -33,7 +34,7 @@ public class CollectionCountTest extends AbstractManagedContextTest {
             q = new CollectionCountQueryDefinition( // TODO if use lookup, more
                                                     // generic
                     parameters);
-            fail("Should have failed!");
+            Assert.fail("Should have failed!");
         } catch (IllegalArgumentException e) {
         } catch (ApiUsageException e) {
         }

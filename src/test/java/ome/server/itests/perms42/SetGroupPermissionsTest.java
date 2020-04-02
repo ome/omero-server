@@ -11,6 +11,7 @@ import ome.model.core.Image;
 import ome.model.internal.Permissions;
 import ome.model.meta.ExperimenterGroup;
 
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
 /**
@@ -32,7 +33,7 @@ public class SetGroupPermissionsTest extends PermissionsTest {
         long gid = iAdmin.createGroup(privateGroup);
         privateGroup = iAdmin.getGroup(gid);
         Permissions perms = privateGroup.getDetails().getPermissions();
-        assertTrue(perms + "", Permissions.USER_PRIVATE.identical(perms));
+        Assert.assertTrue(Permissions.USER_PRIVATE.identical(perms), perms + "");
     }
 
     @Test
@@ -93,14 +94,14 @@ public class SetGroupPermissionsTest extends PermissionsTest {
         assertPublic(image);
         assertPublic(fixture.group());
         iAdmin.changePermissions(fixture.group(), Permissions.USER_PRIVATE);
-        fail("NYI");
+        Assert.fail("NYI");
         assertPrivate(image);
         assertPrivate(fixture.group());
     }
 
     @Test
     public void testEventLogExistsOfGroupChange() throws Exception {
-        fail();
+        Assert.fail();
     }
 
 
@@ -120,7 +121,7 @@ public class SetGroupPermissionsTest extends PermissionsTest {
             ExperimenterGroup g = fixture.group();
             g.getDetails().setPermissions(Permissions.PUBLIC);
             g = iUpdate.saveAndReturnObject(g);
-            fail("ticket:1434");
+            Assert.fail("ticket:1434");
         } catch (SecurityViolation sv) {
             // good
         }
@@ -132,7 +133,7 @@ public class SetGroupPermissionsTest extends PermissionsTest {
 
     @Test
     public void testLoweringPermissionsDoesntBreakConsistency() throws Exception {
-        fail();
+        Assert.fail();
     }
 
     @Test
@@ -150,11 +151,11 @@ public class SetGroupPermissionsTest extends PermissionsTest {
             
         //  update name of group1
         ExperimenterGroup gr1 = iAdmin.getGroup(g1_id);
-        assertEquals("rwrw--", gr1.getDetails().getPermissions().toString());
+        Assert.assertEquals("rwrw--", gr1.getDetails().getPermissions().toString());
         String new_name = "changed_name_group1_" + uuid;
         gr1.setName(new_name);
         iAdmin.updateGroup(gr1);
         ExperimenterGroup gr1_u = iAdmin.getGroup(g1_id);
-        assertEquals(new_name, gr1_u.getName());
+        Assert.assertEquals(new_name, gr1_u.getName());
     }
 }

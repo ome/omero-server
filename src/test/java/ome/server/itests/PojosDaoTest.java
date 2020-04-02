@@ -10,7 +10,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import junit.framework.TestCase;
 import ome.api.IQuery;
 import ome.model.containers.Dataset;
 import ome.model.containers.Project;
@@ -36,7 +35,7 @@ import org.testng.annotations.Test;
 // FIXME
 //TODO rename "PojosQuerySourceTest"
 @Test(groups = "integration")
-public class PojosDaoTest extends TestCase {
+public class PojosDaoTest {
 
     private static Logger log = LoggerFactory.getLogger(PojosDaoTest.class);
 

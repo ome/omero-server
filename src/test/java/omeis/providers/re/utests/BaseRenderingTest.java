@@ -25,9 +25,8 @@ import ome.model.stats.StatsInfo;
 import omeis.providers.re.Renderer;
 import omeis.providers.re.lut.LutProvider;
 import omeis.providers.re.quantum.QuantumFactory;
-import junit.framework.TestCase;
 
-public class BaseRenderingTest extends TestCase
+public class BaseRenderingTest
 {
 	protected Renderer renderer;
 	
@@ -54,8 +53,7 @@ public class BaseRenderingTest extends TestCase
 	public static final int RUN_COUNT = 10;
 	
 	// Configurables
-	
-	@Override
+
 	@BeforeClass
 	protected void setUp()
 	{

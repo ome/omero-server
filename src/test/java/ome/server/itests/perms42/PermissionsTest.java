@@ -6,6 +6,7 @@
  */
 package ome.server.itests.perms42;
 
+import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.Test;
 
@@ -158,37 +159,37 @@ public class PermissionsTest extends AbstractManagedContextTest {
     protected void assertPrivate(IObject obj) {
         obj = lookup(obj);
         Permissions p = obj.getDetails().getPermissions();
-        assertTrue(obj + " is " + p + " !!", p.isGranted(Role.USER, Right.READ));
-        assertFalse(obj + " is " + p + " !!", p.isGranted(Role.GROUP, Right.READ));
-        assertFalse(obj + " is " + p + " !!", p.isGranted(Role.WORLD, Right.READ));
+        Assert.assertTrue(p.isGranted(Role.USER, Right.READ), obj + " is " + p + " !!");
+        Assert.assertFalse(p.isGranted(Role.GROUP, Right.READ), obj + " is " + p + " !!");
+        Assert.assertFalse(p.isGranted(Role.WORLD, Right.READ), obj + " is " + p + " !!");
     }
 
     protected void assertShared(IObject obj) {
         obj = lookup(obj);
         Permissions p = obj.getDetails().getPermissions();
-        assertTrue(obj + " is " + p + " !!", p.isGranted(Role.USER, Right.READ));
-        assertTrue(obj + " is " + p + " !!", p.isGranted(Role.GROUP, Right.READ));
-        assertFalse(obj + " is " + p + " !!", p.isGranted(Role.WORLD, Right.READ));
+        Assert.assertTrue(p.isGranted(Role.USER, Right.READ), obj + " is " + p + " !!");
+        Assert.assertTrue(p.isGranted(Role.GROUP, Right.READ), obj + " is " + p + " !!");
+        Assert.assertFalse(p.isGranted(Role.WORLD, Right.READ), obj + " is " + p + " !!");
     }
 
     protected void assertSharedAndWritable(IObject obj) {
         obj = lookup(obj);
         Permissions p = obj.getDetails().getPermissions();
-        assertTrue(obj + " is " + p + " !!", p.isGranted(Role.USER, Right.READ));
-        assertTrue(obj + " is " + p + " !!", p.isGranted(Role.GROUP, Right.READ));
-        assertFalse(obj + " is " + p + " !!", p.isGranted(Role.WORLD, Right.READ));
-        assertTrue(obj + " is " + p + " !!", p.isGranted(Role.USER, Right.WRITE));
-        assertTrue(obj + " is " + p + " !!", p.isGranted(Role.GROUP, Right.WRITE));
-        assertFalse(obj + " is " + p + " !!", p.isGranted(Role.WORLD, Right.WRITE));
+        Assert.assertTrue(p.isGranted(Role.USER, Right.READ), obj + " is " + p + " !!");
+        Assert.assertTrue(p.isGranted(Role.GROUP, Right.READ), obj + " is " + p + " !!");
+        Assert.assertFalse(p.isGranted(Role.WORLD, Right.READ), obj + " is " + p + " !!");
+        Assert. assertTrue(p.isGranted(Role.USER, Right.WRITE), obj + " is " + p + " !!");
+        Assert.assertTrue(p.isGranted(Role.GROUP, Right.WRITE), obj + " is " + p + " !!");
+        Assert.assertFalse(p.isGranted(Role.WORLD, Right.WRITE), obj + " is " + p + " !!");
 
     }
 
     protected void assertPublic(IObject obj) {
         obj = lookup(obj);
         Permissions p = obj.getDetails().getPermissions();
-        assertTrue(obj + " is " + p + " !!", p.isGranted(Role.USER, Right.READ));
-        assertTrue(obj + " is " + p + " !!", p.isGranted(Role.GROUP, Right.READ));
-        assertTrue(obj + " is " + p + " !!", p.isGranted(Role.WORLD, Right.READ));
+        Assert.assertTrue(p.isGranted(Role.USER, Right.READ), obj + " is " + p + " !!");
+        Assert.assertTrue(p.isGranted(Role.GROUP, Right.READ), obj + " is " + p + " !!");
+        Assert.assertTrue(p.isGranted(Role.WORLD, Right.READ), obj + " is " + p + " !!");
     }
 
 }

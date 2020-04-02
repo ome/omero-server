@@ -9,6 +9,7 @@ package ome.server.itests.perms42;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.Test;
 
@@ -113,13 +114,13 @@ public class AllGroupsTest extends PermissionsTest {
     }
 
     protected void assertCanLoad(IObject obj) {
-        assertNotNull(lookup(obj));
+        Assert.assertNotNull(lookup(obj));
     }
 
     protected void assertCantLoad(IObject obj) {
         try {
             lookup(obj);
-            fail("secvio");
+            Assert.fail("secvio");
         } catch (SecurityViolation sv) {
             // ok.
         }

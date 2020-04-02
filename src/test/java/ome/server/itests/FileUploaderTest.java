@@ -9,8 +9,6 @@ import java.io.File;
 import java.sql.Timestamp;
 import java.util.UUID;
 
-import junit.framework.TestCase;
-
 import ome.conditions.ApiUsageException;
 import ome.model.core.OriginalFile;
 import ome.model.internal.Permissions;
@@ -21,6 +19,7 @@ import ome.system.Principal;
 import ome.tools.spring.ManagedServiceFactory;
 
 import org.springframework.util.ResourceUtils;
+import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -29,7 +28,7 @@ import org.testng.annotations.Test;
  * @since 3.0-Beta3
  */
 @Test(groups = { "integration", "broken" })
-public class FileUploaderTest extends TestCase {
+public class FileUploaderTest {
 
     OmeroContext ctx;
     ManagedServiceFactory sf;
@@ -92,7 +91,7 @@ public class FileUploaderTest extends TestCase {
         f.setMimetype("random");
         f.run();
         Long id = f.getId();
-        assertTrue(id != null);
+        Assert.assertTrue(id != null);
         of = sf.getQueryService().get(OriginalFile.class, id);
     }
 
@@ -106,26 +105,26 @@ public class FileUploaderTest extends TestCase {
         f.setPerms(Permissions.GROUP_IMMUTABLE);
         f.run();
         Long id = f.getId();
-        assertTrue(id != null);
+        Assert.assertTrue(id != null);
         of = sf.getQueryService().get(OriginalFile.class, id);
-        assertTrue(of.getCtime() != null);
-        assertEquals("boo", of.getName());
-        assertEquals("/dev/hi", of.getPath());
+        Assert.assertTrue(of.getCtime() != null);
+        Assert.assertEquals("boo", of.getName());
+        Assert.assertEquals("/dev/hi", of.getPath());
         Permissions p = of.getDetails().getPermissions();
-        assertTrue(p + ":" + Permissions.GROUP_IMMUTABLE, p
-                .sameRights(Permissions.GROUP_IMMUTABLE));
+        Assert.assertTrue(p
+                .sameRights(Permissions.GROUP_IMMUTABLE), p + ":" + Permissions.GROUP_IMMUTABLE);
     }
 
     @Test
     public void testDefaultFormatIsTextPlain() throws Exception {
         f = new FileUploader(sf, new File("/dev/null"));
         f.init();
-        assertTrue(f.getMimetype().equals("text/plain"));
+        Assert.assertTrue(f.getMimetype().equals("text/plain"));
     }
 
     @Test(groups = "broken")
     public void testFormatShouldBeDeterminedByFileEnding() throws Exception {
-        fail("NYI");
+        Assert.fail("NYI");
     }
 
 }

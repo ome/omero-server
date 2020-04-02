@@ -11,7 +11,6 @@ import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.Set;
 
-import junit.framework.TestCase;
 import ome.annotations.ApiConstraintChecker;
 import ome.conditions.ApiUsageException;
 import ome.logic.PojosImpl;
@@ -26,7 +25,7 @@ import org.testng.annotations.Test;
  *         href="mailto:josh.moore@gmx.de">josh.moore@gmx.de</a>
  * @since Omero 3.0
  */
-public class ApiConstraintCheckerTest extends TestCase {
+public class ApiConstraintCheckerTest {
 
     Class c;
 

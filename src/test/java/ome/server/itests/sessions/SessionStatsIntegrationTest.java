@@ -6,7 +6,6 @@
  */
 package ome.server.itests.sessions;
 
-import junit.framework.TestCase;
 import ome.model.meta.Experimenter;
 import ome.server.itests.ManagedContextFixture;
 import ome.services.messages.stats.ObjectsReadStatsMessage;
@@ -14,6 +13,7 @@ import ome.services.messages.stats.ObjectsReadStatsMessage;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ApplicationEventMulticaster;
+import org.testng.Assert;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
@@ -22,7 +22,7 @@ import org.testng.annotations.Test;
  * @since Beta4
  */
 @Test(groups = "integration")
-public class SessionStatsIntegrationTest extends TestCase {
+public class SessionStatsIntegrationTest {
 
     ManagedContextFixture fixture;
     
@@ -45,7 +45,7 @@ public class SessionStatsIntegrationTest extends TestCase {
         for (int i = 0; i < 10001; i++) {
             fixture.managedSf.getQueryService().get(Experimenter.class, 1L);
         }
-        assertTrue(called[0]);
+        Assert.assertTrue(called[0]);
     }
 
 }

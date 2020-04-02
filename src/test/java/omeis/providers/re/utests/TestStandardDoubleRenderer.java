@@ -30,6 +30,7 @@ import omeis.providers.re.quantum.QuantumStrategy;
 
 import org.perf4j.LoggingStopWatch;
 import org.perf4j.StopWatch;
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
 public class TestStandardDoubleRenderer extends BaseRenderingTest
@@ -96,16 +97,16 @@ public class TestStandardDoubleRenderer extends BaseRenderingTest
                 settings.getQuantization(), pixels);
         int n = data.size();
         for (int i = 0; i < n/2; i++) {
-            assertEquals(0.0, data.getPixelValue(i));
+            Assert.assertEquals(0.0, data.getPixelValue(i));
         }
         for (int i = 0; i < n/2; i++) {
-            assertEquals(qs.getPixelsTypeMax(), data.getPixelValue(i+n/2));
+            Assert.assertEquals(qs.getPixelsTypeMax(), data.getPixelValue(i+n/2));
         }
 
         try
         {
-            assertEquals(0.0, data.getPixelValue(n));
-            fail("Should have thrown an IndexOutOfBoundsException.");
+            Assert.assertEquals(0.0, data.getPixelValue(n));
+            Assert.fail("Should have thrown an IndexOutOfBoundsException.");
         }
         catch (IndexOutOfBoundsException e) { }
     }
@@ -115,9 +116,9 @@ public class TestStandardDoubleRenderer extends BaseRenderingTest
     {
         QuantumStrategy qs = quantumFactory.getStrategy(
                 settings.getQuantization(), pixels);
-        assertEquals(new Double(Integer.MIN_VALUE),
+        Assert.assertEquals(new Double(Integer.MIN_VALUE),
                 new Double(qs.getPixelsTypeMin()));
-        assertEquals(new Double(Integer.MAX_VALUE),
+        Assert.assertEquals(new Double(Integer.MAX_VALUE),
                 new Double(qs.getPixelsTypeMax()));
     }
 

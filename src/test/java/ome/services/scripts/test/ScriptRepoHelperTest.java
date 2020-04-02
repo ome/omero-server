@@ -22,6 +22,7 @@ import ome.system.Roles;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.context.event.ContextRefreshedEvent;
+import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
@@ -67,21 +68,21 @@ public class ScriptRepoHelperTest extends AbstractManagedContextTest {
 
     public void testLoadAddsObjects() throws Exception {
         path = generateFile();
-        assertEquals(1, helper.countOnDisk());
-        assertEquals(0, helper.countInDb());
+        Assert.assertEquals(1, helper.countOnDisk());
+        Assert.assertEquals(0, helper.countInDb());
         files = helper.loadAll(false);
         assertContains(helper.iterate(), path);
-        assertEquals(1, files.size());
-        assertEquals(1, helper.countInDb());
-        assertEquals(path.fullname(),
+        Assert.assertEquals(1, files.size());
+        Assert.assertEquals(1, helper.countInDb());
+        Assert.assertEquals(path.fullname(),
                 path.dirname() + path.basename());
-        assertEquals(path.fullname(),
+        Assert.assertEquals(path.fullname(),
                 files.get(0).getPath() + files.get(0).getName());
     }
 
     public void testFindInDb() throws Exception {
         testLoadAddsObjects();
-        assertEquals(files.get(0).getId(), helper.findInDb(path, true));
+        Assert.assertEquals(files.get(0).getId(), helper.findInDb(path, true));
     }
 
     public void testFileModificationsAreFoundManually() throws Exception {
@@ -89,10 +90,10 @@ public class ScriptRepoHelperTest extends AbstractManagedContextTest {
         Long fileID = files.get(0).getId();
         RepoFile file = helper.write(path, "changed");
         files = helper.loadAll(false);
-        assertEquals(fileID, files.get(0).getId());
+        Assert.assertEquals(fileID, files.get(0).getId());
         helper.modificationCheck();
         files = helper.loadAll(false);
-        assertFalse(fileID.equals(files.get(0).getId()));
+        Assert.assertFalse(fileID.equals(files.get(0).getId()));
     }
 
     public void testFileModificationsCanBeFoundOnLoad() throws Exception {
@@ -100,7 +101,7 @@ public class ScriptRepoHelperTest extends AbstractManagedContextTest {
         Long fileID = files.get(0).getId();
         helper.write(path, "changed");
         files = helper.loadAll(true);
-        assertFalse(fileID.equals(files.get(0).getId()));
+        Assert.assertFalse(fileID.equals(files.get(0).getId()));
     }
 
     public void testHiddenFiles() throws Exception {
@@ -125,23 +126,23 @@ public class ScriptRepoHelperTest extends AbstractManagedContextTest {
     public void testLutFilesLoadByMimetype() throws Exception {
         path = generateFile("test", ".lut", "1 2 3");
         files = helper.loadAll(false, "text/x-lut");
-        assertEquals(1, helper.countOnDisk());
-        assertEquals(1, helper.countInDb());
-        assertEquals(1, files.size());
+        Assert.assertEquals(1, helper.countOnDisk());
+        Assert.assertEquals(1, helper.countInDb());
+        Assert.assertEquals(1, files.size());
     }
 
     public void testLutFilesLoadAll() throws Exception {
         path = generateFile("test", ".lut", "1 2 3");
         files = helper.loadAll(false);
-        assertEquals(1, helper.countOnDisk());
-        assertEquals(1, helper.countInDb());
-        assertEquals(0, files.size());
+        Assert.assertEquals(1, helper.countOnDisk());
+        Assert.assertEquals(1, helper.countInDb());
+        Assert.assertEquals(0, files.size());
     }
 
     public void testFilesAreAddedToUserGroup() throws Exception {
         path = generateFile();
         files = helper.loadAll(false);
-        assertEquals(Long.valueOf(new Roles().getUserGroupId()), files.get(0)
+        Assert.assertEquals(Long.valueOf(new Roles().getUserGroupId()), files.get(0)
                 .getDetails().getGroup().getId());
     }
 
@@ -151,7 +152,7 @@ public class ScriptRepoHelperTest extends AbstractManagedContextTest {
         Long oldID = files.get(0).getId();
         helper.write(path, "updated");
         helper.modificationCheck();
-        assertFalse(helper.isInRepo(oldID));
+        Assert.assertFalse(helper.isInRepo(oldID));
     }
 
     public void testFileModificationsUpdateTheHash() throws Exception {
@@ -161,22 +162,22 @@ public class ScriptRepoHelperTest extends AbstractManagedContextTest {
         helper.write(path, "updated");
         files = helper.loadAll(true);
         Long newID = files.get(0).getId();
-        assertFalse(oldID.equals(newID));
+        Assert.assertFalse(oldID.equals(newID));
         String fsHash = path.hash();
         String dbHash = files.get(0).getHash();
-        assertEquals(dbHash, fsHash);
+        Assert.assertEquals(dbHash, fsHash);
     }
 
     public void testFilesCanBeDeletedByRelativeValue() throws Exception {
         path = generateFile();
         files = helper.loadAll(false);
-        assertEquals(1, files.size());
+        Assert.assertEquals(1, files.size());
         Long id = files.get(0).getId();
-        assertTrue(path.file().exists());
+        Assert.assertTrue(path.file().exists());
         helper.delete(id);
         helper.modificationCheck();
-        assertFalse(helper.isInRepo(id));
-        assertFalse(path.file().exists());
+        Assert.assertFalse(helper.isInRepo(id));
+        Assert.assertFalse(path.file().exists());
     }
 
     public void testFilesRemovedFromDiskAreRemovedFromDb() throws Exception {
@@ -184,17 +185,17 @@ public class ScriptRepoHelperTest extends AbstractManagedContextTest {
         int before = helper.loadAll(true).size();
         path.file().delete();
         int after = helper.loadAll(true).size();
-        assertEquals(before - 1, after);
+        Assert.assertEquals(before - 1, after);
     }
 
     // Helpers
     // =========================================================================
 
     protected void assertEmptyRepo() {
-        assertEquals(0, helper.countOnDisk());
-        assertEquals(0, helper.countInDb());
+        Assert.assertEquals(0, helper.countOnDisk());
+        Assert.assertEquals(0, helper.countInDb());
         files = helper.loadAll(false);
-        assertEquals(0, files.size());
+        Assert.assertEquals(0, files.size());
     }
 
     protected RepoFile generateFile() throws Exception {
@@ -217,7 +218,7 @@ public class ScriptRepoHelperTest extends AbstractManagedContextTest {
                 found = true;
             }
         }
-        assertTrue(found);
+        Assert.assertTrue(found);
     }
 
     protected void mkdir() throws IOException {

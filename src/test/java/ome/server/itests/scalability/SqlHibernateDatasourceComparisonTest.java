@@ -17,7 +17,6 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 import javax.sql.DataSource;
 
-import junit.framework.TestCase;
 import ome.api.IQuery;
 import ome.server.itests.ManagedContextFixture;
 import ome.testing.Report;
@@ -29,6 +28,7 @@ import org.hibernate.stat.Statistics;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.orm.hibernate3.FilterDefinitionFactoryBean;
 import org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean;
+import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -37,7 +37,7 @@ import com.jamonapi.Monitor;
 import com.jamonapi.MonitorFactory;
 
 @Test(enabled = false, groups = { "integration" })
-public class SqlHibernateDatasourceComparisonTest extends TestCase {
+public class SqlHibernateDatasourceComparisonTest {
 
     static final String select = "select p from Pixels p ";
     static final String idsin = "p.id in (220, 221, 222, 223, 224, 225, 226, 227, 228, 229)";
@@ -215,7 +215,7 @@ public class SqlHibernateDatasourceComparisonTest extends TestCase {
     public void testComparseDataSources() throws Exception {
         try {
             // check pre-conditions
-            assertEquals(9, calls.size());
+            Assert.assertEquals(9, calls.size());
             prime();
 
             List<Callable<Object>> copy = new ArrayList(calls);

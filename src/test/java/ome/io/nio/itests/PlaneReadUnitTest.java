@@ -18,6 +18,7 @@ import ome.model.core.Pixels;
 import ome.server.itests.AbstractManagedContextTest;
 
 import org.apache.commons.codec.binary.Hex;
+import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -111,7 +112,7 @@ public class PlaneReadUnitTest extends AbstractManagedContextTest {
 
         byte[] messageDigest = Helper.calculateMessageDigest(plane.getData());
 
-        assertEquals(Hex.encodeHexString(originalDigests[0]), Hex
+        Assert.assertEquals(Hex.encodeHexString(originalDigests[0]), Hex
                 .encodeHexString(messageDigest));
     }
 
@@ -127,7 +128,7 @@ public class PlaneReadUnitTest extends AbstractManagedContextTest {
 
         byte[] messageDigest = Helper.calculateMessageDigest(plane.getData());
 
-        assertEquals(Hex.encodeHexString(originalDigests[digestOffset]), Hex
+        Assert.assertEquals(Hex.encodeHexString(originalDigests[digestOffset]), Hex
                 .encodeHexString(messageDigest));
     }
 
@@ -150,7 +151,7 @@ public class PlaneReadUnitTest extends AbstractManagedContextTest {
                     oldMessageDigest = Hex
                             .encodeHexString(originalDigests[digestOffset]);
 
-                    assertEquals(getPlaneCheckErrStr(z, c, t),
+                    Assert.assertEquals(getPlaneCheckErrStr(z, c, t),
                             oldMessageDigest, newMessageDigest);
                 }
             }

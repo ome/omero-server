@@ -16,6 +16,7 @@ import ome.model.meta.ExperimenterGroup;
 import ome.server.itests.AbstractManagedContextTest;
 import ome.testing.ObjectFactory;
 
+import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -26,7 +27,6 @@ public class EnumTest extends AbstractManagedContextTest {
 
     @BeforeClass
     public void createData() throws Exception {
-        setUp();
 
         loginRoot();
 
@@ -43,8 +43,6 @@ public class EnumTest extends AbstractManagedContextTest {
         e.setLdap(false);
         e = factory.getAdminService().getExperimenter(
                 factory.getAdminService().createUser(e, gid));
-
-        tearDown();
     }
 
     @Test
@@ -87,7 +85,7 @@ public class EnumTest extends AbstractManagedContextTest {
         assertWorldReadable(types.createEnumeration(new Format(uuid)));
         
         Format f = types.getEnumeration(Format.class, "image/png");
-        assertNotNull(f);
+        Assert.assertNotNull(f);
         
     }
 

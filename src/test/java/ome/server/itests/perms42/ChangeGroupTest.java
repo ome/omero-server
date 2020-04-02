@@ -13,6 +13,7 @@ import ome.model.core.Pixels;
 import ome.model.internal.Permissions;
 import ome.model.meta.ExperimenterGroup;
 
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
 /**
@@ -56,7 +57,7 @@ public class ChangeGroupTest extends PermissionsTest {
         iQuery.projection("select i.details.group.id, p.details.group.id " +
         		"from Image i join i.pixels p where i.id = " + img.getId(), null);
         Object[] values = rv.get(0);
-        assertEquals(values[0], values[1]);
+        Assert.assertEquals(values[0], values[1]);
         
     }
     
@@ -71,35 +72,35 @@ public class ChangeGroupTest extends PermissionsTest {
      * each group.
      */
     public void testChgrpImageCanCopyAnnotations() {
-        fail();
+        Assert.fail();
     }
     
     public void testChgrpImageWontCopyOriginalFiles() {
-        fail();
+        Assert.fail();
     }
     
     public void testChgrpImageCanAlsoChgrpOriginalFiles() {
-        fail();
+        Assert.fail();
     }
 
     public void testChgrpImageCanCreateAnUnlinkLog() {
-        fail();
+        Assert.fail();
     }
 
 
     public void testChgrpOnCertainTypesIsFlat() {
-        fail();
+        Assert.fail();
     }
     
     public void testOnlyOwnersOrAdminCanCallChangeGroup() {
-        fail();
+        Assert.fail();
     }
     
     public void testCanOnlyMoveToMembersGroup() {
-        fail();
+        Assert.fail();
     }
     
     public void testUseChgrpOrMoveToCommonSpace() {
-        fail(); // ? perhaps changeGroup(x, "user") is "move to common space"
+        Assert.fail(); // ? perhaps changeGroup(x, "user") is "move to common space"
     }
 }

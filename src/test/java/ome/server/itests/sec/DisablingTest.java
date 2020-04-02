@@ -10,6 +10,7 @@ import ome.conditions.InternalException;
 import ome.model.meta.Experimenter;
 import ome.server.itests.AbstractManagedContextTest;
 
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
 @Test(groups = { "security" })
@@ -34,7 +35,7 @@ public class DisablingTest extends AbstractManagedContextTest {
         loginRoot();
         securitySystem.disable("load");
         loadFails(); // this implicitly resets
-        assertTrue(securitySystem.isDisabled("load"));
+        Assert.assertTrue(securitySystem.isDisabled("load"));
     }
 
     // ~ Helpers

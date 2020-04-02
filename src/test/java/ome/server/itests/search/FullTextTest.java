@@ -44,6 +44,7 @@ import org.hibernate.Session;
 import org.springframework.core.io.support.PropertiesLoaderUtils;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ResourceUtils;
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
 @Test(groups = { "integration" })
@@ -176,12 +177,12 @@ public class FullTextTest extends AbstractTest {
         iUpdate.indexObject(i.unmodifiableAnnotationLinks().iterator().next());
 
         Annotation a = i.linkedAnnotationList().get(0);
-        assertEquals(1, a.sizeOfAnnotationLinks());
+        Assert.assertEquals(1, a.sizeOfAnnotationLinks());
 
         this.loginRoot();
         List<Image> list = iQuery.findAllByFullText(Image.class, uuid, null);
-        assertEquals(1, list.size());
-        assertTrue(list.get(0).getId().equals(i.getId()));
+        Assert.assertEquals(1, list.size());
+        Assert.assertTrue(list.get(0).getId().equals(i.getId()));
     }
 
     public void testUniqueImage() throws Exception {
@@ -191,8 +192,8 @@ public class FullTextTest extends AbstractTest {
         this.loginRootKeepGroup();
         List<Image> list = iQuery.findAllByFullText(Image.class, i.getName(),
                 null);
-        assertEquals(1, list.size());
-        assertEquals(i.getId(), list.get(0).getId());
+        Assert.assertEquals(1, list.size());
+        Assert.assertEquals(i.getId(), list.get(0).getId());
     }
 
     public void testUniquePrivateImage() throws Exception {
@@ -202,7 +203,7 @@ public class FullTextTest extends AbstractTest {
         this.loginNewUser();
         List<Image> list = iQuery.findAllByFullText(Image.class, i.getName(),
                 null);
-        assertEquals(0, list.size());
+        Assert.assertEquals(0, list.size());
     }
 
     public void testUniqueImageBelongingToOnlyUser() throws Exception {
@@ -218,10 +219,10 @@ public class FullTextTest extends AbstractTest {
 
         List<Image> list = iQuery.findAllByFullText(Image.class, i.getName(),
                 new Parameters(new Filter().owner(id)));
-        assertEquals(1, list.size());
+        Assert.assertEquals(1, list.size());
 
         list = iQuery.findAllByFullText(Image.class, i.getName(), null);
-        assertEquals(2, list.size());
+        Assert.assertEquals(2, list.size());
 
     }
 
@@ -231,10 +232,10 @@ public class FullTextTest extends AbstractTest {
 
         List<Image> list = iQuery.findAllByFullText(Image.class, i.getName(),
                 new Parameters(new Filter().group(id)));
-        assertEquals(1, list.size());
+        Assert.assertEquals(1, list.size());
 
         list = iQuery.findAllByFullText(Image.class, i.getName(), null);
-        assertEquals(2, list.size());
+        Assert.assertEquals(2, list.size());
 
     }
 
@@ -268,9 +269,9 @@ public class FullTextTest extends AbstractTest {
         List<Project> list;
 
         list = iQuery.findAllByFullText(Project.class, query, null);
-        assertTrue("should find it now", list.size() == 1);
+        Assert.assertEquals(list.size(),  1, "should find it now");
         list = iQuery.findAllByFullText(Project.class, before, null);
-        assertTrue("should find it now in combined", list.size() == 1);
+        Assert.assertEquals(list.size(), 1, "should find it now in combined");
 
         // Change the name and the project should be changed too
         i = p.linkedDatasetList().get(0).linkedImageList().get(0);
@@ -281,16 +282,16 @@ public class FullTextTest extends AbstractTest {
         iUpdate.indexObject(p);
 
         list = iQuery.findAllByFullText(Project.class, query, null);
-        assertTrue("should NOT find it now", list.size() == 0);
+        Assert.assertTrue(list.size() == 0, "should NOT find it now");
         list = iQuery.findAllByFullText(Project.class, before, null);
-        assertTrue("should NOT find it now in combined", list.size() == 0);
+        Assert.assertTrue(list.size() == 0,"should NOT find it now in combined");
         list = iQuery.findAllByFullText(Project.class, after, null);
-        assertTrue("BUT should find it with new name", list.size() == 1);
+        Assert.assertTrue(list.size() == 1, "BUT should find it with new name");
 
     }
 
     public void testUserOverridesGroup() throws Exception {
-        fail("nyi");
+        Assert.fail("nyi");
     }
 
     public void testCreateFile() throws Exception {
@@ -347,16 +348,16 @@ public class FullTextTest extends AbstractTest {
 
         List<? extends IObject> list;
         list = iQuery.findAllByFullText(Image.class, str, null);
-        assertTrue("combined_fields", list.size() == 1);
+        Assert.assertTrue(list.size() == 1, "combined_fields");
         list = iQuery.findAllByFullText(Image.class, "name:" + str, null);
-        assertTrue("name", list.size() == 1);
+        Assert.assertTrue(list.size() == 1, "name");
         list = iQuery.findAllByFullText(Image.class, "file.name:" + str, null);
-        assertTrue("file.name", list.size() == 1);
+        Assert.assertTrue(list.size() == 1, "file.name");
         list = iQuery.findAllByFullText(Image.class, "file.path:" + str, null);
-        assertTrue("file.path", list.size() == 1);
+        Assert.assertTrue(list.size() == 1, "file.path");
         list = iQuery.findAllByFullText(Image.class, "file.contents:" + str,
                 null);
-        assertTrue("file.contents", list.size() == 1);
+        Assert.assertTrue(list.size() == 1, "file.contents");
 
     }
 
@@ -391,13 +392,13 @@ public class FullTextTest extends AbstractTest {
 
         List<? extends IObject> list;
         list = iQuery.findAllByFullText(Image.class, name + "_links.txt", null);
-        assertTrue("name_links", list.size() == 1);
+        Assert.assertEquals(list.size(), 1, "name_links");
         list = iQuery.findAllByFullText(Image.class, name + "*", null);
-        assertTrue("name*", list.size() == 1);
+        Assert.assertEquals( list.size(), 1, "name*");
         list = iQuery.findAllByFullText(Image.class, "secret.html", null);
-        assertTrue("secret.html", list.size() >= 1);
+        Assert.assertTrue(list.size() >= 1, "secret.html");
         list = iQuery.findAllByFullText(Image.class, "secret*", null);
-        assertTrue("secret.*", list.size() >= 1);
+        Assert.assertTrue(list.size() >= 1, "secret.*");
 
     }
 
@@ -418,7 +419,7 @@ public class FullTextTest extends AbstractTest {
         loginUser(e.getOmeName());
         List<? extends IObject> list;
         list = iQuery.findAllByFullText(Image.class, uuid, null);
-        assertEquals(1, list.size());
+        Assert.assertEquals(1, list.size());
     }
 
     // Helpers

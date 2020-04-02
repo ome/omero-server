@@ -24,6 +24,7 @@ import ome.server.itests.AbstractManagedContextTest;
 import ome.services.query.PojosFindAnnotationsQueryDefinition;
 import ome.testing.CreatePojosFixture;
 
+import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -40,12 +41,12 @@ public class FindAnnotationsQueryTest extends AbstractManagedContextTest {
     @BeforeClass
     public void makePojos() throws Exception {
         try {
-            setUp();
+            onSetUp();
             DATA = new CreatePojosFixture(this.factory);
             DATA.pdi();
             DATA.annotations();
         } finally {
-            tearDown();
+            onTearDown();
         }
     }
 
@@ -56,7 +57,7 @@ public class FindAnnotationsQueryTest extends AbstractManagedContextTest {
             // new QueryParameterDef(QP.CLASS,Class.class,false),
             // new QueryParameterDef("annotatorIds",Collection.class,true));
             q = new PojosFindAnnotationsQueryDefinition(parameters);
-            fail("Should have failed!");
+            Assert.fail("Should have failed!");
         } catch (IllegalArgumentException e) {
         } catch (ApiUsageException e) {
         }
@@ -102,7 +103,7 @@ public class FindAnnotationsQueryTest extends AbstractManagedContextTest {
 
         Collection<IAnnotated> results = (Collection) iQuery.execute(q);
         for (IAnnotated annotated : results) {
-            assertTrue(ids.contains(annotated.getId()));
+            Assert.assertTrue(ids.contains(annotated.getId()));
         }
     }
 
@@ -115,7 +116,7 @@ public class FindAnnotationsQueryTest extends AbstractManagedContextTest {
 
         Collection<IAnnotated> results = (Collection) iQuery.execute(q);
         for (IAnnotated annotated : results) {
-            assertTrue(ids.contains(annotated.getId()));
+            Assert.assertTrue(ids.contains(annotated.getId()));
         }
     }
 
@@ -136,9 +137,9 @@ public class FindAnnotationsQueryTest extends AbstractManagedContextTest {
 
         Collection<IAnnotated> results = (Collection) iQuery.execute(q);
         for (IAnnotated annotated : results) {
-            assertNotNull(annotated.getDetails().getCreationEvent().getTime());
-            assertNotNull(annotated.getDetails().getUpdateEvent().getTime());
-            assertNotNull(annotated.linkedAnnotationList().get(0).getDetails()
+            Assert.assertNotNull(annotated.getDetails().getCreationEvent().getTime());
+            Assert.assertNotNull(annotated.getDetails().getUpdateEvent().getTime());
+            Assert.assertNotNull(annotated.linkedAnnotationList().get(0).getDetails()
                     .getCreationEvent().getTime());
             // assertNotNull(annotated.linkedAnnotationList().get(0).getDetails()
             // .getUpdateEvent().getTime());

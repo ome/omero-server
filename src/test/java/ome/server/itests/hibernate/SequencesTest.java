@@ -28,6 +28,7 @@ import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionTemplate;
+import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -71,7 +72,7 @@ public class SequencesTest extends AbstractManagedContextTest {
         }
 
         long current = getCurrentNextValue(seq_name);
-        assertEquals(loop, current);
+        Assert.assertEquals(loop, current);
     }
 
     /**
@@ -83,19 +84,19 @@ public class SequencesTest extends AbstractManagedContextTest {
         log.warn("XXXX: GETTING CONNECTIONS");
         Connection conn1 = ds.getConnection();
         Connection conn2 = ds.getConnection();
-        assertFalse(conn1.equals(conn2));
+        Assert.assertFalse(conn1.equals(conn2));
         log.warn("XXXX: GOT 2 CONNECTIONS");
     }
 
     public void testBasics() throws Exception {
         String uuid = UUID.randomUUID().toString();
-        assertEquals(-1, getCurrentNextValue(uuid));
-        assertEquals(1, callNextValue(uuid, 1));
-        assertEquals(2, getCurrentNextValue(uuid));
-        assertEquals(2, callNextValue(uuid, 1));
-        assertEquals(3, getCurrentNextValue(uuid));
-        assertEquals(4, callNextValue(uuid, 2));
-        assertEquals(5, getCurrentNextValue(uuid));
+        Assert.assertEquals(-1, getCurrentNextValue(uuid));
+        Assert.assertEquals(1, callNextValue(uuid, 1));
+        Assert.assertEquals(2, getCurrentNextValue(uuid));
+        Assert.assertEquals(2, callNextValue(uuid, 1));
+        Assert.assertEquals(3, getCurrentNextValue(uuid));
+        Assert.assertEquals(4, callNextValue(uuid, 2));
+        Assert.assertEquals(5, getCurrentNextValue(uuid));
     }
 
     public void testSequences() throws Exception {
@@ -103,41 +104,41 @@ public class SequencesTest extends AbstractManagedContextTest {
         long valueBefore = getCurrentNextValue(seq_name);
         long addedId = incrementImage();
 
-        assertEquals(valueBefore, addedId);
+        Assert.assertEquals(valueBefore, addedId);
 
         long valueAfterFirst = getCurrentNextValue(seq_name);
-        assertEquals(valueBefore + incr_value, valueAfterFirst);
+        Assert.assertEquals(valueBefore + incr_value, valueAfterFirst);
 
         // The second save shouldn't update seq_table
         addedId = incrementImage();
-        assertEquals(valueBefore + 1, addedId);
+        Assert.assertEquals(valueBefore + 1, addedId);
         addedId = incrementImage();
-        assertEquals(valueBefore + 2, addedId);
+        Assert.assertEquals(valueBefore + 2, addedId);
 
         // No change despite the various calls to incrementImage()
         long valueAfterSecond = getCurrentNextValue(seq_name);
-        assertEquals(valueAfterFirst, valueAfterSecond);
+        Assert.assertEquals(valueAfterFirst, valueAfterSecond);
 
         // The next 48 should also be the same
         for (int i = 0; i < incr_value - 3; i++) {
             addedId = incrementImage();
             long valueAfterLoop = getCurrentNextValue(seq_name);
-            assertEquals("Differnt on loop " + i, valueAfterFirst,
-                    valueAfterLoop);
+            Assert.assertEquals(valueAfterFirst,
+                    valueAfterLoop, "Different on loop " + i);
         }
 
         // Now another loop of 50 should start
         addedId = incrementImage();
-        assertEquals(valueAfterSecond, addedId);
-        assertEquals(valueAfterSecond + incr_value,
+        Assert.assertEquals(valueAfterSecond, addedId);
+        Assert.assertEquals(valueAfterSecond + incr_value,
                 getCurrentNextValue(seq_name));
 
         // A manual load should increment by 1
         long bv = getCurrentNextValue(seq_name);
         long nv = sql.nextValue(seq_name, 1);
         long cv = getCurrentNextValue(seq_name);
-        assertEquals(bv, nv);
-        assertEquals(nv + 1, cv);
+        Assert.assertEquals(bv, nv);
+        Assert.assertEquals(nv + 1, cv);
 
     }
 
@@ -212,7 +213,7 @@ public class SequencesTest extends AbstractManagedContextTest {
                     throw new RuntimeException("Should rollback tx");
                 }
             });
-            fail("must throw");
+            Assert.fail("must throw");
         } catch (Exception e) {
             // good
         }
@@ -222,12 +223,12 @@ public class SequencesTest extends AbstractManagedContextTest {
 
         // First the image must be gone. Most important!
         log.warn("XXXX: QUERY.FIND");
-        assertNull(iQuery.find(Image.class, values[IMAGEID]));
+        Assert.assertNull(iQuery.find(Image.class, values[IMAGEID]));
 
         // Then value should have updated despite the rollback.
-        assertEquals(values[BEFORE], values[DURING]);
-        assertEquals(values[DURING] + 1, values[AFTER]);
-        assertEquals(values[AFTER], values[OUTSIDE]);
+        Assert.assertEquals(values[BEFORE], values[DURING]);
+        Assert.assertEquals(values[DURING] + 1, values[AFTER]);
+        Assert.assertEquals(values[AFTER], values[OUTSIDE]);
 
     }
 
@@ -241,14 +242,14 @@ public class SequencesTest extends AbstractManagedContextTest {
         images[1] = new Image(/* no name */);
         try {
             iUpdate.saveAndReturnArray(images);
-            fail("Must throw");
+            Assert.fail("Must throw");
         } catch (ValidationException ve) {
             // good
         }
         long rolledBackId = images[0].getId();
 
-        assertNull(iQuery.find(Image.class, rolledBackId));
-        assertTrue(getCurrentNextValue(seq_name) > rolledBackId);
+        Assert.assertNull(iQuery.find(Image.class, rolledBackId));
+        Assert.assertTrue(getCurrentNextValue(seq_name) > rolledBackId);
 
     }
 
@@ -269,13 +270,13 @@ public class SequencesTest extends AbstractManagedContextTest {
                 }
 
             });
-            fail("Must throw");
+            Assert.fail("Must throw");
         } catch (ValidationException ve) {
             // good
         }
         long rolledBackId = images[0].getId();
-        assertNull(iQuery.find(Image.class, rolledBackId));
-        assertEquals(getCurrentNextValue(seq_name), rolledBackId + incr_value);
+        Assert.assertNull(iQuery.find(Image.class, rolledBackId));
+        Assert.assertEquals(getCurrentNextValue(seq_name), rolledBackId + incr_value);
 
     }
 

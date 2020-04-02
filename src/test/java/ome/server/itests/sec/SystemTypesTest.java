@@ -35,7 +35,7 @@ public class SystemTypesTest extends AbstractManagedContextTest {
 
     @BeforeClass
     public void createData() throws Exception {
-        setUp();
+        super.onSetUp();
 
         loginRoot();
 
@@ -53,7 +53,7 @@ public class SystemTypesTest extends AbstractManagedContextTest {
         e = factory.getAdminService().getExperimenter(
                 factory.getAdminService().createUser(e, gname));
 
-        tearDown();
+        super.onTearDown();
     }
 
     // ~ Admin types

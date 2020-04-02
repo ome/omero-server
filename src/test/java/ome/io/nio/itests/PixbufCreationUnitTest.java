@@ -17,6 +17,7 @@ import ome.model.core.Pixels;
 import ome.server.itests.AbstractManagedContextTest;
 
 import org.apache.commons.codec.binary.Hex;
+import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -38,7 +39,7 @@ public class PixbufCreationUnitTest extends AbstractManagedContextTest {
         String validSHA1 = "11875aa5c6e7c09d433b1b0c793761001f8f34e7";
 
         byte[] md = pixbuf.calculateMessageDigest();
-        assertEquals(validSHA1, Hex.encodeHexString(md));
+        Assert.assertEquals(validSHA1, Hex.encodeHexString(md));
     }
 
     @Test
@@ -48,7 +49,7 @@ public class PixbufCreationUnitTest extends AbstractManagedContextTest {
             for (int c = 0; c < pixels.getSizeC(); c++) {
                 for (int z = 0; z < pixels.getSizeZ(); z++) {
                     PixelData pd = pixbuf.getPlane(z, c, t);
-                    assertNull(pd);
+                    Assert.assertNull(pd);
                 }
             }
         }

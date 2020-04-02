@@ -28,6 +28,7 @@ import omeis.providers.re.quantum.QuantumStrategy;
 
 import org.perf4j.LoggingStopWatch;
 import org.perf4j.StopWatch;
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
 public class TestStandardSigned32BitRenderer extends BaseRenderingTest
@@ -88,16 +89,16 @@ public class TestStandardSigned32BitRenderer extends BaseRenderingTest
         QuantumStrategy qs = quantumFactory.getStrategy(
                 settings.getQuantization(), pixels);
         for (int i = 0; i < n/2; i++) {
-            assertEquals(qs.getPixelsTypeMin(), data.getPixelValue(i));
+            Assert.assertEquals(qs.getPixelsTypeMin(), data.getPixelValue(i));
         }
         for (int i = 0; i < n/2; i++) {
-            assertEquals(qs.getPixelsTypeMax(), data.getPixelValue(i+n/2));
+            Assert.assertEquals(qs.getPixelsTypeMax(), data.getPixelValue(i+n/2));
         }
 
         try
         {
-            assertEquals(0.0, data.getPixelValue(n));
-            fail("Should have thrown an IndexOutOfBoundsException.");
+            Assert.assertEquals(0.0, data.getPixelValue(n));
+            Assert.fail("Should have thrown an IndexOutOfBoundsException.");
         }
         catch (IndexOutOfBoundsException e) { }
     }
@@ -107,8 +108,8 @@ public class TestStandardSigned32BitRenderer extends BaseRenderingTest
     {
         QuantumStrategy qs = quantumFactory.getStrategy(
                 settings.getQuantization(), pixels);
-        assertEquals(-Math.pow(2, 32)/2, qs.getPixelsTypeMin());
-        assertEquals(Math.pow(2, 32)/2-1, qs.getPixelsTypeMax());
+        Assert.assertEquals(-Math.pow(2, 32)/2, qs.getPixelsTypeMin());
+        Assert.assertEquals(Math.pow(2, 32)/2-1, qs.getPixelsTypeMax());
     }
 
     @Test(timeOut=30000)

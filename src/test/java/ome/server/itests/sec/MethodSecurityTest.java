@@ -16,6 +16,7 @@ import ome.system.ServiceFactory;
 
 import org.hibernate.Session;
 import org.springframework.transaction.annotation.Transactional;
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
 @Test(groups = "integration")
@@ -41,14 +42,14 @@ public class MethodSecurityTest extends AbstractManagedContextTest {
             }
         });
 
-        assertTrue(roles.size() >= 2);
+        Assert.assertTrue(roles.size() >= 2);
         boolean found = false;
         for (int i = 0; i < roles.size(); i++) {
             if (roles.get(i).equals("system")) {
                 found = true;
             }
         }
-        assertTrue(found);
+        Assert.assertTrue(found);
     }
 
 }

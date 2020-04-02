@@ -28,6 +28,7 @@ import ome.testing.ObjectFactory;
 import ome.tools.hibernate.ExtendedMetadata;
 
 import org.hibernate.SessionFactory;
+import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -37,17 +38,17 @@ public class ExtendedMetadataTest extends AbstractManagedContextTest {
 
     @BeforeClass
     public void init() throws Exception {
-        setUp();
+        onSetUp();
         metadata = new ExtendedMetadata.Impl();
         metadata.setSessionFactory((SessionFactory)applicationContext.getBean("sessionFactory"));
-        tearDown();
+        onTearDown();
     }
 
     @Test
     public void testAnnotatedAreFound() throws Exception {
         Set<Class<IAnnotated>> anns = metadata.getAnnotatableTypes();
-        assertTrue(anns.contains(Image.class));
-        assertTrue(anns.contains(Project.class));
+        Assert.assertTrue(anns.contains(Image.class));
+        Assert.assertTrue(anns.contains(Project.class));
         // And several others
     }
 
@@ -55,9 +56,9 @@ public class ExtendedMetadataTest extends AbstractManagedContextTest {
     @Test
     public void testAnnotationsAreFound() throws Exception {
         Set<Class<Annotation>> anns = metadata.getAnnotationTypes();
-        assertTrue(anns.toString(), anns.contains(Annotation.class));
-        assertTrue(anns.toString(), anns.contains(BasicAnnotation.class));
-        assertTrue(anns.toString(), anns.contains(LongAnnotation.class));
+        Assert.assertTrue(anns.contains(Annotation.class), anns.toString());
+        Assert.assertTrue(anns.contains(BasicAnnotation.class), anns.toString());
+        Assert.assertTrue(anns.contains(LongAnnotation.class), anns.toString());
         // And several others
     }
 
@@ -68,7 +69,7 @@ public class ExtendedMetadataTest extends AbstractManagedContextTest {
      */
     @Test
     public void testLinkFromSubclassToSuperClassRel() {
-       assertNotNull(
+        Assert.assertNotNull(
                metadata.getRelationship("ImageAnnotationLink", "FileAnnotation"));
     }
 
@@ -80,8 +81,8 @@ public class ExtendedMetadataTest extends AbstractManagedContextTest {
     @Test(groups = {"broken","fixme"})
     public void testAnnotatedAreFoundByFQN() throws Exception {
         Set<Class<IAnnotated>> anns = metadata.getAnnotatableTypes();
-        assertTrue(anns.contains(Image.class));
-        assertTrue(anns.contains(Project.class));
+        Assert.assertTrue(anns.contains(Image.class));
+        Assert.assertTrue(anns.contains(Project.class));
         // And several others
     }
     // ~ Locking
@@ -182,12 +183,12 @@ public class ExtendedMetadataTest extends AbstractManagedContextTest {
 
     @Test(groups = { "ticket:657" })
     public void testCountQueriesAreCorrect() throws Exception {
-        assertEquals(metadata.getCountQuery(DatasetImageLink.CHILD), metadata
+        Assert.assertEquals(metadata.getCountQuery(DatasetImageLink.CHILD), metadata
                 .getCountQuery(DatasetImageLink.CHILD),
                 "select target.child.id, count(target) "
                         + "from ome.model.containers.DatasetImageLink target "
                         + "group by target.child.id");
-        assertEquals(metadata.getCountQuery(Pixels.IMAGE), metadata
+        Assert.assertEquals(metadata.getCountQuery(Pixels.IMAGE), metadata
                 .getCountQuery(Pixels.IMAGE),
                 "select target.image.id, count(target) "
                         + "from ome.model.core.Pixels target "
@@ -197,8 +198,8 @@ public class ExtendedMetadataTest extends AbstractManagedContextTest {
 
     @Test(groups = { "ticket:657" })
     public void testTargetTypes() throws Exception {
-        assertEquals(metadata.getTargetType(Pixels.IMAGE), Image.class);
-        assertEquals(metadata.getTargetType(DatasetImageLink.CHILD),
+        Assert.assertEquals(metadata.getTargetType(Pixels.IMAGE), Image.class);
+        Assert.assertEquals(metadata.getTargetType(DatasetImageLink.CHILD),
                 Image.class);
     }
 
@@ -209,9 +210,9 @@ public class ExtendedMetadataTest extends AbstractManagedContextTest {
     public void testRelationships() {
         String rel;
         rel = metadata.getRelationship(Pixels.class.getSimpleName(), Image.class.getSimpleName());
-        assertEquals("image", rel);
+        Assert.assertEquals("image", rel);
         rel = metadata.getRelationship(Image.class.getSimpleName(), Pixels.class.getSimpleName());
-        assertEquals("pixels", rel);
+        Assert.assertEquals("pixels", rel);
     }
 
     // ~ Helpers
@@ -219,13 +220,13 @@ public class ExtendedMetadataTest extends AbstractManagedContextTest {
 
     private void assertContains(Object[] array, Object i) {
         if (!contained(array, i)) {
-            fail(i + " not contained in " + Arrays.toString(array));
+            Assert.fail(i + " not contained in " + Arrays.toString(array));
         }
     }
 
     private void assertDoesntContain(IObject[] array, IObject i) {
         if (contained(array, i)) {
-            fail(i + " contained in " + Arrays.toString(array));
+            Assert.fail(i + " contained in " + Arrays.toString(array));
         }
     }
 
@@ -238,7 +239,7 @@ public class ExtendedMetadataTest extends AbstractManagedContextTest {
                 contained |= true;
             }
         }
-        assertTrue(contained);
+        Assert.assertTrue(contained);
 
     }
 

@@ -21,6 +21,7 @@ import ome.services.util.Executor;
 import ome.system.Principal;
 
 import org.springframework.context.ApplicationEvent;
+import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -51,7 +52,7 @@ public class SessionManagerTest extends AbstractManagedContextTest {
         Thread.sleep(2000L);
         sm.update(s);
         long last2 = sc.getLastUpdated();
-        assertTrue(last2 > last1);
+        Assert.assertTrue(last2 > last1);
     }
 
     @Test
@@ -61,17 +62,17 @@ public class SessionManagerTest extends AbstractManagedContextTest {
 
     @Test
     public void testThrowsRemovedSession() {
-        fail("nyi");
+        Assert.fail("nyi");
     }
 
     @Test
     public void testThrowsExpiredSession() {
-        fail("nyi");
+        Assert.fail("nyi");
     }
 
     @Test
     public void testFakingAnotherUserDoesntWork() {
-        fail("nyi");
+        Assert.fail("nyi");
     }
 
     @Test(expectedExceptions = ValidationException.class)
@@ -86,7 +87,7 @@ public class SessionManagerTest extends AbstractManagedContextTest {
     @Test
     public void testUpdateSessionPermitsChangingDefaultGroup() {
         login("root", "user", "User");
-        assertEquals("system", iAdmin.getEventContext().getCurrentGroupName());
+        Assert.assertEquals("system", iAdmin.getEventContext().getCurrentGroupName());
 
         String uuid = uuid();
         ExperimenterGroup newGroup = new ExperimenterGroup(uuid, false);
@@ -97,7 +98,7 @@ public class SessionManagerTest extends AbstractManagedContextTest {
         ExperimenterGroup g = iAdmin.lookupGroup(uuid);
         setGroupContext(g);
 
-        assertEquals(uuid, iAdmin.getEventContext().getCurrentGroupName());
+        Assert.assertEquals(uuid, iAdmin.getEventContext().getCurrentGroupName());
 
     }
 
@@ -120,17 +121,17 @@ public class SessionManagerTest extends AbstractManagedContextTest {
         Session s = sm.createWithAgent(new Principal("root", "user", "Test"), "Test", "127.0.0.1");
         String uuid = s.getUuid();
 
-        assertNull(sessionManager.getInput(uuid, "a"));
+        Assert.assertNull(sessionManager.getInput(uuid, "a"));
         sessionManager.setInput(uuid, "a", 1L);
-        assertEquals(1L, sessionManager.getInput(uuid, "a"));
+        Assert.assertEquals(1L, sessionManager.getInput(uuid, "a"));
         sessionManager.setInput(uuid, "a", null);
-        assertNull(sessionManager.getInput(uuid, "a"));
+        Assert.assertNull(sessionManager.getInput(uuid, "a"));
 
-        assertNull(sessionManager.getOutput(uuid, "a"));
+        Assert.assertNull(sessionManager.getOutput(uuid, "a"));
         sessionManager.setOutput(uuid, "a", 2L);
-        assertEquals(2L, sessionManager.getOutput(uuid, "a"));
+        Assert.assertEquals(2L, sessionManager.getOutput(uuid, "a"));
         sessionManager.setOutput(uuid, "a", null);
-        assertNull(sessionManager.getOutput(uuid, "a"));
+        Assert.assertNull(sessionManager.getOutput(uuid, "a"));
     }
     
     // Timeouts
@@ -145,7 +146,7 @@ public class SessionManagerTest extends AbstractManagedContextTest {
         s.setTimeToIdle(0L);
         try {
             sm.update(s);
-            fail("No security violation!");
+            Assert.fail("No security violation!");
         } catch (SecurityViolation sv) {
             // ok
         }

@@ -7,7 +7,6 @@ package ome.services.db;
 import java.sql.Timestamp;
 import java.util.UUID;
 
-import junit.framework.TestCase;
 import ome.model.IObject;
 import ome.model.annotations.CommentAnnotation;
 import ome.model.enums.EventType;
@@ -22,12 +21,13 @@ import org.slf4j.LoggerFactory;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 @Test(groups = "integration" )
-public class HibernateTest extends TestCase {
+public class HibernateTest {
 
     private static Logger log = LoggerFactory.getLogger(HibernateTest.class);
 
@@ -113,7 +113,7 @@ public class HibernateTest extends TestCase {
                 .createQuery("select e from Experimenter e join fetch e.annotationLinks");
         q.setMaxResults(1);
         Experimenter test = (Experimenter) q.uniqueResult();
-        assertTrue(test.sizeOfAnnotationLinks() >= 1);
+        Assert.assertTrue(test.sizeOfAnnotationLinks() >= 1);
     }
 
     @Test
@@ -141,7 +141,7 @@ public class HibernateTest extends TestCase {
                         + "where e.id = 0 and g.name != user and m.parent = g.id "
                         + "and m.child = e.id and index(m) = 0");
         ExperimenterGroup test = (ExperimenterGroup) q.uniqueResult();
-        assertNotNull(test);
+        Assert.assertNotNull(test);
     }
 
     // ==============================================================

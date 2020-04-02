@@ -14,6 +14,7 @@ import ome.model.units.Time;
 import ome.parameters.Parameters;
 import ome.testing.ObjectFactory;
 
+import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -39,9 +40,9 @@ public class DetachedPixelsGraphTest extends AbstractUpdateTest {
         example = iUpdate.saveAndReturnObject(example.getImage()).getPixels(0);
 
         p = ObjectFactory.createPixelGraph(example);
-        assertTrue("Starting off empty", p.sizeOfChannels() >= 0);
+        Assert.assertTrue(p.sizeOfChannels() >= 0, "Starting off empty");
         channelsSizeBefore = p.sizeOfChannels();
-        assertTrue("Starting off empty", channelsSizeBefore > 0);
+        Assert.assertTrue( channelsSizeBefore > 0, "Starting off empty");
 
     }
 
@@ -52,14 +53,14 @@ public class DetachedPixelsGraphTest extends AbstractUpdateTest {
         p = iUpdate.saveAndReturnObject(p.getImage()).getPixels(0);
 
         // TEST -------------------------------------------------
-        assertTrue("Related-to is null", p.getRelatedTo() != null);
-        assertTrue("or it has no id", p.getRelatedTo().getId().longValue() > 0);
+        Assert.assertTrue(p.getRelatedTo() != null, "Related-to is null");
+        Assert.assertTrue(p.getRelatedTo().getId().longValue() > 0, "or it has no id");
 
         long id = (Long) iQuery.projection(
                 "select relatedto from Pixels where id = :id",
                 new Parameters().addId(p.getId())).get(0)[0];
-        assertTrue("Id *really* has to be there.", p.getRelatedTo().getId()
-                .longValue() == id);
+        Assert.assertTrue(p.getRelatedTo().getId()
+                .longValue() == id, "Id *really* has to be there.");
 
     }
 
@@ -77,9 +78,9 @@ public class DetachedPixelsGraphTest extends AbstractUpdateTest {
         p = iUpdate.saveAndReturnObject(p);
 
         // TEST -------------------------------------------------
-        assertTrue("Related-to is null", p.getRelatedTo() != null);
-        assertTrue("and it has no id", p.getRelatedTo().getId().equals(
-                p2.getId()));
+        Assert.assertTrue(p.getRelatedTo() != null, "Related-to is null");
+        Assert.assertTrue(p.getRelatedTo().getId().equals(
+                p2.getId()), "and it has no id");
 
     }
 
@@ -129,9 +130,9 @@ public class DetachedPixelsGraphTest extends AbstractUpdateTest {
         p = iUpdate.saveAndReturnObject(p);
 
         // TEST -------------------------------------------------
-        assertTrue("Didn't get re-filled", p.sizeOfChannels() >= 0);
-        assertTrue("channel ids aren't the same", equalCollections(example
-                .unmodifiableChannels(), p.unmodifiableChannels()));
+        Assert. assertTrue(p.sizeOfChannels() >= 0, "Didn't get re-filled");
+        Assert.assertTrue( equalCollections(example
+                .unmodifiableChannels(), p.unmodifiableChannels()), "channel ids aren't the same");
     }
 
     @Test
@@ -146,10 +147,10 @@ public class DetachedPixelsGraphTest extends AbstractUpdateTest {
 
         // TEST -------------------------------------------------
         int channelsSizeAfter = p.sizeOfChannels();
-        assertTrue("Filtered channels not refilled",
-                channelsSizeAfter == channelsSizeBefore);
+        Assert.assertEquals(
+                channelsSizeAfter, channelsSizeBefore, "Filtered channels not refilled");
         for (Channel c : p.unmodifiableChannels()) {
-            assertTrue("Channel missing a valid id.", c.getId().longValue() > 0);
+            Assert.assertTrue(c.getId().longValue() > 0, "Channel missing a valid id.");
         }
 
     }
@@ -183,10 +184,10 @@ public class DetachedPixelsGraphTest extends AbstractUpdateTest {
 
         // TEST ----------------------------------------------------
         // ObjectFactory now creations PlaneInfos, so this p already has one.
-        assertTrue("Need at least two pixInfos, please.", p.collectPlaneInfo(
-                null).size() >= 2);
+        Assert.assertTrue( p.collectPlaneInfo(
+                null).size() >= 2, "Need at least two pixInfos, please.");
         for (PlaneInfo pi : p.unmodifiablePlaneInfo()) {
-            assertTrue("Need an id, please.", pi.getId().longValue() > 0);
+            Assert.assertTrue(pi.getId().longValue() > 0, "Need an id, please.");
         }
     }
 

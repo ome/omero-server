@@ -40,6 +40,7 @@ import omeis.providers.re.quantum.QuantumStrategy;
 
 import org.perf4j.LoggingStopWatch;
 import org.perf4j.StopWatch;
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
 
@@ -107,17 +108,17 @@ public class TestStandardFloatRenderer extends BaseRenderingTest
                 settings.getQuantization(), pixels);
         int n = data.size();
         for (int i = 0; i < n/2; i++) {
-            assertEquals(0.0, data.getPixelValue(i));
+            Assert.assertEquals(0.0, data.getPixelValue(i));
         }
         for (int i = 0; i < n/2; i++) {
-            assertEquals(new Float(qs.getPixelsTypeMax()),
+            Assert.assertEquals(new Float(qs.getPixelsTypeMax()),
                     new Float(data.getPixelValue(i+n/2)));
         }
 
         try
         {
-            assertEquals(0.0, data.getPixelValue(n));
-            fail("Should have thrown an IndexOutOfBoundsException.");
+            Assert.assertEquals(0.0, data.getPixelValue(n));
+            Assert.fail("Should have thrown an IndexOutOfBoundsException.");
         }
         catch (IndexOutOfBoundsException e) { }
     }
@@ -127,8 +128,8 @@ public class TestStandardFloatRenderer extends BaseRenderingTest
     {
         QuantumStrategy qs = quantumFactory.getStrategy(
                 settings.getQuantization(), pixels);
-        assertTrue(Integer.MIN_VALUE == qs.getPixelsTypeMin());
-        assertTrue(Integer.MAX_VALUE == qs.getPixelsTypeMax());
+        Assert.assertTrue(Integer.MIN_VALUE == qs.getPixelsTypeMin());
+        Assert.assertTrue(Integer.MAX_VALUE == qs.getPixelsTypeMax());
     }
 
     @Test(timeOut=30000)

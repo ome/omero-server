@@ -6,6 +6,7 @@
  */
 package ome.server.itests.perms42;
 
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
 /**
@@ -19,84 +20,84 @@ public class MiscPermissionsTest extends PermissionsTest {
 
     @Test
     public void testUserLoggedIntoGroupDuringGroupChangeIsNotified() throws Exception {
-        fail();
+        Assert.fail();
         // Do we need to lock the group?
         // Best-effort at using umask to keep user tx going
     }
 
     @Test
     public void testIAdminChangeGroupIsNotSupported() throws Exception {
-        fail();
+        Assert.fail();
     }
 
     @Test
     public void testIAdminChangePermissionsIsSeverlyLimited() throws Exception {
-        fail();
+        Assert.fail();
     }
 
     @Test
     public void testUserInDiffGroupCantSeeObjects() throws Exception {
-        fail();
+        Assert.fail();
     }
 
     @Test
     public void testUserCantReadOwnFromAnotherContext() throws Exception {
-        fail();
+        Assert.fail();
     }
 
     @Test
     public void testPICanStillDoAnythingInGroup() throws Exception {
-        fail();
+        Assert.fail();
     }
 
     @Test
     public void testAdminCantChangePermsOfGroupByAccident() throws Exception {
-        fail();
+        Assert.fail();
     }
 
     @Test
     public void testOwnerCanCallChgrpOnCoherentGraph() throws Exception {
-        fail();
+        Assert.fail();
     }
 
     @Test
     public void testOwnerCantCallChgrpForAnotherOwner() throws Exception {
-        fail();
+        Assert.fail();
     }
 
     @Test
     public void testChgrpLeavesADeletionRecordWhereNecessary() throws Exception {
-        fail();
+        Assert.fail();
     }
 
     @Test
     public void testChgrpCanAlternativelyStoreByValue() throws Exception {
-        fail();
+        Assert.fail();
     }
 
     @Test
     public void testTriggersPreventMixingGraphs() throws Exception {
-        fail();
+        Assert.fail();
     }
 
     @Test
     public void testWorldPermissionsAreKeptCoherent() throws Exception {
-        fail();
+        Assert.fail();
     }
 
     @Test
     public void testUserCanSafelyStoreInfoInAPrivateGroup() throws Exception {
-        fail();
+        Assert.fail();
     }
 
     @Test
     public void testPICanMoveAGroupToShared() throws Exception {
-        fail();
+        Assert.fail();
     }
 
     @Test
     public void testUserWillBeInformedIfGroupIsShared() throws Exception {
-        fail();
+        Assert.fail();
     }
 
 }

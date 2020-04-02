@@ -15,6 +15,7 @@ import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.ldap.core.LdapOperations;
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
 public class LdapTest extends AbstractManagedContextTest {
@@ -82,8 +83,7 @@ public class LdapTest extends AbstractManagedContextTest {
 			try {
 				iLdap.findDN("jsmith");
 			} catch (Exception e) {
-				System.err.println("Subtree should not contains two the same CNs");
-				e.printStackTrace();
+				Assert.fail("Subtree should not contains two the same CNs", e);
 			}
 		}
 	}
@@ -98,8 +98,7 @@ public class LdapTest extends AbstractManagedContextTest {
             try {
                 iLdap.findDN("jsmith");
             } catch (Exception e) {
-                System.err.println("Subtree should not contains two the same CNs");
-                e.printStackTrace();
+				Assert.fail("Subtree should not contains two the same CNs", e);
             }
         }
     }
@@ -112,7 +111,7 @@ public class LdapTest extends AbstractManagedContextTest {
                 exp = iAdmin.lookupExperimenter("jmoore");
             } catch (ApiUsageException e) {
                 // iLdap.createUserFromLdap("jmoore", "XXX");
-                fail();
+				Assert.fail();
             }
             
             if(exp!=null) 

@@ -11,8 +11,6 @@ import java.util.UUID;
 
 import javax.sql.DataSource;
 
-import junit.framework.TestCase;
-
 import ome.model.enums.DimensionOrder;
 import ome.model.enums.PixelsType;
 import ome.system.EventContext;
@@ -56,12 +54,14 @@ import org.springframework.aop.interceptor.JamonPerformanceMonitorInterceptor;
 import org.springframework.aop.target.HotSwappableTargetSource;
 import org.springframework.ldap.core.LdapTemplate;
 import org.springframework.mail.MailSender;
+
+import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 @Test(groups = { "integration" })
-public class AbstractManagedContextTest extends TestCase {
+public class AbstractManagedContextTest {
 
     // =========================================================================
 
@@ -329,14 +329,14 @@ public class AbstractManagedContextTest extends TestCase {
             d.linkImage(i);
             iUpdate.saveObject(d);
         }
-        assertNotNull(i);
+        Assert.assertNotNull(i);
         return i;
     }
 
     protected <T extends IObject> void assertWorldReadable(T t) {
         Permissions p = t.getDetails().getPermissions();
-        assertTrue(p.isGranted(Role.GROUP, Right.READ));
-        assertTrue(p.isGranted(Role.WORLD, Right.READ));
+        Assert.assertTrue(p.isGranted(Role.GROUP, Right.READ));
+        Assert.assertTrue(p.isGranted(Role.WORLD, Right.READ));
     }
 
     protected <T extends IObject> void assertWorldReadable(List<T> list) {

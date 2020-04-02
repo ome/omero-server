@@ -24,6 +24,7 @@ import ome.services.query.Query;
 import ome.services.query.QueryFactory;
 import ome.services.query.StringQuery;
 
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
 @Test(groups = { "query" })
@@ -45,7 +46,7 @@ public class UniqueResultTest extends AbstractManagedContextTest {
         try {
 
             IObject o1 = iQuery.execute(q1);
-            fail("Should have thrown an exception.");
+            Assert.fail("Should have thrown an exception.");
         } catch (ClassCastException cce) {
             // ok.
         }
@@ -69,9 +70,9 @@ public class UniqueResultTest extends AbstractManagedContextTest {
             iQuery.findAllByQuery("select p from Project p where p.id = :id",
                     new Parameters().addId(p.getId()).setFilter(
                             new Filter().unique()));
-            fail("Should have thrown class cast exception.");
+            Assert.fail("Should have thrown class cast exception.");
         } catch (InternalException ie) {
-            assertTrue(ie.getMessage().contains("ClassCastException"));
+            Assert.assertTrue(ie.getMessage().contains("ClassCastException"));
             // ok.
         }
 
@@ -94,7 +95,7 @@ public class UniqueResultTest extends AbstractManagedContextTest {
     public void test_ContainerFindHierarchies_list() throws Exception {
         p = new Parameters().addIds(getNewProjects(2, TICKET_83)).addClass(
                 Project.class);
-        assertFalse(p.isUnique());
+        Assert.assertFalse(p.isUnique());
         Query q = new PojosFindHierarchiesQueryDefinition(p);
         iQuery.execute(q);
     }
@@ -112,7 +113,7 @@ public class UniqueResultTest extends AbstractManagedContextTest {
     public void test_ContainerGetImages_list() throws Exception {
         p = new Parameters().addIds(getNewProjects(2, TICKET_83)).addClass(
                 Project.class);
-        assertFalse(p.isUnique());
+        Assert.assertFalse(p.isUnique());
         Query q = new PojosGetImagesQueryDefinition(p);
         iQuery.execute(q);
     }
@@ -130,7 +131,7 @@ public class UniqueResultTest extends AbstractManagedContextTest {
     public void test_ContainerLoadHierarchies_list() throws Exception {
         p = new Parameters().addIds(getNewProjects(2, TICKET_83)).addClass(
                 Project.class);
-        assertFalse(p.isUnique());
+        Assert.assertFalse(p.isUnique());
         Query q = new PojosLoadHierarchyQueryDefinition(p);
         iQuery.execute(q);
     }
@@ -148,7 +149,7 @@ public class UniqueResultTest extends AbstractManagedContextTest {
     public void test_CollectionCount_list() throws Exception {
         p = new Parameters().addIds(getNewProjects(2, TICKET_83)).addString(
                 "field", Project.DATASETLINKS);
-        assertFalse(p.isUnique());
+        Assert.assertFalse(p.isUnique());
         Query q = new CollectionCountQueryDefinition(p);
         iQuery.execute(q);
     }
@@ -166,7 +167,7 @@ public class UniqueResultTest extends AbstractManagedContextTest {
     @Test(groups = { TICKET_83 })
     public void test_IObjectClassQuery_list() throws Exception {
         p = new Parameters().addClass(Project.class);
-        assertFalse(p.isUnique());
+        Assert.assertFalse(p.isUnique());
         Query q = new IObjectClassQuery(p);
         iQuery.execute(q);
     }
@@ -189,7 +190,7 @@ public class UniqueResultTest extends AbstractManagedContextTest {
                 StringQuery.STRING,
                 "select p from Project p where p.id in (:" + Parameters.IDS
                         + ")").addIds(getNewImages(2, TICKET_83));
-        assertFalse(p.isUnique());
+        Assert.assertFalse(p.isUnique());
         Query q = new StringQuery(p);
         iQuery.execute(q);
     }

@@ -5,8 +5,6 @@
 
 package ome.tools.utests;
 
-import junit.framework.TestCase;
-
 /**
  * Simple unit tests of the ome.tools.RepositoryTask utility.
  *
@@ -14,7 +12,7 @@ import junit.framework.TestCase;
  *         href="mailto:david@glencoesoftware.com">david@glencoesoftware.com</a>
  * @since 3.0
  */
-public class RepositoryTaskTest extends TestCase {
+public class RepositoryTaskTest {
 	
 //	RepositoryTask task = null;
 //	private OmeroContext ctx;

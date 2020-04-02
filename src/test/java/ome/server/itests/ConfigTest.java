@@ -11,6 +11,7 @@ import java.util.UUID;
 import ome.api.IConfig;
 import ome.conditions.SecurityViolation;
 
+import org.testng.Assert;
 import org.testng.annotations.*;
 
 /**
@@ -59,7 +60,7 @@ public class ConfigTest extends AbstractManagedContextTest {
          */
         IConfig test = factory.getConfigService();
 
-        assertNotNull(test.getServerTime());
+        Assert.assertNotNull(test.getServerTime());
     }
 
     @Test
@@ -67,7 +68,7 @@ public class ConfigTest extends AbstractManagedContextTest {
         /*
          * Developer notes: --------------- Using the instance variable
          */
-        assertNotNull(iConfig.getDatabaseTime());
+        Assert.assertNotNull(iConfig.getDatabaseTime());
     }
 
     @Test
@@ -78,7 +79,7 @@ public class ConfigTest extends AbstractManagedContextTest {
          * will be available
          */
         String value = iConfig.getConfigValue(UUID.randomUUID().toString());
-        assertNull(value);
+        Assert.assertNull(value);
 
     }
     
@@ -86,12 +87,12 @@ public class ConfigTest extends AbstractManagedContextTest {
     public void testDefaultPreferencesConfiguration() throws Exception {
         
         loginNewUser();
-        assertEquals("false", iConfig
+        Assert.assertEquals("false", iConfig
                 .getConfigValue("omero.mail.config"));
         
         try {
             iConfig.getConfigValue("omero.mail.password");
-            fail("secvio!");
+            Assert.fail("secvio!");
         } catch (SecurityViolation sv) {
             // regular user should not be able to acquire sensitive info
         }
@@ -107,7 +108,7 @@ public class ConfigTest extends AbstractManagedContextTest {
         
         loginRoot();
         iConfig.setConfigValue("omero.cluster.redirect", "foo");
-        assertEquals("foo", iConfig.getConfigValue("omero.cluster.redirect"));
+        Assert.assertEquals("foo", iConfig.getConfigValue("omero.cluster.redirect"));
 
     }
 
@@ -119,13 +120,13 @@ public class ConfigTest extends AbstractManagedContextTest {
      */
     @Test(groups = "ignore")
     public void testThisTestUsuallyWontBeCalled() throws Exception {
-        fail("This usually won't be called. You're probably using "
+        Assert.fail("This usually won't be called. You're probably using "
                 + "the developer test suite; don't worry about this.");
     }
 
     @Test(enabled = false)
     public void testThisTestWontBeCalled() throws Exception {
-        fail("Error in TestNG!");
+        Assert.fail("Error in TestNG!");
     }
 
 }

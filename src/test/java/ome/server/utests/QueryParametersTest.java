@@ -9,7 +9,6 @@ package ome.server.utests;
 import java.util.Collections;
 import java.util.Set;
 
-import junit.framework.TestCase;
 import ome.conditions.ApiUsageException;
 import ome.parameters.QueryParameter;
 import ome.services.query.CollectionQueryParameterDef;
@@ -17,7 +16,7 @@ import ome.services.query.QueryParameterDef;
 
 import org.testng.annotations.Test;
 
-public class QueryParametersTest extends TestCase {
+public class QueryParametersTest {
 
     // ~ Exceptions
     // =========================================================================

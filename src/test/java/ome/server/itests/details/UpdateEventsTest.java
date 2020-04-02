@@ -14,6 +14,7 @@ import ome.parameters.Filter;
 import ome.parameters.Parameters;
 import ome.server.itests.AbstractManagedContextTest;
 
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
 /**
@@ -42,7 +43,7 @@ public class UpdateEventsTest extends AbstractManagedContextTest {
 
         try {
             iUpdate.saveObject(i);
-            fail("secvio!");
+            Assert.fail("secvio!");
         } catch (SecurityViolation sv) {
             // ok
         }
@@ -63,9 +64,9 @@ public class UpdateEventsTest extends AbstractManagedContextTest {
         i = iUpdate.saveAndReturnObject(i);
         Event test = i.getDetails().getUpdateEvent();
 
-        assertEquals("When interceptor reverts changes, "
-                + "there should be no modification", modification.getId(), test
-                .getId());
+        Assert.assertEquals( modification.getId(), test
+                .getId(), "When interceptor reverts changes, "
+                + "there should be no modification");
     }
 
     @Test
@@ -82,8 +83,9 @@ public class UpdateEventsTest extends AbstractManagedContextTest {
         i = iUpdate.saveAndReturnObject(i);
         Event test = i.getDetails().getUpdateEvent();
 
-        assertFalse("On a real change, the modification must increment",
-                modification.getId().equals(test.getId()));
+        Assert.assertFalse(
+                modification.getId().equals(test.getId()),
+                "On a real change, the modification must increment");
     }
 
 

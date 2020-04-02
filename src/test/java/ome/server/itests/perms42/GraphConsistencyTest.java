@@ -16,6 +16,7 @@ import ome.model.internal.Permissions;
 import ome.model.meta.Experimenter;
 import ome.model.meta.ExperimenterGroup;
 
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
 /**
@@ -56,7 +57,7 @@ public class GraphConsistencyTest extends PermissionsTest {
         i.setName(uuid());
         try {
             iUpdate.saveObject(i);
-            fail("sec-vio");
+            Assert.fail("sec-vio");
         } catch (SecurityViolation sv) {
             // ok
         }
@@ -69,7 +70,7 @@ public class GraphConsistencyTest extends PermissionsTest {
             ImageAnnotationLink link = new ImageAnnotationLink();
             link.link(i.proxy(), new TagAnnotation());
             iUpdate.saveObject(link);
-            fail("sec-vio");
+            Assert.fail("sec-vio");
         } catch (SecurityViolation sv) {
             // ok
         }
@@ -93,7 +94,7 @@ public class GraphConsistencyTest extends PermissionsTest {
 
         // Now get all images that belong to the user
         List<Image> images = allImagesForFixtureUser();
-        assertEquals(1, images.size());
+        Assert.assertEquals(1, images.size());
 
     }
 
@@ -105,11 +106,11 @@ public class GraphConsistencyTest extends PermissionsTest {
         loginRoot();
         // Logged into "system"
         List<Image> images = allImagesForFixtureUser();
-        assertEquals(0, images.size());
+        Assert.assertEquals(0, images.size());
         // Logged into the fixture group
         fixture.use_fixture_group();
         images = allImagesForFixtureUser();
-        assertEquals(1, images.size());
+        Assert.assertEquals(1, images.size());
 
     }
 
@@ -138,7 +139,7 @@ public class GraphConsistencyTest extends PermissionsTest {
             // if the read is disabled, then it won't be possible to
             // load the object for linking?
             d = iUpdate.saveAndReturnObject(d);
-            fail("Mixed group should not allowed!");
+            Assert.fail("Mixed group should not allowed!");
         } catch (SecurityViolation sv) {
             // good
         }
@@ -156,7 +157,7 @@ public class GraphConsistencyTest extends PermissionsTest {
         Permissions groupPermissions = fixture.group().getDetails()
                 .getPermissions();
         Permissions imagePermissions = image.getDetails().getPermissions();
-        assertTrue(groupPermissions.identical(imagePermissions));
+        Assert.assertTrue(groupPermissions.identical(imagePermissions));
 
     }
 
@@ -164,7 +165,7 @@ public class GraphConsistencyTest extends PermissionsTest {
     public void testObjectCreatedWithGroupPermissionsMinusUmask()
             throws Exception {
         setup(Permissions.USER_PRIVATE);
-        fail();
+        Assert.fail();
     }
 
     //

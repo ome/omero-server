@@ -12,6 +12,7 @@ import ome.model.annotations.TextAnnotation;
 import ome.model.core.Image;
 import ome.parameters.Parameters;
 
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
 /**
@@ -28,8 +29,8 @@ public class CountTest extends AbstractManagedContextTest {
 
         i = loadImageWithAnnotationCounts(i);
 
-        assertNotNull(i.getAnnotationLinksCountPerOwner());
-        assertNull(i.getAnnotationLinksCountPerOwner().get(self));
+        Assert.assertNotNull(i.getAnnotationLinksCountPerOwner());
+        Assert.assertNull(i.getAnnotationLinksCountPerOwner().get(self));
 
         TextAnnotation ta = new CommentAnnotation();
         ta.setNs("");
@@ -40,14 +41,14 @@ public class CountTest extends AbstractManagedContextTest {
 
         i = loadImageWithAnnotationCounts(i);
 
-        assertNotNull(i.getAnnotationLinksCountPerOwner());
-        assertTrue(i.getAnnotationLinksCountPerOwner().get(self).equals(1L));
+        Assert.assertNotNull(i.getAnnotationLinksCountPerOwner());
+        Assert.assertTrue(i.getAnnotationLinksCountPerOwner().get(self).equals(1L));
 
         // Attempting to edit them
         i.getAnnotationLinksCountPerOwner().put(self, 1000000L);
 
         i = loadImageWithAnnotationCounts(i);
-        assertTrue(i.getAnnotationLinksCountPerOwner().get(self).equals(1L));
+        Assert.assertTrue(i.getAnnotationLinksCountPerOwner().get(self).equals(1L));
     }
 
     private Image loadImageWithAnnotationCounts(Image i) {

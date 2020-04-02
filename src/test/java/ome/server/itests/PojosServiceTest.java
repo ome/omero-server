@@ -34,6 +34,7 @@ import ome.testing.OMEData;
 import ome.testing.ObjectFactory;
 import ome.util.CBlock;
 
+import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -69,7 +70,7 @@ public class PojosServiceTest extends AbstractManagedContextTest {
 
         try {
             iContainer.loadContainerHierarchy(Project.class, null, null);
-            fail("Should throw ApiUsage.");
+            Assert.fail("Should throw ApiUsage.");
         } catch (ApiUsageException aue) {
             // ok
         }
@@ -110,8 +111,8 @@ public class PojosServiceTest extends AbstractManagedContextTest {
         // Aren't returned now by getImages
         // assertTrue(d.getAnnotationLinksCountPerOwner() != null);
         // assertTrue(d.getAnnotationLinksCountPerOwner().get(self).equals(1L));
-        assertTrue(i.getAnnotationLinksCountPerOwner() != null);
-        assertTrue(i.getAnnotationLinksCountPerOwner().get(self).equals(1L));
+        Assert.assertTrue(i.getAnnotationLinksCountPerOwner() != null);
+        Assert.assertTrue(i.getAnnotationLinksCountPerOwner().get(self).equals(1L));
 
     }
 
@@ -172,7 +173,7 @@ public class PojosServiceTest extends AbstractManagedContextTest {
 
         Set<Image> images = iContainer.getImagesByOptions(options);
         Image i = images.iterator().next();
-        assertTrue(i.getAnnotationLinksCountPerOwner() != null);
+        Assert.assertTrue(i.getAnnotationLinksCountPerOwner() != null);
 
     }
 
@@ -199,7 +200,7 @@ public class PojosServiceTest extends AbstractManagedContextTest {
         Set screens = iContainer.loadContainerHierarchy(Screen.class, 
         		new HashSet(), options);
 
-        assertEquals(1, screens.size());
+        Assert.assertEquals(1, screens.size());
         
         Iterator i = screens.iterator();
         Screen screen;
@@ -208,13 +209,13 @@ public class PojosServiceTest extends AbstractManagedContextTest {
         Plate plate;
         while (i.hasNext()) {
         	screen = (Screen) i.next();
-		assertEquals(screen.getId(), s.getId());
+            Assert.assertEquals(screen.getId(), s.getId());
         	plates = screen.linkedPlateList();
-        	assertTrue(plates.size() == 1);
+            Assert.assertTrue(plates.size() == 1);
         	j = plates.iterator();
         	while (j.hasNext()) {
         		plate = (Plate) j.next();
-			assertEquals(plate.getId(), p1.getId());
+                Assert.assertEquals(plate.getId(), p1.getId());
 			}
 		}
 
@@ -222,15 +223,15 @@ public class PojosServiceTest extends AbstractManagedContextTest {
         options.orphan();
         screens = iContainer.loadContainerHierarchy(Screen.class, 
         		new HashSet(), options);
-        assertTrue(screens.size() == 2);
+        Assert.assertTrue(screens.size() == 2);
         i = screens.iterator();
         IObject object;
         while (i.hasNext()) {
         	object = (IObject) i.next();
         	if (object instanceof Screen) {
-        		assertTrue(object.getId() == s.getId());
+                Assert.assertTrue(object.getId() == s.getId());
         	} else if (object instanceof Plate) {
-        		assertTrue(object.getId() == p2.getId());
+                Assert.assertTrue(object.getId() == p2.getId());
         	}
 		}
     }

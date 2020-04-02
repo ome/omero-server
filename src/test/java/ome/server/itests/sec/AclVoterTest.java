@@ -18,6 +18,7 @@
 package ome.server.itests.sec;
 
 import ome.system.EventContext;
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import ome.conditions.SecurityViolation;
@@ -188,7 +189,7 @@ public class AclVoterTest extends AbstractManagedContextTest {
         try {
             T rv = iUpdate.saveAndReturnObject(o);
             if (!pass) {
-                fail("No secvio thrown! :" + o);
+                Assert.fail("No secvio thrown! :" + o);
             }
             return rv;
         }
