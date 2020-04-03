@@ -8,6 +8,8 @@ package ome.server.itests.query;
 
 import java.util.HashSet;
 import java.util.List;
+
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import ome.conditions.ApiUsageException;
@@ -42,9 +44,9 @@ public class SimpleQueriesTest extends AbstractManagedContextTest {
         // Test 1
 
         p = iQuery.refresh(p);
-        assertNotNull(p);
-        assertNotNull(p.getId());
-        assertEquals(p.getName(), TICKET_347);
+        Assert.assertNotNull(p);
+        Assert.assertNotNull(p.getId());
+        Assert.assertEquals(p.getName(), TICKET_347);
 
         // Test 2
 
@@ -56,7 +58,7 @@ public class SimpleQueriesTest extends AbstractManagedContextTest {
         // this should fail since dataset is a new instance.
         try {
             p = iQuery.refresh(p);
-            fail("refresh should throw ApiUsage on transient entities.");
+            Assert.fail("refresh should throw ApiUsage on transient entities.");
         } catch (ApiUsageException api) {
             // ok
         }
@@ -73,8 +75,8 @@ public class SimpleQueriesTest extends AbstractManagedContextTest {
         p = iUpdate.saveAndReturnObject(p);
 
         p = iQuery.refresh(p);
-        assertNotNull(p);
-        assertTrue(p.sizeOfDatasetLinks() == 1);
+        Assert.assertNotNull(p);
+        Assert.assertTrue(p.sizeOfDatasetLinks() == 1);
 
         // Test 4
 
@@ -84,16 +86,16 @@ public class SimpleQueriesTest extends AbstractManagedContextTest {
         link = iUpdate.saveAndReturnObject(link);
 
         p = iQuery.refresh(p);
-        assertNotNull(p);
-        assertTrue(p.sizeOfDatasetLinks() == 2);
+        Assert.assertNotNull(p);
+        Assert.assertTrue(p.sizeOfDatasetLinks() == 2);
 
         // Test 5
 
         // now let's remove something
         iUpdate.deleteObject(link);
         p = iQuery.refresh(p);
-        assertNotNull(p);
-        assertTrue(p.sizeOfDatasetLinks() == 1);
+        Assert.assertNotNull(p);
+        Assert.assertTrue(p.sizeOfDatasetLinks() == 1);
 
     }
 }

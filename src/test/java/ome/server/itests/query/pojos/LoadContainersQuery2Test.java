@@ -18,6 +18,7 @@ import ome.parameters.Parameters;
 import ome.server.itests.AbstractManagedContextTest;
 import ome.services.query.PojosLoadHierarchyQueryDefinition;
 
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
 /**
@@ -57,8 +58,8 @@ public class LoadContainersQuery2Test extends AbstractManagedContextTest {
         Set<IObject> ds = iContainer.loadContainerHierarchy(Dataset.class,
                 Collections.singleton(d.getId()), null);
         d = (Dataset) ds.iterator().next();
-        assertNotNull(d.getAnnotationLinksCountPerOwner());
-        assertTrue(d.getAnnotationLinksCountPerOwner().get(self).longValue() == 1L);
+        Assert.assertNotNull(d.getAnnotationLinksCountPerOwner());
+        Assert.assertEquals(d.getAnnotationLinksCountPerOwner().get(self).longValue(), 1L);
     }
 
     public void testQueryReturnsCountsForTwoLevels() throws Exception {
@@ -77,12 +78,12 @@ public class LoadContainersQuery2Test extends AbstractManagedContextTest {
                 Collections.singleton(p.getId()), null);
         p = (Project) ps.iterator().next();
         d = p.linkedDatasetList().get(0);
-        assertNotNull(p.getAnnotationLinksCountPerOwner());
-        assertTrue(p.getAnnotationLinksCountPerOwner().get(self).longValue() == 1L);
-        assertNotNull(d.getAnnotationLinksCountPerOwner());
-        assertTrue(d.getAnnotationLinksCountPerOwner().get(self).longValue() == 1L);
-        assertNotNull(d.getImageLinksCountPerOwner());
-        assertTrue(d.getImageLinksCountPerOwner().get(self).longValue() == 1L);
+        Assert.assertNotNull(p.getAnnotationLinksCountPerOwner());
+        Assert.assertEquals(p.getAnnotationLinksCountPerOwner().get(self).longValue(), 1L);
+        Assert.assertNotNull(d.getAnnotationLinksCountPerOwner());
+        Assert.assertEquals(d.getAnnotationLinksCountPerOwner().get(self).longValue(), 1L);
+        Assert.assertNotNull(d.getImageLinksCountPerOwner());
+        Assert.assertEquals(d.getImageLinksCountPerOwner().get(self).longValue(), 1L);
 
     }
 
@@ -91,20 +92,20 @@ public class LoadContainersQuery2Test extends AbstractManagedContextTest {
         Dataset d = createDataset();
         Set<IObject> ds = this.iContainer.loadContainerHierarchy(Dataset.class,
                 Collections.singleton(d.getId()), null);
-        assertTrue(ds.size() == 1);
+        Assert.assertEquals(ds.size(), 1);
         d = (Dataset) ds.iterator().next();
-        assertTrue(d.getImageLinksCountPerOwner() != null);
-        assertTrue(d.getAnnotationLinksCountPerOwner() != null);
+        Assert.assertTrue(d.getImageLinksCountPerOwner() != null);
+        Assert.assertTrue(d.getAnnotationLinksCountPerOwner() != null);
 
         // With leaves
         ds = this.iContainer.loadContainerHierarchy(Dataset.class, Collections
                 .singleton(d.getId()), new Parameters().leaves());
-        assertTrue(ds.size() == 1);
+        Assert.assertEquals(ds.size(), 1);
         d = (Dataset) ds.iterator().next();
-        assertTrue(d.getImageLinksCountPerOwner() != null);
-        assertTrue(d.getAnnotationLinksCountPerOwner() != null);
+        Assert.assertTrue(d.getImageLinksCountPerOwner() != null);
+        Assert.assertTrue(d.getAnnotationLinksCountPerOwner() != null);
         Image i = d.linkedImageIterator().next();
-        assertTrue(i.toString(), i.getAnnotationLinksCountPerOwner() != null);
+        Assert.assertTrue(i.getAnnotationLinksCountPerOwner() != null, i.toString());
     }
 
     @Test(groups = "ticket:907")
@@ -114,14 +115,14 @@ public class LoadContainersQuery2Test extends AbstractManagedContextTest {
         // with leaves
         Set<IObject> ds = this.iContainer.loadContainerHierarchy(Dataset.class,
                 Collections.singleton(d.getId()), new Parameters().leaves());
-        assertTrue(ds.size() == 1);
-        assertTrue(((Dataset)ds.iterator().next()).sizeOfImageLinks() == 1);
+        Assert.assertEquals(ds.size(), 1);
+        Assert.assertEquals(((Dataset)ds.iterator().next()).sizeOfImageLinks(), 1);
 
         // without leaves
         ds = this.iContainer.loadContainerHierarchy(Dataset.class, Collections
                 .singleton(d.getId()), new Parameters().noLeaves());
-        assertTrue(ds.size() == 1);
-        assertTrue(((Dataset)ds.iterator().next()).sizeOfImageLinks() < 0);
+        Assert.assertEquals(ds.size(), 1);
+        Assert.assertTrue(((Dataset) ds.iterator().next()).sizeOfImageLinks() < 0);
 
     }
     
@@ -152,7 +153,7 @@ public class LoadContainersQuery2Test extends AbstractManagedContextTest {
         // with leaves
         Set<IObject> res = this.iContainer.loadContainerHierarchy(Project.class,
                 null, new Parameters().exp(uid).orphan());
-        assertEquals(10, res.size());
+        Assert.assertEquals(10, res.size());
     }
 
     // Helpers

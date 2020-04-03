@@ -16,6 +16,7 @@ import ome.model.core.Pixels;
 import ome.parameters.Parameters;
 import ome.testing.ObjectFactory;
 
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
 public class PostAnnotationsUpdateTest extends AbstractUpdateTest {
@@ -43,13 +44,13 @@ public class PostAnnotationsUpdateTest extends AbstractUpdateTest {
         d = (Dataset) s.iterator().next();
         i = d.linkedImageList().get(0);
         p = i.getPrimaryPixels();
-        assertTrue(p.isLoaded());
+        Assert.assertTrue(p.isLoaded());
         // assertTrue(p.unmodifiableChannels().iterator().next().isLoaded());
 
         s = iContainer.loadContainerHierarchy(Dataset.class, Collections
                 .singleton(d.getId()), new Parameters().noLeaves());
         d = (Dataset) s.iterator().next();
-        assertTrue(d.sizeOfImageLinks() < 0);
+        Assert.assertTrue(d.sizeOfImageLinks() < 0);
 
     }
 
@@ -64,9 +65,9 @@ public class PostAnnotationsUpdateTest extends AbstractUpdateTest {
         IObject[] objs = iUpdate.saveAndReturnArray(imgs);
         imgs[0] = (Image) objs[0];
         imgs[1] = (Image) objs[1];
-        assertTrue(imgs[0].isLoaded());
-        assertTrue(imgs[0].getPrimaryPixels().isLoaded());
-        assertTrue(imgs[0].getPrimaryPixels().getPrimaryChannel().isLoaded());
+        Assert.assertTrue(imgs[0].isLoaded());
+        Assert.assertTrue(imgs[0].getPrimaryPixels().isLoaded());
+        Assert.assertTrue(imgs[0].getPrimaryPixels().getPrimaryChannel().isLoaded());
 
     }
 

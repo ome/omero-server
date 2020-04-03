@@ -16,6 +16,7 @@ import ome.model.meta.Experimenter;
 import ome.parameters.Parameters;
 import ome.server.itests.AbstractManagedContextTest;
 
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
 public class ProjectionTest extends AbstractManagedContextTest {
@@ -31,7 +32,7 @@ public class ProjectionTest extends AbstractManagedContextTest {
         List<Object[]> rv = iQuery.projection(" select count(i.name), i.name "
                 + "from Image i where i.name = :uuid group by i.name", new Parameters()
                 .addString("uuid", uuid));
-        assertEquals(0, rv.size());
+        Assert.assertEquals(0, rv.size());
     }
 
     @Test
@@ -47,7 +48,7 @@ public class ProjectionTest extends AbstractManagedContextTest {
                 + "p.pixelsType.value, "
                 + "sum(p.sizeX * p.sizeY * p.sizeZ * p.sizeT * p.sizeC) "
                 + "from Pixels p group by p.pixelsType.value", null);
-        assertEquals(0, rv.size());
+        Assert.assertEquals(0, rv.size());
     }
 
     @Test
@@ -59,7 +60,7 @@ public class ProjectionTest extends AbstractManagedContextTest {
                 + "sum(e.entityId)/count(e.entityId) "
                 + "from EventLog e where e.action = 'DELETE' "
                 + "group by e.entityType", null);
-        assertTrue(0 <= rv.size());
+        Assert.assertTrue(0 <= rv.size());
     }
 
     @Test(expectedExceptions = ClassCastException.class)
@@ -67,7 +68,7 @@ public class ProjectionTest extends AbstractManagedContextTest {
         loginNewUser();
         List<Object[]> rv = iQuery.projection("select e from Experimenter e",
                 null);
-        assertTrue(rv.get(0)[0] instanceof Experimenter);
+        Assert.assertTrue(rv.get(0)[0] instanceof Experimenter);
     }
 
     @Test
@@ -76,7 +77,7 @@ public class ProjectionTest extends AbstractManagedContextTest {
         List<Object[]> rv = iQuery.projection("select e.id, " +
 			"e from Experimenter e",
                 null);
-        assertTrue(rv.get(0)[1] instanceof Experimenter);
+        Assert.assertTrue(rv.get(0)[1] instanceof Experimenter);
     }
 
     @Test
@@ -86,7 +87,7 @@ public class ProjectionTest extends AbstractManagedContextTest {
                 "select e.omeName, size(e.groupExperimenterMap) "
                         + "from Experimenter e group by e.omeName", null);
         for (Object[] objects : rv) {
-            assertTrue(((Integer) objects[1]).intValue() > 0);
+            Assert.assertTrue(((Integer) objects[1]).intValue() > 0);
         }
     }
 
@@ -109,7 +110,7 @@ public class ProjectionTest extends AbstractManagedContextTest {
                 "left outer join l.child a where a.ns <> 'OMIT'" +
                 "group by i.id", null);
         Object[] values = rv.get(0);
-        assertEquals(i.getId(), values[0]);
-        assertEquals((long) 1, values[1]);
+        Assert.assertEquals(i.getId(), values[0]);
+        Assert.assertEquals((long) 1, values[1]);
     }
 }

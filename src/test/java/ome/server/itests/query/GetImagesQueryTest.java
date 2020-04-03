@@ -29,6 +29,7 @@ import ome.server.itests.AbstractManagedContextTest;
 import ome.services.query.PojosGetImagesQueryDefinition;
 import ome.testing.ObjectFactory;
 
+import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -41,7 +42,7 @@ public class GetImagesQueryTest extends AbstractManagedContextTest {
     protected void creation_fails(Parameters parameters) {
         try {
             q = new PojosGetImagesQueryDefinition(parameters);
-            fail("Should have failed!");
+            Assert.fail("Should have failed!");
         } catch (IllegalArgumentException e) {
         } catch (ApiUsageException aue) {
         }
@@ -105,8 +106,8 @@ public class GetImagesQueryTest extends AbstractManagedContextTest {
         q = new PojosGetImagesQueryDefinition(new Parameters().addIds(
                 Arrays.asList(prj.getId())).addClass(Project.class));
         list = (List) iQuery.execute(q);
-        assertTrue(list.size() > 0);
-        assertTrue(list.iterator().next().getClass().equals(Image.class));
+        Assert.assertTrue(list.size() > 0);
+        Assert.assertTrue(list.iterator().next().getClass().equals(Image.class));
 
     }
 
@@ -289,9 +290,8 @@ public class GetImagesQueryTest extends AbstractManagedContextTest {
 
         list = (List) iQuery.execute(q);
 
-        assertTrue(
-                "Didn't find expected number of results, but " + list.size(),
-                list.size() == results.size());
+        Assert.assertEquals(
+                list.size(), results.size(), "Didn't find expected number of results, but " + list.size());
     }
 
     // ~ FILTERING
@@ -311,7 +311,7 @@ public class GetImagesQueryTest extends AbstractManagedContextTest {
                 noFilter).addClass(Project.class));
 
         list = (List) iQuery.execute(q);
-        assertTrue(list.size() == userImageRootProjectMap.listAllObjects(
+        Assert.assertEquals(list.size(), userImageRootProjectMap.listAllObjects(
                 Project.class).size()
                 + rootProjectMap.listAllObjects(Project.class).size()
                 + userProjectMap.listAllObjects(Project.class).size());
@@ -323,7 +323,7 @@ public class GetImagesQueryTest extends AbstractManagedContextTest {
         int expected = userImageRootProjectMap.listAllObjects(Project.class)
                 .size()
                 + userProjectMap.listAllObjects(Project.class).size();
-        assertTrue(list.size() + " not " + expected, list.size() == expected);
+        Assert.assertEquals(list.size(), expected, list.size() + " not " + expected);
 
     }
 
@@ -340,14 +340,14 @@ public class GetImagesQueryTest extends AbstractManagedContextTest {
                 noFilter).addClass(Project.class));
 
         list = (List) iQuery.execute(q);
-        assertTrue(list.size() == rootOnlyMap.listAllObjects(Project.class)
+        Assert.assertEquals(list.size(), rootOnlyMap.listAllObjects(Project.class)
                 .size());
 
         q = new PojosGetImagesQueryDefinition(new Parameters(ids).addAll(
                 filterForUser).addClass(Project.class));
 
         list = (List) iQuery.execute(q);
-        assertTrue(list.size() + " not 0", list.size() == 0);
+        Assert.assertEquals(list.size(), 0, list.size() + " not 0");
 
     }
 
@@ -360,7 +360,7 @@ public class GetImagesQueryTest extends AbstractManagedContextTest {
                 "select i from Image i left outer join fetch i.pixels p "
                         + "where p.id = :id and index(p) = 0", new Parameters()
                         .addId(p.getId()));
-        assertNotNull(i.getPrimaryPixels());
+        Assert.assertNotNull(i.getPrimaryPixels());
 
         Dataset d = new Dataset();
         d.setName("ticket:177");
@@ -373,7 +373,7 @@ public class GetImagesQueryTest extends AbstractManagedContextTest {
                 .unique()).addClass(Dataset.class).addIds(
                 Collections.singleton(d.getId())));
         Image test = (Image) iQuery.execute(q);
-        assertNotNull(test.getPrimaryPixels());
+        Assert.assertNotNull(test.getPrimaryPixels());
     }
 
     @Test(groups = { "ticket:221" })
@@ -391,9 +391,9 @@ public class GetImagesQueryTest extends AbstractManagedContextTest {
                 .unique()).addClass(Dataset.class).addIds(
                 Collections.singleton(d.getId())));
         Image test = (Image) iQuery.execute(q);
-        assertNotNull(test);
-        assertNotNull(test.getPrimaryPixels());
-        assertNotNull(test.getPrimaryPixels().getPixelsType());
+        Assert.assertNotNull(test);
+        Assert.assertNotNull(test.getPrimaryPixels());
+        Assert.assertNotNull(test.getPrimaryPixels().getPixelsType());
     }
 
     @Test(groups = { "ticket:296" })
@@ -406,8 +406,8 @@ public class GetImagesQueryTest extends AbstractManagedContextTest {
                 .unique()).addClass(Image.class).addIds(
                 Collections.singleton(i.getId())));
         Image test = (Image) iQuery.execute(q);
-        assertNotNull(test);
-        assertEquals(i.getId(), test.getId());
+        Assert.assertNotNull(test);
+        Assert.assertEquals(i.getId(), test.getId());
     }
 
     @Test(groups = { "ticket:172" })
@@ -420,8 +420,8 @@ public class GetImagesQueryTest extends AbstractManagedContextTest {
                 .unique()).addClass(Image.class).addIds(
                 Collections.singleton(i.getId())));
         Image test = (Image) iQuery.execute(q);
-        assertNotNull(test.getDetails().getCreationEvent().getTime());
-        assertNotNull(test.getDetails().getUpdateEvent().getTime());
+        Assert.assertNotNull(test.getDetails().getCreationEvent().getTime());
+        Assert.assertNotNull(test.getDetails().getUpdateEvent().getTime());
     }
 
     @Test(groups = { "CollectionsCounts" })
@@ -445,10 +445,10 @@ public class GetImagesQueryTest extends AbstractManagedContextTest {
                 .unique()).addClass(Image.class).addIds(
                 Collections.singleton(i.getId())));
         Image test = (Image) iQuery.execute(q);
-        assertNotNull(test.getAnnotationLinksCountPerOwner());
-        assertNotNull(test.getAnnotationLinksCountPerOwner().get(self));
-        assertNotNull(test.getDatasetLinksCountPerOwner());
-        assertNotNull(test.getDatasetLinksCountPerOwner().get(self));
+        Assert.assertNotNull(test.getAnnotationLinksCountPerOwner());
+        Assert.assertNotNull(test.getAnnotationLinksCountPerOwner().get(self));
+        Assert.assertNotNull(test.getDatasetLinksCountPerOwner());
+        Assert.assertNotNull(test.getDatasetLinksCountPerOwner().get(self));
     }
 
     // ~ Helpers

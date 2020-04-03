@@ -6,7 +6,6 @@ package ome.services.db;
 
 import java.util.List;
 
-import junit.framework.TestCase;
 import ome.model.IObject;
 import ome.model.meta.Event;
 import ome.model.meta.Experimenter;
@@ -28,10 +27,11 @@ import org.hibernate.ScrollableResults;
 import org.hibernate.Transaction;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
 @Test( groups = "integration" )
-public class SearchTest extends TestCase {
+public class SearchTest {
 
     private static Logger log = LoggerFactory.getLogger(SearchTest.class);
 
@@ -45,7 +45,7 @@ public class SearchTest extends TestCase {
         ht.setupSession();
         String queryStr = "manual";
         List<Event> list = query(ht, queryStr, Event.class, "status");
-        assertTrue(list.size() > 0);
+        Assert.assertTrue(list.size() > 0);
     }
 
     @Test
@@ -75,7 +75,7 @@ public class SearchTest extends TestCase {
         ht.setupSession();
         List<Experimenter> list = query(ht, "root", Experimenter.class,
                 "omeName");
-        assertTrue(list.toString(), list.size() == 1);
+        Assert.assertTrue(list.size() == 1, list.toString());
         ht.closeSession();
     }
 
@@ -91,7 +91,7 @@ public class SearchTest extends TestCase {
         FullTextSession fts = Search.getFullTextSession(ht.s);
         Query q = fts.createFullTextQuery(lq, Event.class, Experimenter.class);
         List list = q.list();
-        assertTrue(list.toString(), list.size() > 1);
+        Assert.assertTrue(list.size() > 1, list.toString());
 
         ht.closeSession();
     }

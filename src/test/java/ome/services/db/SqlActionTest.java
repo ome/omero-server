@@ -23,6 +23,7 @@ import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
 import org.hibernate.metadata.ClassMetadata;
 import org.springframework.dao.DataAccessException;
+import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -53,19 +54,19 @@ public class SqlActionTest extends AbstractManagedContextTest {
         final String n = e.getOmeName();
         loginRoot();
         iAdmin.changeUserPassword(n, "");
-        assertTrue(iAdmin.checkPassword(n, "anything", false));
-        assertTrue(iAdmin.checkPassword(n, "", false));
-        assertTrue(iAdmin.checkPassword(n, null, false));
+        Assert.assertTrue(iAdmin.checkPassword(n, "anything", false));
+        Assert.assertTrue(iAdmin.checkPassword(n, "", false));
+        Assert.assertTrue(iAdmin.checkPassword(n, null, false));
 
         iAdmin.changeUserPassword(n, "ome");
-        assertTrue(iAdmin.checkPassword(n, "ome", false));
-        assertFalse(iAdmin.checkPassword(n, "", false));
-        assertFalse(iAdmin.checkPassword(n, null, false));
+        Assert.assertTrue(iAdmin.checkPassword(n, "ome", false));
+        Assert.assertFalse(iAdmin.checkPassword(n, "", false));
+        Assert.assertFalse(iAdmin.checkPassword(n, null, false));
 
         iAdmin.changeUserPassword(n, null);
-        assertFalse(iAdmin.checkPassword(n, "ome", false));
-        assertFalse(iAdmin.checkPassword(n, "", false));
-        assertFalse(iAdmin.checkPassword(n, null, false));
+        Assert.assertFalse(iAdmin.checkPassword(n, "ome", false));
+        Assert.assertFalse(iAdmin.checkPassword(n, "", false));
+        Assert.assertFalse(iAdmin.checkPassword(n, null, false));
 
     }
 
@@ -117,7 +118,7 @@ public class SqlActionTest extends AbstractManagedContextTest {
                     break;
                 }
             }
-            assertNotNull(segment_value);
+            Assert.assertNotNull(segment_value);
             sql.nextValue(segment_value, 1);
         }
     }
@@ -131,7 +132,7 @@ public class SqlActionTest extends AbstractManagedContextTest {
             ids.add(Long.valueOf(i));
         }
 
-        super.setUp();
+        //super.setUp();
         Parameters p = new Parameters();
         p.addList("ids", ids);
 

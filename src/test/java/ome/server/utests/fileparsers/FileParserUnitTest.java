@@ -12,7 +12,6 @@ import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
 
-import junit.framework.TestCase;
 import ome.services.fulltext.PdfParser;
 import ome.services.messages.RegisterServiceCleanupMessage;
 import ome.system.OmeroContext;
@@ -20,9 +19,10 @@ import ome.system.OmeroContext;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.util.ResourceUtils;
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
-public class FileParserUnitTest extends TestCase {
+public class FileParserUnitTest {
 
     static List<RegisterServiceCleanupMessage> list = new ArrayList<RegisterServiceCleanupMessage>();
 
@@ -39,7 +39,7 @@ public class FileParserUnitTest extends TestCase {
             BufferedReader buffered = new BufferedReader(reader);
             sb.append(buffered.readLine());
         }
-        assertEquals("ABC123", sb.toString());
+        Assert.assertEquals("ABC123", sb.toString());
         for (RegisterServiceCleanupMessage cleanup : list) {
             cleanup.close();
         }

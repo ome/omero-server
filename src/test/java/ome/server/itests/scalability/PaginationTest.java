@@ -21,6 +21,7 @@ import ome.parameters.Parameters;
 import ome.server.itests.AbstractManagedContextTest;
 import ome.testing.Report;
 
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
 @Test(groups = { "integration" })
@@ -72,7 +73,7 @@ public class PaginationTest extends AbstractManagedContextTest {
         long start;
         start = System.currentTimeMillis();
         Set<Image> images = iContainer.getImages(kls, containerIds, po);
-        assertTrue(images.size() + " items", images.size() >= size);
+        Assert.assertTrue(images.size() >= size, images.size() + " items");
         long getImagesTime = System.currentTimeMillis() - start;
 
         // For checking
@@ -84,16 +85,16 @@ public class PaginationTest extends AbstractManagedContextTest {
 
         // Try with pagination
         long[] pageTimes = new long[pages];
-        assertTrue(size % pages == 0);
+        Assert.assertTrue(size % pages == 0);
         int page_size = size / pages;
         for (int i = 0; i < pages; i++) {
             po.paginate(i * page_size, page_size);
             start = System.currentTimeMillis();
             images = iContainer.getImages(kls, containerIds, po);
             pageTimes[i] = System.currentTimeMillis() - start;
-            assertTrue(images.size() + " items", images.size() == page_size);
+            Assert.assertTrue(images.size() == page_size, images.size() + " items");
             for (Image img : images) {
-                assertTrue(img + " - extra", allImageIds.contains(img.getId()));
+                Assert.assertTrue(allImageIds.contains(img.getId()), img + " - extra");
                 pagedImageIds.add(img.getId());
             }
         }
@@ -101,7 +102,7 @@ public class PaginationTest extends AbstractManagedContextTest {
         // Make sure we found all of them.
         Set<Long> test = new HashSet<Long>(allImageIds);
         test.removeAll(pagedImageIds);
-        assertTrue("Remainder:" + test.toString(), test.size() == 0);
+        Assert.assertTrue(test.size() == 0, "Remainder:" + test.toString());
     }
 
     private Dataset loadOrCreateDataset(int batch, int size) {

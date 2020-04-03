@@ -11,6 +11,7 @@ import ome.conditions.PermissionMismatchGroupSecurityViolation;
 import ome.model.core.Image;
 import ome.model.internal.Permissions;
 
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
 /**
@@ -26,7 +27,7 @@ public class SetOtherPermissionsTest extends PermissionsTest {
     public void testUserTriesToCreateObjectWithWorldRead() throws Exception {
         setup(Permissions.COLLAB_READONLY);
         Image i = fixture.saveImage(Permissions.PUBLIC);
-        fail("This shouldn't be allowed");
+        Assert.fail("This shouldn't be allowed");
     }
 
     @Test
@@ -72,13 +73,13 @@ public class SetOtherPermissionsTest extends PermissionsTest {
         i.getDetails().setPermissions(p);
         try {
             iUpdate.saveObject(i);
-            fail("ticket:1776 - iupdate");
+            Assert.fail("ticket:1776 - iupdate");
         } catch (GroupSecurityViolation gsv) {
             // ok.
         }
         try {
             iAdmin.changePermissions(i, p);
-            fail("ticket:1776 - iadmin");
+            Assert.fail("ticket:1776 - iadmin");
         } catch (GroupSecurityViolation gsv) {
             // ok
         }

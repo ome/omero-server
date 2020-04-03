@@ -8,7 +8,6 @@ package ome.server.itests;
 
 import java.util.Arrays;
 
-import junit.framework.TestCase;
 import ome.api.IQuery;
 import ome.api.local.LocalCompress;
 import ome.services.ThumbnailBean;
@@ -17,11 +16,12 @@ import ome.system.ServiceFactory;
 
 import org.springframework.aop.framework.Advised;
 import org.springframework.beans.factory.BeanFactoryUtils;
+import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 @Test(groups = "integration")
-public class ContextTest extends TestCase {
+public class ContextTest {
 
     protected TB rb;
 
@@ -42,7 +42,6 @@ public class ContextTest extends TestCase {
         }
     }
 
-    @Override
     @BeforeMethod
     protected void setUp() throws Exception {
         rb = new TB();
@@ -57,7 +56,7 @@ public class ContextTest extends TestCase {
     public void testListBeans() throws Exception {
         OmeroContext ctx = OmeroContext.getManagedServerContext();
         ctx.refreshAllIfNecessary();
-        assertTrue(0 < Arrays.asList(
+        Assert.assertTrue(0 < Arrays.asList(
                 BeanFactoryUtils.beanNamesForTypeIncludingAncestors(ctx
                         .getBeanFactory(), Object.class, true, true)).size());
     }
@@ -80,7 +79,7 @@ public class ContextTest extends TestCase {
     protected void onContext(OmeroContext ctx) {
         ServiceFactory sf = new ServiceFactory(ctx);
         IQuery q = sf.getQueryService();
-        assertTrue(Advised.class.isAssignableFrom(q.getClass()));
+        Assert.assertTrue(Advised.class.isAssignableFrom(q.getClass()));
     }
 
     @Test
@@ -89,13 +88,13 @@ public class ContextTest extends TestCase {
         OmeroContext ctx = OmeroContext.getManagedServerContext();
         ctx.refreshAllIfNecessary();
         ctx.applyBeanPropertyValues(rb, "internal-ome.api.ThumbnailStore");
-        assertTrue(rb.csCalled);
+        Assert.assertTrue(rb.csCalled);
     }
 
     @Test
     public void testSelfConfigureBean() throws Exception {
         rb.selfConfigure();
-        assertTrue(rb.csCalled);
+        Assert.assertTrue(rb.csCalled);
     }
 
 }

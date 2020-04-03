@@ -6,6 +6,7 @@ package ome.server.itests.query;
 
 import java.util.List;
 
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import ome.model.meta.Experimenter;
@@ -27,13 +28,13 @@ public class InvariantsTest extends AbstractManagedContextTest {
         Experimenter root = (Experimenter) iQuery.findByQuery(
                 Experimenter.class.getName(), new Parameters().addId(0L));
 
-        assertNotNull("Root has to be defined.", root);
+        Assert.assertNotNull(root, "Root has to be defined.");
         // FIXME assertNotNull("And it should have details",root.getDetails());
 
         List<Experimenter> l = iQuery.findAllByQuery(
                 "select e from Experimenter e", null);
 
-        assertTrue("If root is defined, can't be empty", l.size() > 0);
+        Assert.assertTrue(l.size() > 0, "If root is defined, can't be empty");
 
     }
 

@@ -17,6 +17,7 @@ import ome.system.ServiceFactory;
 
 import org.hibernate.Session;
 import org.springframework.transaction.annotation.Transactional;
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
 /**
@@ -75,7 +76,7 @@ public class RootAnnotatingPermissionsTest extends PermissionsTest {
                 rv[0] = securitySystem.isGraphCritical(null); // may throw
                 return null;
             }});
-        assertEquals(value, rv[0]);
+        Assert.assertEquals(value, rv[0]);
     }
 
     @Test
@@ -83,7 +84,7 @@ public class RootAnnotatingPermissionsTest extends PermissionsTest {
         setup(Permissions.USER_PRIVATE);
         loginRootKeepGroup();
         Image image = fixture.saveImage();
-        assertEquals(fixture.group().getId(), image.getDetails().getGroup().getId());
+        Assert.assertEquals(fixture.group().getId(), image.getDetails().getGroup().getId());
     }
 
     @Test
@@ -97,18 +98,18 @@ public class RootAnnotatingPermissionsTest extends PermissionsTest {
         link.link(new Image(image.getId(), false), tag);
         try {
             link = iUpdate.saveAndReturnObject(link);
-            fail("group-security-violation");
+            Assert.fail("group-security-violation");
         } catch (GroupSecurityViolation gsv) {
             // ok
         }
         assertNumberOfImages(1);
-        assertEquals(1, iQuery.findAllByQuery(
+        Assert.assertEquals(1, iQuery.findAllByQuery(
                 "select i from Image i left outer join fetch i.annotationLinks", null)
                 .size());
     }
 
     private void assertNumberOfImages(int count) {
-        assertEquals(count, iQuery.findAll(Image.class, null).size());
+        Assert.assertEquals(count, iQuery.findAll(Image.class, null).size());
     }
 
 }

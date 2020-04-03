@@ -17,6 +17,7 @@ import ome.model.meta.ExperimenterGroup;
 import ome.model.meta.Session;
 import ome.server.itests.AbstractManagedContextTest;
 
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
 /**
@@ -40,7 +41,7 @@ public class EventFieldsTest extends AbstractManagedContextTest {
         e2.setContainingEvent(e1);
         e2 = iUpdate.saveAndReturnObject(e2);
 
-        assertTrue(e2.getContainingEvent().getId().equals(e1.getId()));
+        Assert.assertTrue(e2.getContainingEvent().getId().equals(e1.getId()));
 
     }
 
@@ -50,14 +51,14 @@ public class EventFieldsTest extends AbstractManagedContextTest {
         dummy.setName("dummy");
         dummy = iUpdate.saveAndReturnObject(dummy);
 
-        assertNotNull(dummy.getDetails());
-        assertNotNull(dummy.getDetails().getCreationEvent());
-        assertNotNull(dummy.getDetails().getCreationEvent().getExperimenter());
-        assertNotNull(dummy.getDetails().getCreationEvent()
+        Assert.assertNotNull(dummy.getDetails());
+        Assert.assertNotNull(dummy.getDetails().getCreationEvent());
+        Assert.assertNotNull(dummy.getDetails().getCreationEvent().getExperimenter());
+        Assert.assertNotNull(dummy.getDetails().getCreationEvent()
                 .getExperimenterGroup());
-        assertNotNull(dummy.getDetails().getUpdateEvent());
-        assertNotNull(dummy.getDetails().getUpdateEvent().getExperimenter());
-        assertNotNull(dummy.getDetails().getUpdateEvent()
+        Assert.assertNotNull(dummy.getDetails().getUpdateEvent());
+        Assert.assertNotNull(dummy.getDetails().getUpdateEvent().getExperimenter());
+        Assert.assertNotNull(dummy.getDetails().getUpdateEvent()
                 .getExperimenterGroup());
 
     }

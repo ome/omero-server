@@ -55,6 +55,7 @@ import ome.testing.ObjectFactory;
 import org.hibernate.LockOptions;
 import org.hibernate.Session;
 import org.springframework.transaction.annotation.Transactional;
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
 public class UpdateTest extends AbstractUpdateTest {
@@ -72,8 +73,8 @@ public class UpdateTest extends AbstractUpdateTest {
                 + " left outer join fetch p.channels " + "  where p.id = :id",
                 new Parameters().addId(p.getId()));
 
-        assertTrue("channel ids differ", equalCollections(p
-                .unmodifiableChannels(), check.unmodifiableChannels()));
+        Assert.assertTrue(equalCollections(p
+                .unmodifiableChannels(), check.unmodifiableChannels()), "channel ids differ");
     }
 
     @Test(enabled=false)
@@ -85,7 +86,7 @@ public class UpdateTest extends AbstractUpdateTest {
 
         Project compare = iQuery.findByString(Project.class, "name", name);
 
-        assertTrue(p.getId().equals(compare.getId()));
+        Assert.assertTrue(p.getId().equals(compare.getId()));
 
         Project send = new Project();
         send.setName(p.getName());
@@ -94,7 +95,7 @@ public class UpdateTest extends AbstractUpdateTest {
         send.setDescription("...test...");
         Project test = iUpdate.saveAndReturnObject(send);
 
-        assertTrue(p.getId().equals(test.getId()));
+        Assert.assertTrue(p.getId().equals(test.getId()));
 
         iQuery.findByString(Project.class, "name", name);
 
@@ -193,8 +194,8 @@ public class UpdateTest extends AbstractUpdateTest {
                         + " join fetch e.groupExperimenterMap m "
                         + " join fetch m.parent p " + " where e.id = :id "
                         + "and index(m) = 0", new Parameters().addId(e.getId()));
-        assertNotNull(test.getPrimaryGroupExperimenterMap());
-        assertTrue(test.getPrimaryGroupExperimenterMap().parent().getName()
+        Assert.assertNotNull(test.getPrimaryGroupExperimenterMap());
+        Assert.assertTrue(test.getPrimaryGroupExperimenterMap().parent().getName()
                 .startsWith("DEFAULT"));
 
     }
@@ -302,10 +303,10 @@ public class UpdateTest extends AbstractUpdateTest {
     protected void assertPixels(Thumbnail tb) {
         Thumbnail test = iUpdate.saveAndReturnObject(tb);
         Thumbnail copy = iQuery.get(test.getClass(), test.getId());
-        assertFalse(err, copy.getPixels().isLoaded()
-                && copy.getPixels().sizeOfThumbnails() == 0);
-        assertFalse(err, test.getPixels().isLoaded()
-                && test.getPixels().sizeOfThumbnails() == 0);
+        Assert.assertFalse(copy.getPixels().isLoaded()
+                && copy.getPixels().sizeOfThumbnails() == 0, err);
+        Assert.assertFalse(test.getPixels().isLoaded()
+                && test.getPixels().sizeOfThumbnails() == 0, err);
     }
 
     @Test(enabled=false, groups = { "broken", "ticket:346" })
@@ -424,8 +425,8 @@ public class UpdateTest extends AbstractUpdateTest {
         Pixels p = ObjectFactory.createPixelGraph(null);
         // p.setDimensionOrder(iQuery.findAll(DimensionOrder.class, null).get(0));
         Image i = iUpdate.saveAndReturnObject(p.getImage());
-        assertEquals(1, i.sizeOfPixels());
-        assertNotNull(i.collectPixels(null).get(0));
+        Assert.assertEquals(1, i.sizeOfPixels());
+        Assert.assertNotNull(i.collectPixels(null).get(0));
     }
 
     @Test(groups ="ticket:1183")
@@ -450,9 +451,9 @@ public class UpdateTest extends AbstractUpdateTest {
         os.setRefractiveIndex(0.0);
         i.setObjectiveSettings(os);
         i = iUpdate.saveAndReturnObject(i);
-        assertNotNull(i.getObjectiveSettings());
+        Assert.assertNotNull(i.getObjectiveSettings());
         i = iUpdate.saveAndReturnObject(i);
-        assertNotNull(i.getObjectiveSettings());
+        Assert.assertNotNull(i.getObjectiveSettings());
         i.setObjectiveSettings(new ObjectiveSettings(i.getObjectiveSettings().getId(),false));
         i = iUpdate.saveAndReturnObject(i);
     }
@@ -465,9 +466,9 @@ public class UpdateTest extends AbstractUpdateTest {
         p = i.getPrimaryPixels();
 
         Set<Long> ids = new HashSet<Long>();
-        assertEquals(3, p.sizeOfChannels());
+        Assert.assertEquals(3, p.sizeOfChannels());
         for (Channel ch : p.unmodifiableChannels()) {
-            assertNotNull(ch);
+            Assert.assertNotNull(ch);
             ids.add(ch.getId());
         }
 
@@ -478,8 +479,8 @@ public class UpdateTest extends AbstractUpdateTest {
         i = iUpdate.saveAndReturnObject(i);
         p = i.getPrimaryPixels();
 
-        assertEquals(4, p.sizeOfChannels());
-        assertFalse(ids.contains(p.getChannel(3).getId()));
+        Assert.assertEquals(4, p.sizeOfChannels());
+        Assert.assertFalse(ids.contains(p.getChannel(3).getId()));
 
     }
 
@@ -492,14 +493,14 @@ public class UpdateTest extends AbstractUpdateTest {
         p = i.getPrimaryPixels();
 
         Set<Long> ids = new HashSet<Long>();
-        assertEquals(3, p.sizeOfChannels());
-        assertNotNull(p.getChannel(0));
+        Assert.assertEquals(3, p.sizeOfChannels());
+        Assert.assertNotNull(p.getChannel(0));
         ids.add(p.getChannel(0).getId());
 
         // Middle should be empty
-        assertNull(p.getChannel(1));
+        Assert.assertNull(p.getChannel(1));
 
-        assertNotNull(p.getChannel(2));
+        Assert.assertNotNull(p.getChannel(2));
         ids.add(p.getChannel(2).getId());
 
         // Now add a channel to the front
@@ -511,8 +512,8 @@ public class UpdateTest extends AbstractUpdateTest {
         i = iUpdate.saveAndReturnObject(i);
         p = i.getPrimaryPixels();
 
-        assertEquals(3, p.sizeOfChannels());
-        assertFalse(ids.contains(p.getChannel(0).getId()));
+        Assert.assertEquals(3, p.sizeOfChannels());
+        Assert.assertFalse(ids.contains(p.getChannel(0).getId()));
     }
 
     @Test(groups = "ticket:2547")
@@ -524,14 +525,14 @@ public class UpdateTest extends AbstractUpdateTest {
         p = i.getPrimaryPixels();
 
         Set<Long> ids = new HashSet<Long>();
-        assertEquals(3, p.sizeOfChannels());
-        assertNotNull(p.getChannel(0));
+        Assert.assertEquals(3, p.sizeOfChannels());
+        Assert.assertNotNull(p.getChannel(0));
         ids.add(p.getChannel(0).getId());
 
         // Middle should be empty
-        assertNull(p.getChannel(1));
+        Assert.assertNull(p.getChannel(1));
 
-        assertNotNull(p.getChannel(2));
+        Assert.assertNotNull(p.getChannel(2));
         ids.add(p.getChannel(2).getId());
 
         // Now add a channel to the space
@@ -541,8 +542,8 @@ public class UpdateTest extends AbstractUpdateTest {
         i = iUpdate.saveAndReturnObject(i);
         p = i.getPrimaryPixels();
 
-        assertEquals(3, p.sizeOfChannels());
-        assertFalse(ids.contains(p.getChannel(1).getId()));
+        Assert.assertEquals(3, p.sizeOfChannels());
+        Assert.assertFalse(ids.contains(p.getChannel(1).getId()));
     }
 
     @Test(groups = {"ticket:1679", "ticket:2547"})
@@ -608,14 +609,14 @@ public class UpdateTest extends AbstractUpdateTest {
     protected void assertLink(ProjectDatasetLink link) {
         ProjectDatasetLink test = iUpdate.saveAndReturnObject(link);
         ProjectDatasetLink copy = iQuery.get(test.getClass(), test.getId());
-        assertFalse(err, copy.parent().isLoaded()
-                && copy.parent().sizeOfDatasetLinks() == 0);
-        assertFalse(err, copy.child().isLoaded()
-                && copy.child().sizeOfProjectLinks() == 0);
-        assertFalse(err, test.parent().isLoaded()
-                && test.parent().sizeOfDatasetLinks() == 0);
-        assertFalse(err, test.child().isLoaded()
-                && test.child().sizeOfProjectLinks() == 0);
+        Assert.assertFalse(copy.parent().isLoaded()
+                && copy.parent().sizeOfDatasetLinks() == 0, err);
+        Assert.assertFalse( copy.child().isLoaded()
+                && copy.child().sizeOfProjectLinks() == 0, err);
+        Assert.assertFalse(test.parent().isLoaded()
+                && test.parent().sizeOfDatasetLinks() == 0, err);
+        Assert.assertFalse(test.child().isLoaded()
+                && test.child().sizeOfProjectLinks() == 0, err);
     }
 
     /**
@@ -633,7 +634,7 @@ public class UpdateTest extends AbstractUpdateTest {
         la.setNs("ticket:3131-C");
         la = iUpdate.saveAndReturnObject(la);
 
-        assertEquals(-1,
+        Assert.assertEquals(-1,
                 la.getDetails().getUpdateEvent().getSession().sizeOfEvents());
 
         indexObject(la);
@@ -644,7 +645,7 @@ public class UpdateTest extends AbstractUpdateTest {
         la = (LongAnnotation) search.next();
 
         // In this case, the session is not even loaded.
-        assertFalse(la.getDetails().getUpdateEvent().getSession().isLoaded());
+        Assert.assertFalse(la.getDetails().getUpdateEvent().getSession().isLoaded());
 
         /*
         assertEquals(-1,
@@ -747,13 +748,13 @@ public class UpdateTest extends AbstractUpdateTest {
         t2.join();
 
         if (t1.e == null) {
-            assertEquals(TryAgain.class, t2.e.getClass());
+            Assert.assertEquals(TryAgain.class, t2.e.getClass());
         } else if (t2.e == null) {
-            assertEquals(TryAgain.class, t1.e.getClass());
+            Assert.assertEquals(TryAgain.class, t1.e.getClass());
         } else {
             t1.e.printStackTrace();
             t2.e.printStackTrace();
-            fail("Expected exactly one exception");
+            Assert.fail("Expected exactly one exception");
         }
 
     }

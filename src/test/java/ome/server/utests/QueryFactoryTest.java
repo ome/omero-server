@@ -8,7 +8,6 @@ package ome.server.utests;
 
 import java.util.Arrays;
 
-import junit.framework.TestCase;
 import ome.conditions.ApiUsageException;
 import ome.model.containers.Project;
 import ome.parameters.Parameters;
@@ -21,10 +20,11 @@ import ome.services.query.QueryFactory;
 import ome.services.query.QuerySource;
 import ome.services.query.StringQuerySource;
 
+import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-public class QueryFactoryTest extends TestCase {
+public class QueryFactoryTest {
 
     Query q;
 
@@ -32,7 +32,6 @@ public class QueryFactoryTest extends TestCase {
 
     QuerySource nullQS, stringQS, classQS;
 
-    @Override
     @BeforeMethod
     protected void setUp() throws Exception {
         nullQS = new NullQuerySource();
@@ -63,7 +62,7 @@ public class QueryFactoryTest extends TestCase {
         qf = new QueryFactory(nullQS);
         try {
             qf.lookup("UNKNOWN QUERY ID", null);
-            fail("Should throw a query exception");
+            Assert.fail("Should throw a query exception");
         } catch (QueryException e) {
             // Good.
         }
@@ -74,7 +73,7 @@ public class QueryFactoryTest extends TestCase {
             throws Exception {
         qf = new QueryFactory(stringQS);
         q = qf.lookup("UNKNOWN QUERY ID BUT STILL WORKS", null);
-        assertNotNull("We should have a string query", q);
+        Assert.assertNotNull( q, "We should have a string query");
     }
 
     @Test
@@ -83,7 +82,7 @@ public class QueryFactoryTest extends TestCase {
         q = qf.lookup(PojosLoadHierarchyQueryDefinition.class.getName(),
                 new Parameters().addClass(Project.class).addIds(
                         Arrays.asList(0L)).addString(Parameters.OWNER_ID, null));
-        assertNotNull("We should have a Pojos Query", q);
+        Assert.assertNotNull(q, "We should have a Pojos Query");
     }
 
     @Test(expectedExceptions = ApiUsageException.class)

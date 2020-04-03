@@ -29,6 +29,7 @@ import ome.system.ServiceFactory;
 
 import org.hibernate.Session;
 import org.springframework.transaction.annotation.Transactional;
+import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -81,7 +82,7 @@ public class PersistentEventLogLoaderTest extends AbstractManagedContextTest {
         Long l = call("NoValueInDatabase", new Callable<Long>() {
             public Long call() throws Exception {
                 ll.deleteCurrentId();
-                assertEquals(-1, ll.getCurrentId());
+                Assert.assertEquals(-1, ll.getCurrentId());
                 if (ll.hasNext()) {
                     EventLog log = ll.next();
                     for (EventLog log2 : ll) {
@@ -92,7 +93,7 @@ public class PersistentEventLogLoaderTest extends AbstractManagedContextTest {
                         }
                     }
                     Long current = ll.getCurrentId();
-                    assertTrue("is " + current, current > 0);
+                    Assert.assertTrue(current > 0, "is " + current);
                 }
                 return null;
             }
@@ -108,8 +109,8 @@ public class PersistentEventLogLoaderTest extends AbstractManagedContextTest {
         call("MultipleUsers", new Callable<Long>() {
             public Long call() throws Exception {
                 ll.setCurrentId(el1.getId() - 1);
-                assertTrue(ll.hasNext());
-                assertEquals(el1.getId() - 1,
+                Assert.assertTrue(ll.hasNext());
+                Assert.assertEquals(el1.getId() - 1,
                         ll.getCurrentId());
                 assertNext(el1);
                 assertNext(el2);
@@ -137,7 +138,7 @@ public class PersistentEventLogLoaderTest extends AbstractManagedContextTest {
             public Long call() throws Exception {
 
                 ll.setCurrentId(el1a.getId() - 1);
-                assertTrue(ll.hasNext());
+                Assert.assertTrue(ll.hasNext());
                 assertNext(el1a);
                 assertNext(el2a);
                 assertNext(el2b);
@@ -182,7 +183,7 @@ public class PersistentEventLogLoaderTest extends AbstractManagedContextTest {
             public Long call() throws Exception {
 
                 ll.setCurrentId(el1a.getId() - 1);
-                assertTrue(ll.hasNext());
+                Assert.assertTrue(ll.hasNext());
                 assertNext(el1a);
                 assertNext(el1b);
                 assertNext(el1c);
@@ -206,7 +207,7 @@ public class PersistentEventLogLoaderTest extends AbstractManagedContextTest {
 
     protected void assertNext(EventLog el) {
         EventLog test = ll.next();
-        assertEquals(el.getId(), test.getId());
+        Assert.assertEquals(el.getId(), test.getId());
     }
 
     protected EventLog eventlog() throws Exception {

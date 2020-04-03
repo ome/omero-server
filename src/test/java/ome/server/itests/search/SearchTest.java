@@ -47,6 +47,7 @@ import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.aop.framework.Advised;
 import org.springframework.transaction.annotation.Transactional;
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
 /**
@@ -123,44 +124,44 @@ public class SearchTest extends AbstractTest {
 
         list = this.iQuery.findAllByFullText(Image.class, "myIQueryImageTest",
                 null);
-        assertTrue(list.toString(), list.size() >= 1);
+        Assert.assertTrue(list.size() >= 1, list.toString());
 
         list = this.iQuery.findAllByFullText(Image.class,
                 "name:myIQueryImageTest", null);
-        assertTrue(list.toString(), list.size() >= 1);
+        Assert.assertTrue( list.size() >= 1, list.toString());
 
         list = this.iQuery.findAllByFullText(Image.class, "name:myIQuery*",
                 null);
-        assertTrue(list.toString(), list.size() >= 1);
+        Assert.assertTrue(list.size() >= 1, list.toString());
 
         list = this.iQuery.findAllByFullText(Image.class, part + "*", null);
-        assertTrue(list.toString(), list.size() == 1);
+        Assert.assertEquals(list.size(), 1, list.toString());
 
         list = this.iQuery.findAllByFullText(Image.class, uuid, null);
-        assertTrue(list.toString(), list.size() == 1);
+        Assert.assertEquals(list.size(), 1, list.toString());
 
         list = this.iQuery.findAllByFullText(Image.class, "\"some*" + uuid
                 + "*\"", null);
-        assertTrue(list.toString(), list.size() == 1);
+        Assert.assertEquals(list.size(), 1, list.toString());
 
         list = this.iQuery.findAllByFullText(Image.class, "tag:" + uuid, null);
-        assertTrue(list.toString(), list.size() == 1);
+        Assert.assertEquals(list.size(), 1, list.toString());
 
         list = this.iQuery.findAllByFullText(Image.class, "annotation:" + uuid,
                 null);
-        assertTrue(list.toString(), list.size() == 1);
+        Assert.assertEquals(list.size(), 1, list.toString());
 
         list = this.iQuery.findAllByFullText(Image.class,
                 "annotation.name:theTagName*", null);
-        assertTrue(list.toString(), list.size() >= 1);
+        Assert.assertTrue(list.size() >= 1, list.toString());
 
         list = this.iQuery.findAllByFullText(Image.class,
                 "annotation.ns:theNamespace*", null);
-        assertTrue(list.toString(), list.size() >= 1);
+        Assert.assertTrue(list.size() >= 1, list.toString());
 
         list = this.iQuery.findAllByFullText(Image.class,
                 "annotation.type:TagAnnotation", null);
-        assertTrue(list.toString(), list.size() >= 1);
+        Assert.assertTrue(list.size() >= 1, list.toString());
 
     }
 
@@ -198,10 +199,10 @@ public class SearchTest extends AbstractTest {
             terms.add(((CommentAnnotation) obj).getTextValue());
         }
         // Lower-casing is necessary since that's what's stored in the index.
-        assertTrue(terms.contains(base2.toLowerCase()));
-        assertTrue(terms.contains(base2.toLowerCase()));
-        assertFalse(terms.contains(base.toLowerCase()));
-        assertFalse(terms.contains(base1.toLowerCase()));
+        Assert.assertTrue(terms.contains(base2.toLowerCase()));
+        Assert.assertTrue(terms.contains(base2.toLowerCase()));
+        Assert.assertFalse(terms.contains(base.toLowerCase()));
+        Assert.assertFalse(terms.contains(base1.toLowerCase()));
     }
 
     @Test
@@ -220,7 +221,7 @@ public class SearchTest extends AbstractTest {
 
         Search search = this.factory.createSearchService();
         search.byGroupForTags(groupStr);
-        assertEquals(1, search.results().size());
+        Assert.assertEquals(1, search.results().size());
 
         // Make another one
         groupStr = uuid();
@@ -232,7 +233,7 @@ public class SearchTest extends AbstractTest {
         // this should return all two then
         search.byGroupForTags(null);
         search.setBatchSize(2);
-        assertEquals(2, search.results().size());
+        Assert.assertEquals(2, search.results().size());
         while (search.hasNext()) {
             search.results(); // Clear search
         }
@@ -253,21 +254,21 @@ public class SearchTest extends AbstractTest {
         tag = iUpdate.saveAndReturnObject(tag);
 
         // All queries finished?
-        assertEquals(0, search.activeQueries());
-        assertFalse(search.hasNext());
+        Assert.assertEquals(0, search.activeQueries());
+        Assert.assertFalse(search.hasNext());
 
         search.onlyOwnedBy(d);
         search.byGroupForTags(groupStr);
-        assertFalse(search.hasNext());
+        Assert. assertFalse(search.hasNext());
 
         d.setOwner(e);
         search.onlyOwnedBy(d);
         search.byGroupForTags(groupStr);
-        assertEquals(1, search.results().size());
+        Assert. assertEquals(1, search.results().size());
 
         search.onlyOwnedBy(null);
         search.byGroupForTags(groupStr);
-        assertEquals(1, search.results().size());
+        Assert.assertEquals(1, search.results().size());
     }
 
     @Test
@@ -286,7 +287,7 @@ public class SearchTest extends AbstractTest {
 
         Search search = this.factory.createSearchService();
         search.byTagForGroups(tagStr);
-        assertEquals(1, search.results().size());
+        Assert.assertEquals(1, search.results().size());
 
         // Make another one
         tagStr = uuid();
@@ -298,7 +299,7 @@ public class SearchTest extends AbstractTest {
         // this should return all two then
         search.byTagForGroups(null);
         search.setBatchSize(2);
-        assertEquals(2, search.results().size());
+        Assert.assertEquals(2, search.results().size());
         while (search.hasNext()) {
             search.results(); // Clear search
         }
@@ -319,21 +320,21 @@ public class SearchTest extends AbstractTest {
         tag = iUpdate.saveAndReturnObject(tag);
 
         // All queries finished?
-        assertEquals(0, search.activeQueries());
-        assertFalse(search.hasNext());
+        Assert.assertEquals(0, search.activeQueries());
+        Assert.assertFalse(search.hasNext());
 
         search.onlyOwnedBy(d);
         search.byTagForGroups(tagStr);
-        assertFalse(search.hasNext());
+        Assert.assertFalse(search.hasNext());
 
         d.setOwner(e);
         search.onlyOwnedBy(d);
         search.byTagForGroups(tagStr);
-        assertEquals(1, search.results().size());
+        Assert.assertEquals(1, search.results().size());
 
         search.onlyOwnedBy(null);
         search.byTagForGroups(tagStr);
-        assertEquals(1, search.results().size());
+        Assert.assertEquals(1, search.results().size());
 
     }
 
@@ -354,9 +355,9 @@ public class SearchTest extends AbstractTest {
         while (search.hasNext()) {
             IObject obj = search.next();
             count++;
-            assertNotNull(obj);
+            Assert.assertNotNull(obj);
         }
-        assertTrue(count == 1);
+        Assert.assertTrue(count == 1);
         search.close();
 
         search.onlyType(Image.class);
@@ -385,7 +386,7 @@ public class SearchTest extends AbstractTest {
                 + i.getName().substring(1, i.getName().length());
         try {
             search.byFullText(leadingWildcard);
-            fail("Should throw AUE");
+            Assert.fail("Should throw AUE");
         } catch (ApiUsageException e) {
             // ok, and clear
             while (search.hasNext()) {
@@ -427,7 +428,7 @@ public class SearchTest extends AbstractTest {
 
         // Make sure we can find it simply
         search.bySomeMustNone(sa(abc), sa(), sa());
-        assertTrue(search.results().size() >= 1);
+        Assert.assertTrue(search.results().size() >= 1);
 
         //
         // Now we'll try more complicated queries
@@ -513,21 +514,21 @@ public class SearchTest extends AbstractTest {
         //
         try {
             search.bySomeMustNone(null, null, null);
-            fail("Should throw");
+            Assert.fail("Should throw");
         } catch (ApiUsageException aue) {
             // ok
         }
 
         try {
             search.bySomeMustNone(sa(), null, null);
-            fail("Should throw");
+            Assert.fail("Should throw");
         } catch (ApiUsageException aue) {
             // ok
         }
 
         try {
             search.bySomeMustNone(sa(""), null, null);
-            fail("Should throw");
+            Assert.fail("Should throw");
         } catch (ApiUsageException aue) {
             // ok
         }
@@ -615,7 +616,7 @@ public class SearchTest extends AbstractTest {
 
     @Test
     public void testAnnotatedWithNamespace() {
-        fail("via namespace");
+        Assert.fail("via namespace");
     }
 
     @Test
@@ -735,7 +736,7 @@ public class SearchTest extends AbstractTest {
         search.byFullText(uuid2);
         List<IObject> output = assertResults(search, 1);
         Image i = (Image) output.get(0);
-        assertTrue(i.sizeOfAnnotationLinks() < 0);
+        Assert.assertTrue(i.sizeOfAnnotationLinks() < 0);
 
         search.byFullText(uuid2);
         search.and();
@@ -745,7 +746,7 @@ public class SearchTest extends AbstractTest {
                         null);
         output = assertResults(search, 1);
         i = (Image) output.get(0);
-        assertTrue(i.sizeOfAnnotationLinks() > 0);
+        Assert.assertTrue(i.sizeOfAnnotationLinks() > 0);
 
     }
 
@@ -771,8 +772,7 @@ public class SearchTest extends AbstractTest {
         search.and();
         search.byFullText(uuid2);
         search.or();
-        search
-                .byHqlQuery(
+        search.byHqlQuery(
                         "select i from Image i join fetch i.annotationLinks where i.id in (:IDLIST)",
                         null);
         List<IObject> output = assertResults(search, 0);
@@ -800,14 +800,13 @@ public class SearchTest extends AbstractTest {
         search.and();
         search.byFullText(uuid2);
         search.or();
-        search
-                .byHqlQuery(
+        search.byHqlQuery(
                         "select i from Image i join fetch i.annotationLinks where i.id in (:IDLIST)",
                         new Parameters().addList("IDLIST", Arrays
                                 .asList(new Long[] { i1.getId(), i2.getId() })));
         List<IObject> output = assertResults(search, 1);
         Image i = (Image) output.get(0);
-        assertTrue(i.sizeOfAnnotationLinks() > 0);
+        Assert.assertTrue(i.sizeOfAnnotationLinks() > 0);
 
     }
 
@@ -918,7 +917,7 @@ public class SearchTest extends AbstractTest {
         // With no restriction it should be found.
         // full text
         search.byFullText(name);
-        assertEquals(1, search.results().size());
+        Assert.assertEquals(1, search.results().size());
         // annotated with
         search.byAnnotatedWith(tag);
         assertResults(search, 1);
@@ -934,7 +933,7 @@ public class SearchTest extends AbstractTest {
         search.onlyOwnedBy(root);
         // full text
         search.byFullText(name);
-        assertFalse(search.hasNext());
+        Assert.assertFalse(search.hasNext());
         // annotated with
         search.byAnnotatedWith(tag);
         assertResults(search, 0);
@@ -966,7 +965,7 @@ public class SearchTest extends AbstractTest {
         search.onlyOwnedBy(user);
         // full text
         search.byFullText(name);
-        assertEquals(1, search.results().size());
+        Assert.assertEquals(1, search.results().size());
         // annotated with
         search.byAnnotatedWith(tag);
         assertResults(search, 1);
@@ -1029,7 +1028,7 @@ public class SearchTest extends AbstractTest {
         // With no restriction it should be found.
         // full text
         search.byFullText(name);
-        assertEquals(1, search.results().size());
+        Assert.assertEquals(1, search.results().size());
         // annotated with
         search.byAnnotatedWith(tag);
         assertResults(search, 1);
@@ -1045,7 +1044,7 @@ public class SearchTest extends AbstractTest {
         search.notOwnedBy(null);
         // full text
         search.byFullText(name);
-        assertFalse(search.hasNext());
+        Assert.assertFalse(search.hasNext());
         // annotated with
         search.byAnnotatedWith(tag);
         assertResults(search, 0);
@@ -1077,7 +1076,7 @@ public class SearchTest extends AbstractTest {
         search.notOwnedBy(null);
         // full text
         search.byFullText(name);
-        assertEquals(1, search.results().size());
+        Assert.assertEquals(1, search.results().size());
         // annotated with
         search.byAnnotatedWith(tag);
         assertResults(search, 1);
@@ -1140,7 +1139,7 @@ public class SearchTest extends AbstractTest {
         // Find the Image
         // full text
         search.byFullText(name);
-        assertEquals(1, search.results().size());
+        Assert.assertEquals(1, search.results().size());
         // annotated with
         search.byAnnotatedWith(tag);
         assertResults(search, 1);
@@ -1155,7 +1154,7 @@ public class SearchTest extends AbstractTest {
         search.onlyCreatedBetween(null, oneHourAgo);
         // full text
         search.byFullText(name);
-        assertFalse(search.hasNext());
+        Assert.assertFalse(search.hasNext());
         // annotated with
         search.byAnnotatedWith(tag);
         assertResults(search, 0);
@@ -1170,7 +1169,7 @@ public class SearchTest extends AbstractTest {
         search.onlyCreatedBetween(inOneHour, null);
         // full text
         search.byFullText(name);
-        assertFalse(search.hasNext());
+        Assert.assertFalse(search.hasNext());
         // annotated with
         search.byAnnotatedWith(tag);
         assertResults(search, 0);
@@ -1185,7 +1184,7 @@ public class SearchTest extends AbstractTest {
         search.onlyCreatedBetween(oneHourAgo, inOneHour);
         // full text
         search.byFullText(name);
-        assertEquals(1, search.results().size());
+        Assert.assertEquals(1, search.results().size());
         // annotated with
         search.byAnnotatedWith(tag);
         assertResults(search, 1);
@@ -1200,7 +1199,7 @@ public class SearchTest extends AbstractTest {
         search.onlyCreatedBetween(null, now);
         // full text
         search.byFullText(name);
-        assertFalse(search.hasNext());
+        Assert.assertFalse(search.hasNext());
         // annotated with
         search.byAnnotatedWith(tag);
         assertResults(search, 0);
@@ -1215,7 +1214,7 @@ public class SearchTest extends AbstractTest {
         search.onlyCreatedBetween(null, null);
         // full text
         search.byFullText(name);
-        assertEquals(1, search.results().size());
+        Assert.assertEquals(1, search.results().size());
         // annotated with
         search.byAnnotatedWith(tag);
         assertResults(search, 1);
@@ -1254,7 +1253,7 @@ public class SearchTest extends AbstractTest {
         // Find the Image
         // full text
         search.byFullText(name);
-        assertEquals(1, search.results().size());
+        Assert.assertEquals(1, search.results().size());
         // annotated with
         search.byAnnotatedWith(tag);
         assertResults(search, 1);
@@ -1269,7 +1268,7 @@ public class SearchTest extends AbstractTest {
         search.onlyModifiedBetween(null, oneHourAgo);
         // full text
         search.byFullText(name);
-        assertFalse(search.hasNext());
+        Assert.assertFalse(search.hasNext());
         // annotated with
         search.byAnnotatedWith(tag);
         assertResults(search, 0);
@@ -1284,7 +1283,7 @@ public class SearchTest extends AbstractTest {
         search.onlyModifiedBetween(inOneHour, null);
         // full text
         search.byFullText(name);
-        assertFalse(search.hasNext());
+        Assert.assertFalse(search.hasNext());
         // annotated with
         search.byAnnotatedWith(tag);
         assertResults(search, 0);
@@ -1299,7 +1298,7 @@ public class SearchTest extends AbstractTest {
         search.onlyModifiedBetween(oneHourAgo, inOneHour);
         // full text
         search.byFullText(name);
-        assertEquals(1, search.results().size());
+        Assert.assertEquals(1, search.results().size());
         // annotated with
         search.byAnnotatedWith(tag);
         assertResults(search, 1);
@@ -1314,7 +1313,7 @@ public class SearchTest extends AbstractTest {
         search.onlyModifiedBetween(null, now);
         // full text
         search.byFullText(name);
-        assertFalse(search.hasNext());
+        Assert.assertFalse(search.hasNext());
         // annotated with
         search.byAnnotatedWith(tag);
         assertResults(search, 0);
@@ -1329,7 +1328,7 @@ public class SearchTest extends AbstractTest {
         search.onlyModifiedBetween(null, null);
         // full text
         search.byFullText(name);
-        assertEquals(1, search.results().size());
+        Assert.assertEquals(1, search.results().size());
         // annotated with
         search.byAnnotatedWith(tag);
         assertResults(search, 1);
@@ -1365,7 +1364,7 @@ public class SearchTest extends AbstractTest {
         // Find the Image
         // full text
         search.byFullText(name);
-        assertEquals(1, search.results().size());
+        Assert.assertEquals(1, search.results().size());
         // annotated with
         search.byAnnotatedWith(tag);
         assertResults(search, 1);
@@ -1380,7 +1379,7 @@ public class SearchTest extends AbstractTest {
         search.onlyAnnotatedBetween(null, oneHourAgo);
         // full text
         search.byFullText(name);
-        assertFalse(search.hasNext());
+        Assert.assertFalse(search.hasNext());
         // annotated with
         search.byAnnotatedWith(tag);
         assertResults(search, 0);
@@ -1395,7 +1394,7 @@ public class SearchTest extends AbstractTest {
         search.onlyAnnotatedBetween(inOneHour, null);
         // full text
         search.byFullText(name);
-        assertFalse(search.hasNext());
+        Assert.assertFalse(search.hasNext());
         // annotated with
         search.byAnnotatedWith(tag);
         assertResults(search, 0);
@@ -1410,7 +1409,7 @@ public class SearchTest extends AbstractTest {
         search.onlyAnnotatedBetween(oneHourAgo, inOneHour);
         // full text
         search.byFullText(name);
-        assertEquals(1, search.results().size());
+        Assert.assertEquals(1, search.results().size());
         // annotated with
         search.byAnnotatedWith(tag);
         assertResults(search, 1);
@@ -1425,7 +1424,7 @@ public class SearchTest extends AbstractTest {
         search.onlyAnnotatedBetween(null, now);
         // full text
         search.byFullText(name);
-        assertFalse(search.hasNext());
+        Assert.assertFalse(search.hasNext());
         // annotated with
         search.byAnnotatedWith(tag);
         assertResults(search, 0);
@@ -1440,7 +1439,7 @@ public class SearchTest extends AbstractTest {
         search.onlyAnnotatedBetween(null, null);
         // full text
         search.byFullText(name);
-        assertEquals(1, search.results().size());
+        Assert.assertEquals(1, search.results().size());
         // annotated with
         search.byAnnotatedWith(tag);
         assertResults(search, 1);
@@ -1476,7 +1475,7 @@ public class SearchTest extends AbstractTest {
         // Find the annotation
         // full text
         search.byFullText(name);
-        assertEquals(1, search.results().size());
+        Assert.assertEquals(1, search.results().size());
         // annotated with
         search.byAnnotatedWith(t);
         assertResults(search, 1);
@@ -1497,7 +1496,7 @@ public class SearchTest extends AbstractTest {
         search.notAnnotatedBy(null);
         // full text
         search.byFullText(name);
-        assertFalse(search.hasNext());
+        Assert.assertFalse(search.hasNext());
         // annotated with
         search.byAnnotatedWith(t);
         assertResults(search, 0);
@@ -1545,13 +1544,13 @@ public class SearchTest extends AbstractTest {
         search.onlyAnnotatedWith(TagAnnotation.class);
         search.onlyType(Image.class);
         search.byFullText(name);
-        assertFalse(search.hasNext());
+        Assert.assertFalse(search.hasNext());
 
         // But if we ask for Images which aren't annotated it should appear
         search.onlyAnnotatedWith(new Class[] {});
         search.onlyType(Image.class);
         search.byFullText(name);
-        assertEquals(1, search.results().size());
+        Assert.assertEquals(1, search.results().size());
 
         // Now let's tag it and see if it shows up
         TagAnnotation t = new TagAnnotation();
@@ -1566,12 +1565,12 @@ public class SearchTest extends AbstractTest {
 
         // Since we're looking for "no annotations" there should be no results
         search.byFullText(name);
-        assertFalse(search.hasNext());
+        Assert.assertFalse(search.hasNext());
 
         // And if we turn the annotations back on?
         search.onlyAnnotatedWith(TagAnnotation.class);
         search.byFullText(name);
-        assertEquals(1, search.results().size());
+        Assert.assertEquals(1, search.results().size());
     }
 
     @Test(groups = { "HHH-879", "broken" })
@@ -1603,15 +1602,15 @@ public class SearchTest extends AbstractTest {
 
         search.onlyAnnotatedWith(TagAnnotation.class);
         search.byFullText(name);
-        assertEquals(2, search.results().size());
+        Assert.assertEquals(2, search.results().size());
 
         search.onlyAnnotatedWith(BooleanAnnotation.class);
         search.byFullText(name);
-        assertEquals(2, search.results().size());
+        Assert.assertEquals(2, search.results().size());
 
         search.onlyAnnotatedWith(BooleanAnnotation.class, TagAnnotation.class);
         search.byFullText(name);
-        assertEquals(1, search.results().size());
+        Assert.assertEquals(1, search.results().size());
 
     }
 
@@ -1679,7 +1678,7 @@ public class SearchTest extends AbstractTest {
         desc.add(i2.getDescription());
         desc.add(i1.getDescription());
         while (search.hasNext()) {
-            assertEquals(desc.remove(0), ((Image) search.next())
+            Assert.assertEquals(desc.remove(0), ((Image) search.next())
                     .getDescription());
         }
         // annotated with
@@ -1688,7 +1687,7 @@ public class SearchTest extends AbstractTest {
         desc.add(i2.getDescription());
         desc.add(i1.getDescription());
         while (search.hasNext()) {
-            assertEquals(desc.remove(0), ((Image) search.next())
+            Assert.assertEquals(desc.remove(0), ((Image) search.next())
                     .getDescription());
         }
 
@@ -1701,7 +1700,7 @@ public class SearchTest extends AbstractTest {
         asc.add(i1.getDescription());
         asc.add(i2.getDescription());
         while (search.hasNext()) {
-            assertEquals(asc.remove(0), ((Image) search.next())
+            Assert.assertEquals(asc.remove(0), ((Image) search.next())
                     .getDescription());
         }
         // annotated with
@@ -1710,7 +1709,7 @@ public class SearchTest extends AbstractTest {
         asc.add(i1.getDescription());
         asc.add(i2.getDescription());
         while (search.hasNext()) {
-            assertEquals(asc.remove(0), ((Image) search.next())
+            Assert.assertEquals(asc.remove(0), ((Image) search.next())
                     .getDescription());
         }
 
@@ -1723,7 +1722,7 @@ public class SearchTest extends AbstractTest {
         ids.add(i2.getId());
         ids.add(i1.getId());
         while (search.hasNext()) {
-            assertEquals(ids.remove(0), search.next().getId());
+            Assert.assertEquals(ids.remove(0), search.next().getId());
         }
         // annotated with
         search.byAnnotatedWith(tag);
@@ -1731,7 +1730,7 @@ public class SearchTest extends AbstractTest {
         ids.add(i2.getId());
         ids.add(i1.getId());
         while (search.hasNext()) {
-            assertEquals(ids.remove(0), search.next().getId());
+            Assert.assertEquals(ids.remove(0), search.next().getId());
         }
 
         // Ordered by creation event id
@@ -1743,7 +1742,7 @@ public class SearchTest extends AbstractTest {
         ids.add(i2.getId());
         ids.add(i1.getId());
         while (search.hasNext()) {
-            assertEquals(ids.remove(0), search.next().getId());
+            Assert.assertEquals(ids.remove(0), search.next().getId());
         }
         // annotated with
         search.byAnnotatedWith(tag);
@@ -1751,7 +1750,7 @@ public class SearchTest extends AbstractTest {
         ids.add(i2.getId());
         ids.add(i1.getId());
         while (search.hasNext()) {
-            assertEquals(ids.remove(0), search.next().getId());
+            Assert.assertEquals(ids.remove(0), search.next().getId());
         }
 
         // ordered by creation event time
@@ -1763,7 +1762,7 @@ public class SearchTest extends AbstractTest {
         ids.add(i2.getId());
         ids.add(i1.getId());
         while (search.hasNext()) {
-            assertEquals(ids.remove(0), search.next().getId());
+            Assert.assertEquals(ids.remove(0), search.next().getId());
         }
         // annotated with
         search.byAnnotatedWith(tag);
@@ -1771,7 +1770,7 @@ public class SearchTest extends AbstractTest {
         ids.add(i2.getId());
         ids.add(i1.getId());
         while (search.hasNext()) {
-            assertEquals(ids.remove(0), search.next().getId());
+            Assert.assertEquals(ids.remove(0), search.next().getId());
         }
 
         // To test multiple sort fields, we add another image with an "a"
@@ -1798,7 +1797,7 @@ public class SearchTest extends AbstractTest {
         multi.add(i1.getId());
         multi.add(i2.getId());
         while (search.hasNext()) {
-            assertEquals(multi.remove(0), search.next().getId());
+            Assert.assertEquals(multi.remove(0), search.next().getId());
         }
         // full text
         search.byFullText(uuid);
@@ -1807,7 +1806,7 @@ public class SearchTest extends AbstractTest {
         multi.add(i1.getId());
         multi.add(i2.getId());
         while (search.hasNext()) {
-            assertEquals(multi.remove(0), search.next().getId());
+            Assert.assertEquals(multi.remove(0), search.next().getId());
         }
 
     }
@@ -1838,44 +1837,44 @@ public class SearchTest extends AbstractTest {
         // full text
         search.byFullText(uuid);
         Image t = (Image) search.results().get(0);
-        assertEquals(-1, t.sizeOfAnnotationLinks());
+        Assert.assertEquals(-1, t.sizeOfAnnotationLinks());
         // annotated with
         search.byAnnotatedWith(tag);
         t = (Image) search.results().get(0);
-        assertEquals(-1, t.sizeOfAnnotationLinks());
+        Assert.assertEquals(-1, t.sizeOfAnnotationLinks());
 
         // Fetch only a given type
         search.fetchAnnotations(TagAnnotation.class);
         // annotated with
         search.byAnnotatedWith(tag);
         t = (Image) search.results().get(0);
-        assertEquals(1, t.sizeOfAnnotationLinks());
+        Assert.assertEquals(1, t.sizeOfAnnotationLinks());
         // full text
         search.byFullText(uuid);
         t = (Image) search.results().get(0);
-        assertEquals(3, t.sizeOfAnnotationLinks());
+        Assert.assertEquals(3, t.sizeOfAnnotationLinks());
 
         // fetch only a given type different from annotated-with type
         search.fetchAnnotations(DoubleAnnotation.class);
         // annotated with
         search.byAnnotatedWith(tag);
         t = (Image) search.results().get(0);
-        assertEquals(1, t.sizeOfAnnotationLinks());
+        Assert.assertEquals(1, t.sizeOfAnnotationLinks());
         // full text
         search.byFullText(uuid);
         t = (Image) search.results().get(0);
-        assertEquals(3, t.sizeOfAnnotationLinks());
+        Assert.assertEquals(3, t.sizeOfAnnotationLinks());
 
         // fetch two types
         search.fetchAnnotations(TagAnnotation.class, DoubleAnnotation.class);
         // annotated with
         search.byAnnotatedWith(tag);
         t = (Image) search.results().get(0);
-        assertEquals(2, t.sizeOfAnnotationLinks());
+        Assert.assertEquals(2, t.sizeOfAnnotationLinks());
         // full text
         search.byFullText(uuid);
         t = (Image) search.results().get(0);
-        assertEquals(3, t.sizeOfAnnotationLinks());
+        Assert.assertEquals(3, t.sizeOfAnnotationLinks());
 
         // Fetch all
         search.fetchAnnotations(Annotation.class);
@@ -1887,7 +1886,7 @@ public class SearchTest extends AbstractTest {
         // full text
         search.byFullText(uuid);
         t = (Image) search.results().get(0);
-        assertEquals(3, t.sizeOfAnnotationLinks());
+        Assert.assertEquals(3, t.sizeOfAnnotationLinks());
 
         // resave and see if there is data loss
         search.fetchAnnotations(TagAnnotation.class);
@@ -1900,12 +1899,12 @@ public class SearchTest extends AbstractTest {
                 .findByQuery(
                         "select t from Image t join fetch t.annotationLinks where t.id = :id",
                         new Parameters().addId(t.getId()));
-        assertEquals(4, t.sizeOfAnnotationLinks());
+        Assert.assertEquals(4, t.sizeOfAnnotationLinks());
     }
 
     @Test
     public void testFetchAlso() {
-        fail("NYI");
+        Assert.fail("NYI");
     }
 
     // bugs and particular issues
@@ -1961,7 +1960,7 @@ public class SearchTest extends AbstractTest {
         search.onlyType(Image.class);
         // search.setAllowLeadingWildcard(true);
         search.byFullText(query);
-        fail("This should not be reached");
+        Assert.fail("This should not be reached");
     }
 
     @Test(groups = "ticket:897", expectedExceptions = ApiUsageException.class)
@@ -1976,7 +1975,7 @@ public class SearchTest extends AbstractTest {
         search.onlyType(Image.class);
         search.setAllowLeadingWildcard(true);
         search.byFullText(query);
-        fail("This should not be reached");
+        Assert.fail("This should not be reached");
     }
 
     /**
@@ -2018,15 +2017,15 @@ public class SearchTest extends AbstractTest {
         if (search.hasNext()) {
             List<IObject> l = search.results();
             for (IObject object : l) {
-                assertTrue("Must be an image", object instanceof Image);
+                Assert.assertTrue(object instanceof Image, "Must be an image");
                 if (object.getId().equals(i.getId())) {
                     found = true;
                 }
             }
         } else {
-            fail("Should have had results.");
+            Assert.fail("Should have had results.");
         }
-        assertTrue("Must be found", found);
+        Assert.assertTrue(found, "Must be found");
     }
 
     /**
@@ -2051,7 +2050,7 @@ public class SearchTest extends AbstractTest {
         search.onlyType(Image.class);
         search.bySomeMustNone(new String[] { "an*" }, null, null);
         for (IObject test : search.results()) {
-            assertTrue(test.toString(), test instanceof Image);
+            Assert.assertTrue(test instanceof Image, test.toString());
         }
 
         Class[] klass = new Class[1];
@@ -2062,7 +2061,7 @@ public class SearchTest extends AbstractTest {
 
         List<IObject> results = assertContainsObject(search, i);
         for (IObject test : results) {
-            assertTrue(test.toString(), test instanceof Image);
+            Assert.assertTrue(test instanceof Image, test.toString());
         }
 
     }
@@ -2103,10 +2102,10 @@ public class SearchTest extends AbstractTest {
         search.bySomeMustNone(new String[] { "an*" }, null, null);
 
         for (IObject test : search.results()) {
-            assertTrue(test.toString(), test instanceof Image);
+            Assert.assertTrue(test instanceof Image, test.toString());
             ids.remove(test.getId());
         }
-        assertTrue(ids + " should be empty", ids.size() == 0);
+        Assert.assertEquals(ids.size(), 0, ids + " should be empty");
 
     }
 
@@ -2217,10 +2216,10 @@ public class SearchTest extends AbstractTest {
         search.byAnnotatedWith(new TagAnnotation());
 
         for (IObject test : search.results()) {
-            assertTrue(test.toString(), test instanceof Image);
+            Assert.assertTrue(test instanceof Image, test.toString());
             ids.remove(test.getId());
         }
-        assertTrue(ids + " should be empty", ids.size() == 0);
+        Assert.assertEquals(ids.size(),  0, ids + " should be empty");
 
     }
 
@@ -2257,7 +2256,7 @@ public class SearchTest extends AbstractTest {
                 return null;
             }
         });
-        fail("Surprising to reach here");
+        Assert.fail("Surprising to reach here");
     }
 
     @Test(groups = "ticket:995")
@@ -2520,20 +2519,20 @@ public class SearchTest extends AbstractTest {
 
     List<IObject> assertResults(Search search, int k) {
         if (k == 0) {
-            assertFalse(search.hasNext());
+            Assert.assertFalse(search.hasNext());
             return null;
         } else {
             List<IObject> output = new ArrayList<IObject>();
             while (search.hasNext()) {
                 output.addAll(search.results());
             }
-            assertEquals(k, output.size());
+            Assert.assertEquals(k, output.size());
             return output;
         }
     }
 
     void assertAtLeastResults(Search search, int k) {
-        assertTrue(search.results().size() >= k);
+        Assert.assertTrue(search.results().size() >= k);
         // Clearing possible overflowing values.
         while (search.hasNext()) {
             search.results();
@@ -2560,7 +2559,7 @@ public class SearchTest extends AbstractTest {
                 }
             }
         }
-        assertTrue(test + " not found in results:" + results, found);
+        Assert.assertTrue(found, test + " not found in results:" + results);
         return results;
     }
 
@@ -2568,7 +2567,7 @@ public class SearchTest extends AbstractTest {
         try {
             return (IObject) test.getClass().getMethod("proxy").invoke(test);
         } catch (Exception e) {
-            fail("Could not obtain a proxy for:" + test);
+            Assert.fail("Could not obtain a proxy for:" + test);
         }
         return null;
     }

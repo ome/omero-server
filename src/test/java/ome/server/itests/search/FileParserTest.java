@@ -26,6 +26,7 @@ import ome.server.itests.FileUploader;
 import org.hibernate.Session;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ResourceUtils;
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
 @Test(groups = { "query", "fulltext", "fileparser" })
@@ -61,7 +62,7 @@ public class FileParserTest extends AbstractTest {
                 return null;
             }});
 
-        assertEquals(str, sw.toString());
+        Assert.assertEquals(str, sw.toString());
     }
 
     @Test()
@@ -96,8 +97,8 @@ public class FileParserTest extends AbstractTest {
 
         loginRootKeepGroup();
         List<Image> imgs = iQuery.findAllByFullText(Image.class, str, null);
-        assertEquals(1, imgs.size());
-        assertTrue(imgs.get(0).getId().equals(i.getId()));
+        Assert.assertEquals(1, imgs.size());
+        Assert.assertTrue(imgs.get(0).getId().equals(i.getId()));
 
     }
 
@@ -131,7 +132,7 @@ public class FileParserTest extends AbstractTest {
         search.onlyType(Image.class);
         search.onlyIds(i.getId());
         search.byFullText("file.contents:ABC123");
-        assertTrue(search.hasNext());
+        Assert.assertTrue(search.hasNext());
     }
 
     @Test(groups = "ticket:2098")
@@ -154,8 +155,8 @@ public class FileParserTest extends AbstractTest {
 
         loginRootKeepGroup();
         List<Image> imgs = iQuery.findAllByFullText(Image.class, uuid, null);
-        assertEquals(1, imgs.size());
-        assertTrue(imgs.get(0).getId().equals(i.getId()));
+        Assert.assertEquals(1, imgs.size());
+        Assert.assertTrue(imgs.get(0).getId().equals(i.getId()));
     }
 
     private Image new_Image() {

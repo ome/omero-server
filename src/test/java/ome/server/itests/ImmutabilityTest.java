@@ -7,6 +7,7 @@
 
 package ome.server.itests;
 
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import ome.model.core.Image;
@@ -47,7 +48,7 @@ public class ImmutabilityTest extends AbstractManagedContextTest {
         iUpdate.saveObject(i);
         // unfortunately still not working properly i = iQuery.refresh(i);
         i = iQuery.get(i.getClass(), i.getId());
-        assertEquals(i.getDetails().getCreationEvent().getId(), oldEvent
+        Assert.assertEquals(i.getDetails().getCreationEvent().getId(), oldEvent
                 .getId());
 
     }

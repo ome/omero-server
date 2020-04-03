@@ -12,8 +12,6 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CyclicBarrier;
 
-import junit.framework.TestCase;
-
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Ehcache;
@@ -37,6 +35,7 @@ import ome.system.OmeroContext;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ApplicationEventMulticaster;
+import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -45,7 +44,7 @@ import org.testng.annotations.Test;
  * @since 3.0-Beta2
  */
 @Test(groups = "sessions")
-public class SessionCacheTest extends TestCase {
+public class SessionCacheTest {
 
     OmeroContext ctx = new OmeroContext(
             new String[] { "classpath:ome/services/messaging.xml" });
@@ -104,7 +103,7 @@ public class SessionCacheTest extends TestCase {
         cache.updateEvent(new UserGroupUpdateEvent(this));
         cache.setStaleCacheListener(new NullStaleCacheListener());
         cache.doUpdate(); // Now it will be removed and the event published.
-        assertTrue(called[0]);
+        Assert.assertTrue(called[0]);
     }
 
     public void testPutNonSerializable() {
@@ -112,7 +111,7 @@ public class SessionCacheTest extends TestCase {
         final Session s = sess();
         int size = cache.getIds().size();
         cache.putSession(s.getUuid(), sc(s));
-        assertTrue(cache.getIds().size() == (size + 1));
+        Assert.assertEquals(cache.getIds().size(), (size + 1));
     }
 
     // Now the cache still needs an update
@@ -177,9 +176,9 @@ public class SessionCacheTest extends TestCase {
         cache.doUpdate(); // This should release the lock
         t1.join();
         t2.join();
-        assertTrue(done[0]);
-        assertTrue(done[1]);
-        assertEquals(1, count[0]);
+        Assert.assertTrue(done[0]);
+        Assert.assertTrue(done[1]);
+        Assert.assertEquals(1, count[0]);
 
     }
 
@@ -189,7 +188,7 @@ public class SessionCacheTest extends TestCase {
         Ehcache inmemory, ondisk;
         try {
             inmemory = cache.inMemoryCache("doesnotexist");
-            fail("should fail");
+            Assert.fail("should fail");
         } catch (SessionException se) {
             // ok
         }
@@ -206,9 +205,9 @@ public class SessionCacheTest extends TestCase {
         // Now recreate the same session and cache should be gone.
         cache.putSession(s.getUuid(), sc(s));
         inmemory = cache.inMemoryCache(s.getUuid());
-        assertFalse(inmemory.isKeyInCache("a"));
+        Assert.assertFalse(inmemory.isKeyInCache("a"));
         ondisk = cache.onDiskCache(s.getUuid());
-        assertFalse(ondisk.isKeyInCache("c"));
+        Assert.assertFalse(ondisk.isKeyInCache("c"));
 
     }
 
@@ -230,7 +229,7 @@ public class SessionCacheTest extends TestCase {
         Session s = sess();
         cache.putSession(uuid, sc(s));
         cache.removeSession(uuid);
-        assertTrue(listener.called);
+        Assert.assertTrue(listener.called);
     }
 
     @Test
@@ -264,7 +263,7 @@ public class SessionCacheTest extends TestCase {
         cache.updateEvent(new UserGroupUpdateEvent(this));
         cache.setStaleCacheListener(new NullStaleCacheListener());
         cache.doUpdate();
-        assertTrue(listener.called);
+        Assert.assertTrue(listener.called);
         throwsRemovedSession(uuid);
     }
 
@@ -293,7 +292,7 @@ public class SessionCacheTest extends TestCase {
         cache.updateEvent(new UserGroupUpdateEvent(this));
         cache.setStaleCacheListener(new NullStaleCacheListener());
         cache.doUpdate();
-        assertTrue(listener.called);
+        Assert.assertTrue(listener.called);
     }
 
     @Test(timeOut=10000)
@@ -306,7 +305,7 @@ public class SessionCacheTest extends TestCase {
             try {
                 cache.getSessionContext(s.getUuid());
             } catch (RemovedSessionException rse) {
-                fail("Removed session on loop " + i);
+                Assert.fail("Removed session on loop " + i);
             }
         }
     }
@@ -335,9 +334,9 @@ public class SessionCacheTest extends TestCase {
             try {
                 cache.getSessionContext(s1.getUuid());
             } catch (RemovedSessionException rse) {
-                fail("Removed session on loop " + i);
+                Assert.fail("Removed session on loop " + i);
             } catch (SessionTimeoutException ste) {
-                fail("Session timeout on loop " + i);
+                Assert.fail("Session timeout on loop " + i);
             }
         }
 
@@ -346,7 +345,7 @@ public class SessionCacheTest extends TestCase {
         cache.doUpdate();
         try {
             cache.getSessionContext(s2.getUuid());
-            fail("Should fail for " + s2.getUuid());
+            Assert.fail("Should fail for " + s2.getUuid());
         } catch (RemovedSessionException rse) {
             // ok.
         } catch (SessionTimeoutException ste) {
@@ -370,12 +369,12 @@ public class SessionCacheTest extends TestCase {
         Thread.sleep(2L);
         try {
             cache.getSessionContext(s.getUuid());
-            fail("should time out");
+            Assert.fail("should time out");
         } catch (SessionException se) {
             // Good.
         }
         Cache internal = CacheManager.getInstance().getCache("SessionCache");
-        assertTrue(internal.isKeyInCache(s.getUuid()));
+        Assert.assertTrue(internal.isKeyInCache(s.getUuid()));
     }
 
     // Helpers
@@ -408,7 +407,7 @@ public class SessionCacheTest extends TestCase {
     private void throwsSessionTimeout(String uuid) {
         try {
             cache.getSessionContext(uuid);
-            fail("Should throw");
+            Assert.fail("Should throw");
         } catch (SessionTimeoutException ste) {
             // ok;
         }
@@ -417,7 +416,7 @@ public class SessionCacheTest extends TestCase {
     private void throwsRemovedSession(String uuid) {
         try {
             cache.getSessionContext(uuid);
-            fail("Should throw");
+            Assert.fail("Should throw");
         } catch (RemovedSessionException rse) {
             // ok;
         }

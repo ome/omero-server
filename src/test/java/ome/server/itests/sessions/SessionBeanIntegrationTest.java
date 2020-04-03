@@ -13,6 +13,7 @@ import ome.model.meta.Session;
 import ome.server.itests.AbstractManagedContextTest;
 import ome.system.Principal;
 
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
 /**
@@ -52,15 +53,15 @@ public class SessionBeanIntegrationTest extends AbstractManagedContextTest {
         loginUserKeepGroup(e); // Second session
 
         List<Session> sessions = iSession.getMyOpenSessions();
-        assertEquals(2, sessions.size());
+        Assert.assertEquals(2, sessions.size());
 
         sessions = iSession.getMyOpenAgentSessions(null);
-        assertEquals(2, sessions.size());
+        Assert.assertEquals(2, sessions.size());
 
         sessions = iSession.getMyOpenAgentSessions("OMERO.test");
-        assertEquals(0, sessions.size());
+        Assert.assertEquals(0, sessions.size());
 
         sessions = iSession.getMyOpenClientSessions();
-        assertEquals(0, sessions.size());
+        Assert.assertEquals(0, sessions.size());
     }
 }

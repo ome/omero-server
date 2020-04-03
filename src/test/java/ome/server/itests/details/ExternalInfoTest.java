@@ -13,6 +13,7 @@ import ome.parameters.Filter;
 import ome.parameters.Parameters;
 import ome.server.itests.AbstractManagedContextTest;
 
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
 @Test(groups = {"ticket:371","broken"})
@@ -28,11 +29,11 @@ public class ExternalInfoTest extends AbstractManagedContextTest {
         loginNewUser();
 
         i = createImage();
-        assertNull(i.getDetails().getExternalInfo());
+        Assert.assertNull(i.getDetails().getExternalInfo());
 
         i = iUpdate.saveAndReturnObject(i);
 
-        assertNull(i.getDetails().getExternalInfo());
+        Assert.assertNull(i.getDetails().getExternalInfo());
 
     }
 
@@ -42,7 +43,7 @@ public class ExternalInfoTest extends AbstractManagedContextTest {
         loginNewUser();
 
         createImageAndInfo();
-        assertNotNull(i.getDetails().getExternalInfo());
+        Assert.assertNotNull(i.getDetails().getExternalInfo());
 
         try {
             i = createImage();
@@ -50,7 +51,7 @@ public class ExternalInfoTest extends AbstractManagedContextTest {
             info.setLsid(null); // SETTING TO NULL
             i.getDetails().setExternalInfo(info);
             iUpdate.saveAndReturnObject(i);
-            fail("invalid!");
+            Assert.fail("invalid!");
         } catch (ValidationException ve) {
             // ok.
         }
@@ -65,7 +66,7 @@ public class ExternalInfoTest extends AbstractManagedContextTest {
             createImageAndInfo();
             i.getDetails().setExternalInfo(null); // null
             iUpdate.saveObject(i);
-            fail("secvio!");
+            Assert.fail("secvio!");
         } catch (SecurityViolation sv) {
             // ok
         }
@@ -76,7 +77,7 @@ public class ExternalInfoTest extends AbstractManagedContextTest {
             different.setLsid("different");
             i.getDetails().setExternalInfo(different);
             iUpdate.saveObject(i);
-            fail("secvio!");
+            Assert.fail("secvio!");
         } catch (SecurityViolation sv) {
             // ok
         }
@@ -88,7 +89,7 @@ public class ExternalInfoTest extends AbstractManagedContextTest {
                             new Filter().page(0, 1)).addId(info.getId()));
             i.getDetails().setExternalInfo(different);
             iUpdate.saveObject(i);
-            fail("secvio!");
+            Assert.fail("secvio!");
         } catch (SecurityViolation sv) {
             // ok
         }
@@ -98,7 +99,7 @@ public class ExternalInfoTest extends AbstractManagedContextTest {
         i.getDetails().setExternalInfo(info);
         iUpdate.saveObject(i);
         info = iQuery.get(info.getClass(), info.getId());
-        assertTrue(info.getLsid().equals(LSID));
+        Assert.assertTrue(info.getLsid().equals(LSID));
     }
 
     @Test
@@ -110,7 +111,7 @@ public class ExternalInfoTest extends AbstractManagedContextTest {
 
         iUpdate.deleteObject(i);
         info = iQuery.find(info.getClass(), info.getId());
-        assertNull(info);
+        Assert.assertNull(info);
 
     }
 
@@ -125,7 +126,7 @@ public class ExternalInfoTest extends AbstractManagedContextTest {
         i2.getDetails().setExternalInfo(info);
         try {
             iUpdate.saveAndReturnObject(i2);
-            fail("invalid!");
+            Assert.fail("invalid!");
         } catch (ValidationException ve) {
             // ok
         }

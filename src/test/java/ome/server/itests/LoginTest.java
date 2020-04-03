@@ -15,6 +15,7 @@ import ome.model.meta.ExperimenterGroup;
 import ome.security.SecuritySystem;
 import ome.security.basic.PrincipalHolder;
 
+import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -49,7 +50,7 @@ public class LoginTest extends AbstractManagedContextTest {
             cleanup();
             loginAop.p = null;
             iQuery.find(Experimenter.class, 0l);
-            fail("Non-logged-in call allowed!");
+            Assert.fail("Non-logged-in call allowed!");
         } catch (RuntimeException e) {
             // ok.
         }
@@ -66,7 +67,7 @@ public class LoginTest extends AbstractManagedContextTest {
         login("root", "system", "Test");
         iQuery.find(Experimenter.class, 0l);
         try {
-            assertTrue(!sec.isReady());
+            Assert.assertTrue(!sec.isReady());
         } catch (NoSuchElementException nsee) {
             // ok. that's our current meaning of "logged out"
         }
@@ -77,7 +78,7 @@ public class LoginTest extends AbstractManagedContextTest {
         try {
             login("unknown2349akljf9q283", "system", "Test");
             iQuery.find(Experimenter.class, 0l);
-            fail("Login allowed with unknown user.");
+            Assert.fail("Login allowed with unknown user.");
         } catch (RuntimeException r) {
         }
         // TODO Otherexception
@@ -85,7 +86,7 @@ public class LoginTest extends AbstractManagedContextTest {
         try {
             login("root", "baba9o38023984019", "Test");
             iQuery.find(Experimenter.class, 0l);
-            fail("Login allowed with unknown group.");
+            Assert.fail("Login allowed with unknown group.");
         } catch (RuntimeException r) {
         }
         // TODO Otherexception
@@ -93,7 +94,7 @@ public class LoginTest extends AbstractManagedContextTest {
         try {
             login("root", "system", "blarg23498239048230");
             iQuery.find(Experimenter.class, 0l);
-            fail("Login allowed with unknown type.");
+            Assert.fail("Login allowed with unknown type.");
         } catch (RuntimeException r) {
         }
         // TODO Otherexception
@@ -119,7 +120,7 @@ public class LoginTest extends AbstractManagedContextTest {
             Image i = new Image();
             i.setName("belongs to wrong group");
             i = iUpdate.saveAndReturnObject(i);
-            fail("Login allowed for user in non-member group.");
+            Assert.fail("Login allowed for user in non-member group.");
         } catch (RuntimeException r) {
         }
     }

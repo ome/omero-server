@@ -8,6 +8,7 @@ package ome.server.itests;
 import ome.api.RawFileStore;
 import ome.model.core.OriginalFile;
 
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
 /**
@@ -30,7 +31,7 @@ public class RawFileStoreTest extends AbstractManagedContextTest {
         rfs.write(new byte[]{0,1,2,3}, 0, 4);
         rfs.close();
         file = iQuery.get(OriginalFile.class, file.getId());
-        assertFalse(file.getSize().equals(-1L)); // The should be updated
-        assertFalse(file.getHash().equals("")); // These should be updated
+        Assert.assertFalse(file.getSize().equals(-1L)); // The should be updated
+        Assert.assertFalse(file.getHash().equals("")); // These should be updated
     }
 }

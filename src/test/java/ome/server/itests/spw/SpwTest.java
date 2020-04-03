@@ -16,6 +16,7 @@ import ome.model.screen.WellSample;
 import ome.parameters.Parameters;
 import ome.server.itests.AbstractManagedContextTest;
 
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
 public class SpwTest extends AbstractManagedContextTest {
@@ -115,7 +116,7 @@ public class SpwTest extends AbstractManagedContextTest {
 
         well = iQuery.findByQuery(sb.toString(), new Parameters().addLong(
                 "plateID", well.getPlate().getId()));
-        assertNotNull(well);
-        assertTrue(well.sizeOfWellSamples() > 0);
+        Assert.assertNotNull(well);
+        Assert.assertTrue(well.sizeOfWellSamples() > 0);
     }
 }

@@ -11,12 +11,12 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import junit.framework.TestCase;
 import ome.services.sharing.BlobShareStore;
 import ome.services.sharing.data.Obj;
 import ome.services.sharing.data.ShareData;
 
 import org.springframework.util.ResourceUtils;
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
 /**
@@ -24,7 +24,7 @@ import org.testng.annotations.Test;
  * @since 4.4.0
  */
 @Test(groups = "ome/services/sharing")
-public class BlobShareStoreTest extends TestCase {
+public class BlobShareStoreTest {
 
     BlobShareStore store = new BlobShareStore();
 
@@ -34,18 +34,18 @@ public class BlobShareStoreTest extends TestCase {
      */
     public void testReadBlobs() throws Exception {
         ShareData[] data = loadData();
-        assertEquals(3, data.length);
+        Assert.assertEquals(3, data.length);
         ShareData d = data[0];
         for (int i = 1; i < data.length; i++) {
             ShareData t = data[i];
-            assertEquals(d.enabled, t.enabled);
-            assertEquals(d.id, t.id);
-            assertEquals(d.optlock, t.optlock);
-            assertEquals(d.owner, t.owner);
-            assertEquals(d.guests.toString(), t.guests.toString());
-            assertEquals(d.members.toString(), t.members.toString());
-            assertEquals(toString(d.objectList), toString(t.objectList));
-            assertEquals(toString(d.objectMap), toString(d.objectMap));
+            Assert.assertEquals(d.enabled, t.enabled);
+            Assert.assertEquals(d.id, t.id);
+            Assert.assertEquals(d.optlock, t.optlock);
+            Assert.assertEquals(d.owner, t.owner);
+            Assert.assertEquals(d.guests.toString(), t.guests.toString());
+            Assert.assertEquals(d.members.toString(), t.members.toString());
+            Assert.assertEquals(toString(d.objectList), toString(t.objectList));
+            Assert.assertEquals(toString(d.objectMap), toString(d.objectMap));
         }
     }
 

@@ -23,6 +23,7 @@ import ome.model.meta.ExperimenterGroup;
 import ome.system.ServiceFactory;
 import omeis.providers.re.RenderingEngine;
 
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
 /**
@@ -100,14 +101,14 @@ public class ThumbnailServiceTest extends AbstractManagedContextTest {
         re.saveCurrentSettings();
         Map<Long, byte[]> after =
             tb.getThumbnailByLongestSideSet(96, pixelsIds);
-        assertEquals(before.size(), after.size());
-        assertTrue(before.keySet().equals(after.keySet()));
+        Assert.assertEquals(before.size(), after.size());
+        Assert.assertTrue(before.keySet().equals(after.keySet()));
         Set<Integer> afterThumbnailLengths = new HashSet<Integer>();
         for (Long pixelsId : before.keySet()) {
             byte[] beforeThumbnail = before.get(pixelsId);
             byte[] afterThumbnail = after.get(pixelsId);
-            assertTrue(beforeThumbnail.length != afterThumbnail.length);
-            assertTrue(afterThumbnailLengths.add(afterThumbnail.length));
+            Assert.assertTrue(beforeThumbnail.length != afterThumbnail.length);
+            Assert.assertTrue(afterThumbnailLengths.add(afterThumbnail.length));
         }
     }
 
@@ -120,26 +121,26 @@ public class ThumbnailServiceTest extends AbstractManagedContextTest {
         RenderingEngine re = sf.createRenderingEngine();
         ThumbnailStore tb = sf.createThumbnailService();
         re.lookupPixels(pix.getId());
-        assertTrue(re.lookupRenderingDef(pix.getId()));
+        Assert.assertTrue(re.lookupRenderingDef(pix.getId()));
         re.load();
         List<RenderingModel> models = re.getAvailableModels();
         RenderingModel rgbModel = getModel(models, "rgb");
         RenderingModel greyscaleModel = getModel(models, "greyscale");
-        assertEquals(greyscaleModel.getId(), re.getModel().getId());
+        Assert.assertEquals(greyscaleModel.getId(), re.getModel().getId());
         Map<Long, byte[]> thumbnails = tb.getThumbnailByLongestSideSet(
                 96, Collections.singleton(pix.getId()));
-        assertEquals(1, thumbnails.size());
+        Assert.assertEquals(1, thumbnails.size());
         byte[] before = thumbnails.get(pix.getId());
-        assertNotNull(before);
+        Assert.assertNotNull(before);
         re.setModel(rgbModel);
-        assertEquals(rgbModel.getId(), re.getModel().getId());
+        Assert.assertEquals(rgbModel.getId(), re.getModel().getId());
         re.saveCurrentSettings();
         thumbnails = tb.getThumbnailByLongestSideSet(
                 96, Collections.singleton(pix.getId()));
-        assertEquals(1, thumbnails.size());
+        Assert.assertEquals(1, thumbnails.size());
         byte[] after = thumbnails.get(pix.getId());
-        assertNotNull(after);
-        assertTrue(before.length != after.length);
+        Assert.assertNotNull(after);
+        Assert.assertTrue(before.length != after.length);
     }
 
     @Test(groups = {"ticket:2075"})
@@ -151,26 +152,26 @@ public class ThumbnailServiceTest extends AbstractManagedContextTest {
         RenderingEngine re = sf.createRenderingEngine();
         ThumbnailStore tb = sf.createThumbnailService();
         re.lookupPixels(pix.getId());
-        assertTrue(re.lookupRenderingDef(pix.getId()));
+        Assert.assertTrue(re.lookupRenderingDef(pix.getId()));
         re.load();
         List<RenderingModel> models = re.getAvailableModels();
         RenderingModel rgbModel = getModel(models, "rgb");
         RenderingModel greyscaleModel = getModel(models, "greyscale");
-        assertEquals(greyscaleModel.getId(), re.getModel().getId());
+        Assert.assertEquals(greyscaleModel.getId(), re.getModel().getId());
         Map<Long, byte[]> thumbnails = tb.getThumbnailSet(
                 96, 96, Collections.singleton(pix.getId()));
-        assertEquals(1, thumbnails.size());
+        Assert.assertEquals(1, thumbnails.size());
         byte[] before = thumbnails.get(pix.getId());
-        assertNotNull(before);
+        Assert.assertNotNull(before);
         re.setModel(rgbModel);
-        assertEquals(rgbModel.getId(), re.getModel().getId());
+        Assert.assertEquals(rgbModel.getId(), re.getModel().getId());
         re.saveCurrentSettings();
         thumbnails = tb.getThumbnailSet(
                 96, 96, Collections.singleton(pix.getId()));
-        assertEquals(1, thumbnails.size());
+        Assert.assertEquals(1, thumbnails.size());
         byte[] after = thumbnails.get(pix.getId());
-        assertNotNull(after);
-        assertTrue(before.length != after.length);
+        Assert.assertNotNull(after);
+        Assert.assertTrue(before.length != after.length);
     }
 
     @Test(groups = {"ticket:3161"})
@@ -186,12 +187,12 @@ public class ThumbnailServiceTest extends AbstractManagedContextTest {
         IPixels ps = sf.getPixelsService();
         ts.setPixelsId(pix.getId());
         byte[] thumbExp1 = ts.getThumbnail(5, 5);
-        assertNotNull(thumbExp1);
+        Assert.assertNotNull(thumbExp1);
         List<IObject> settingsList = 
             ps.retrieveAllRndSettings(pix.getId(), -1);
         RenderingDef settings0 = (RenderingDef) settingsList.get(0);
-        assertEquals(1, settingsList.size());
-        assertEquals(1, settings0.getVersion().intValue());
+        Assert.assertEquals(1, settingsList.size());
+        Assert.assertEquals(1, settings0.getVersion().intValue());
         // Experimenter2's interactions
         Experimenter e2 = loginNewUserInOtherUsersGroup(e1);
         RenderingEngine re = sf.createRenderingEngine();
@@ -207,16 +208,16 @@ public class ThumbnailServiceTest extends AbstractManagedContextTest {
         re.setModel(getModel(models, "rgb"));
         re.saveCurrentSettings();
         byte[] thumbExp2 = ts.getThumbnail(5, 5);
-        assertNotNull(thumbExp2);
+        Assert.assertNotNull(thumbExp2);
         settingsList = ps.retrieveAllRndSettings(pix.getId(), -1);
-        assertEquals(2, settingsList.size());
+        Assert.assertEquals(2, settingsList.size());
         settings0 = (RenderingDef) settingsList.get(0);
         RenderingDef settings1 = (RenderingDef) settingsList.get(1);
-        assertEquals(1, settings0.getVersion().intValue());
-        assertEquals(2, settings1.getVersion().intValue());
+        Assert.assertEquals(1, settings0.getVersion().intValue());
+        Assert.assertEquals(2, settings1.getVersion().intValue());
         byte[][] thumbnails = retrieveAllThumbnailsBySettings(
                 settingsList, ts);
-        assertEquals(2, thumbnails.length);
+        Assert.assertEquals(2, thumbnails.length);
         // Experimenter3's interactions
         Experimenter e3 = loginNewUserInOtherUsersGroup(e1);
         ts = sf.createThumbnailService();
@@ -224,19 +225,19 @@ public class ThumbnailServiceTest extends AbstractManagedContextTest {
         ts.resetDefaults();
         ts.setPixelsId(pix.getId());
         byte[] thumbExp3 = ts.getThumbnail(5, 5);
-        assertNotNull(thumbExp3);
+        Assert.assertNotNull(thumbExp3);
         settingsList = 
             ps.retrieveAllRndSettings(pix.getId(), -1);
         settings0 = (RenderingDef) settingsList.get(0);
         settings1 = (RenderingDef) settingsList.get(1);
         RenderingDef settings2 = (RenderingDef) settingsList.get(2);
-        assertEquals(3, settingsList.size());
-        assertEquals(1, settings0.getVersion().intValue());
-        assertEquals(2, settings1.getVersion().intValue());
-        assertEquals(1, settings2.getVersion().intValue());
+        Assert.assertEquals(3, settingsList.size());
+        Assert.assertEquals(1, settings0.getVersion().intValue());
+        Assert.assertEquals(2, settings1.getVersion().intValue());
+        Assert.assertEquals(1, settings2.getVersion().intValue());
         thumbnails = retrieveAllThumbnailsBySettings(
                 settingsList, ts);
-        assertEquals(3, thumbnails.length);
+        Assert.assertEquals(3, thumbnails.length);
     }
 
     @Test(groups = {"ticket:3161"})
@@ -261,7 +262,7 @@ public class ThumbnailServiceTest extends AbstractManagedContextTest {
         RenderingModel modelExp1 = re.getModel();
         ts.setPixelsId(pix.getId());
         byte[] thumbExp1 = ts.getThumbnail(5, 5);
-        assertNotNull(thumbExp1);
+        Assert.assertNotNull(thumbExp1);
         // Experimenter2's services
         Experimenter e2 = loginNewUserInOtherUsersGroup(e1);
         re = sf.createRenderingEngine();
@@ -275,17 +276,17 @@ public class ThumbnailServiceTest extends AbstractManagedContextTest {
         RenderingModel modelExp2 = re.getModel();
         ts.setPixelsId(pix.getId());
         byte[] thumbExp2A = ts.getThumbnail(5, 5);
-        assertNotNull(thumbExp2A);
+        Assert.assertNotNull(thumbExp2A);
 
         // Check rendering models are the same
-        assertEquals(modelExp1.getId(), modelExp2.getId());
+        Assert.assertEquals(modelExp1.getId(), modelExp2.getId());
         // Check that the rendering settings count is two
         List<IObject> settingsList = 
             psExp1.retrieveAllRndSettings(pix.getId(), -1);
-        assertEquals(2, settingsList.size());
+        Assert.assertEquals(2, settingsList.size());
         byte[][] thumbnails = retrieveAllThumbnailsBySettings(
                 settingsList, ts);
-        assertEquals(2, thumbnails.length);
+        Assert.assertEquals(2, thumbnails.length);
         // Switch rendering model to check the settings
         re.setModel(getModel(models, "rgb"));
         re.saveCurrentSettings();
@@ -294,7 +295,7 @@ public class ThumbnailServiceTest extends AbstractManagedContextTest {
         loginUser(e1.getOmeName());
         thumbnails = retrieveAllThumbnailsBySettings(
                 settingsList, ts);
-        assertEquals(2, thumbnails.length);
+        Assert.assertEquals(2, thumbnails.length);
     }
 
     private byte[][] retrieveAllThumbnailsBySettings(

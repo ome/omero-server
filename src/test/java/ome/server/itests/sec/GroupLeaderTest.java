@@ -22,6 +22,7 @@ import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.springframework.orm.hibernate3.HibernateCallback;
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
 public class GroupLeaderTest extends AbstractManagedContextTest {
@@ -49,8 +50,8 @@ public class GroupLeaderTest extends AbstractManagedContextTest {
                 .findAllByQuery(groupByOwner,
                         new Parameters().addId(e.getId()));
 
-        assertNotNull(groups);
-        assertTrue(groups.size() > 0);
+        Assert.assertNotNull(groups);
+        Assert.assertTrue(groups.size() > 0);
 
     }
 
@@ -69,8 +70,8 @@ public class GroupLeaderTest extends AbstractManagedContextTest {
                 .findAllByQuery(groupByOwner,
                         new Parameters().addId(e.getId()));
 
-        assertNotNull(groups);
-        assertTrue(groups.size() > 0);
+        Assert.assertNotNull(groups);
+        Assert.assertTrue(groups.size() > 0);
 
         final Experimenter exp = e;
         List<Long> groupIds = iQuery.execute(new HibernateCallback() {
@@ -83,8 +84,8 @@ public class GroupLeaderTest extends AbstractManagedContextTest {
             }
         });
 
-        assertNotNull(groupIds);
-        assertTrue(groupIds.size() > 0);
+        Assert.assertNotNull(groupIds);
+        Assert.assertTrue(groupIds.size() > 0);
 
     }
 
@@ -145,8 +146,8 @@ public class GroupLeaderTest extends AbstractManagedContextTest {
         ome.model.meta.Session s = iSession.createSessionWithTimeouts(p, 10000, 0);
         p = login(s.getUuid(), "user", "Test");
         EventContext ec = iAdmin.getEventContext();
-        assertEquals(member.getOmeName(), ec.getCurrentUserName());
-        assertEquals(ownGroup.getId(), ec.getCurrentGroupId());
+        Assert.assertEquals(member.getOmeName(), ec.getCurrentUserName());
+        Assert.assertEquals(ownGroup.getId(), ec.getCurrentGroupId());
         sessionManager.setSecurityContext(p, anotherGroup);
     }
 

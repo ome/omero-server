@@ -33,6 +33,7 @@ import ome.system.ServiceFactory;
 import omeis.providers.re.RenderingEngine;
 import omeis.providers.re.data.PlaneDef;
 
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
 /**
@@ -108,14 +109,14 @@ public class RenderingSessionTest extends AbstractManagedContextTest {
 
         boolean active = f.re.isActive(0);
         f.re.setActive(0, !active);
-        assertEquals(!active,f.re.isActive(0));
+        Assert.assertEquals(!active, f.re.isActive(0));
 
         f.re.resetDefaultSettings(true);
-        assertEquals(active, f.re.isActive(0));
+        Assert.assertEquals(active, f.re.isActive(0));
 
         f.re.setActive(0, !active);
         f.re.saveCurrentSettings();
-        assertEquals(!active, f.re.isActive(0));
+        Assert.assertEquals(!active, f.re.isActive(0));
 
     }
 
@@ -227,7 +228,7 @@ public class RenderingSessionTest extends AbstractManagedContextTest {
         Pixels pix = makePixels();
         deleteRenderingSettings(pix);
         ThumbnailStore tbUser = sf.createThumbnailService();
-        assertFalse(tbUser.setPixelsId(pix.getId()));
+        Assert.assertFalse(tbUser.setPixelsId(pix.getId()));
         tbUser.resetDefaults();
         //tbUser.setPixelsId(pix.getId() // Code that should be called
         tbUser.getThumbnail(64, 64);
@@ -240,7 +241,7 @@ public class RenderingSessionTest extends AbstractManagedContextTest {
         Pixels pix = makePixels();
         deleteRenderingSettings(pix);
         ThumbnailStore tbUser = sf.createThumbnailService();
-        assertFalse(tbUser.setPixelsId(pix.getId()));
+        Assert.assertFalse(tbUser.setPixelsId(pix.getId()));
         tbUser.resetDefaults();
         tbUser.setPixelsId(pix.getId());
         tbUser.getThumbnail(64, 64);
@@ -278,18 +279,18 @@ public class RenderingSessionTest extends AbstractManagedContextTest {
         final ServiceFactory sf = this.factory;// new InternalServiceFactory();
         Pixels pix = makePixels();
         ThumbnailStore tbUser = sf.createThumbnailService();
-        assertTrue(tbUser.setPixelsId(pix.getId()));
-        assertNotNull(tbUser.getThumbnailByLongestSide(80));
+        Assert.assertTrue(tbUser.setPixelsId(pix.getId()));
+        Assert.assertNotNull(tbUser.getThumbnailByLongestSide(80));
         List<Thumbnail> thumbnails = iQuery.findAllByQuery(
                 "select t from Thumbnail as t " +
                 "where t.pixels.id = :id", new Parameters().addId(pix.getId()));
         Set<Long> thumbnailIds = new HashSet<Long>();
         for (Thumbnail thumbnail : thumbnails)
         {
-            assertTrue(thumbnailIds.add(thumbnail.getId()));
-            assertEquals(userId, thumbnail.getDetails().getOwner().getId());
+            Assert.assertTrue(thumbnailIds.add(thumbnail.getId()));
+            Assert.assertEquals(userId, thumbnail.getDetails().getOwner().getId());
         }
-        assertEquals(2, thumbnails.size());
+        Assert.assertEquals(2, thumbnails.size());
     }
 
     @Test(groups = {"ticket:1801"},
@@ -301,7 +302,7 @@ public class RenderingSessionTest extends AbstractManagedContextTest {
         deleteRenderingSettings(pix);
         RenderingEngine reUser = sf.createRenderingEngine();
         reUser.lookupPixels(pix.getId());
-        assertFalse(reUser.lookupRenderingDef(pix.getId()));
+        Assert.assertFalse(reUser.lookupRenderingDef(pix.getId()));
         reUser.resetDefaultSettings(true);
         reUser.load();
     }
@@ -314,7 +315,7 @@ public class RenderingSessionTest extends AbstractManagedContextTest {
         deleteRenderingSettings(pix);
         RenderingEngine reUser = sf.createRenderingEngine();
         reUser.lookupPixels(pix.getId());
-        assertFalse(reUser.lookupRenderingDef(pix.getId()));
+        Assert.assertFalse(reUser.lookupRenderingDef(pix.getId()));
         reUser.resetDefaultSettings(true);
         reUser.lookupRenderingDef(pix.getId());
         reUser.load();
@@ -329,7 +330,7 @@ public class RenderingSessionTest extends AbstractManagedContextTest {
         Pixels pix = makePixels();
         RenderingEngine reUser = sf.createRenderingEngine();
         reUser.lookupPixels(pix.getId());
-        assertTrue(reUser.lookupRenderingDef(pix.getId()));
+        Assert.assertTrue(reUser.lookupRenderingDef(pix.getId()));
         reUser.load();
         // XXX: Slow and may crash the JVM
         //assertNotNull(reUser.renderAsPackedInt(new PlaneDef(PlaneDef.XY, 0)));
@@ -357,7 +358,7 @@ public class RenderingSessionTest extends AbstractManagedContextTest {
         makeDefaultGroupReadWrite(e1);
         loginNewUserInOtherUsersGroup(e1);
         ThumbnailStore tbUser = sf.createThumbnailService();
-        assertFalse(tbUser.setPixelsId(pix.getId()));
+        Assert.assertFalse(tbUser.setPixelsId(pix.getId()));
         tbUser.resetDefaults();
         //tbUser.setPixelsId(pix.getId() // Code that should be called
         tbUser.getThumbnail(64, 64);
@@ -373,9 +374,9 @@ public class RenderingSessionTest extends AbstractManagedContextTest {
         makeDefaultGroupReadWrite(e1);
         loginNewUserInOtherUsersGroup(e1);
         ThumbnailStore tbUser = sf.createThumbnailService();
-        assertFalse(tbUser.setPixelsId(pix.getId()));
+        Assert.assertFalse(tbUser.setPixelsId(pix.getId()));
         tbUser.resetDefaults();
-        assertTrue(tbUser.setPixelsId(pix.getId()));
+        Assert.assertTrue(tbUser.setPixelsId(pix.getId()));
         tbUser.getThumbnail(64, 64);
     }
 
@@ -388,9 +389,9 @@ public class RenderingSessionTest extends AbstractManagedContextTest {
         makeDefaultGroupReadWrite(e1);
         loginNewUserInOtherUsersGroup(e1);
         ThumbnailStore tbUser = sf.createThumbnailService();
-        assertFalse(tbUser.setPixelsId(pix.getId()));
+        Assert.assertFalse(tbUser.setPixelsId(pix.getId()));
         tbUser.resetDefaults();
-        assertTrue(tbUser.setPixelsId(pix.getId()));
+        Assert.assertTrue(tbUser.setPixelsId(pix.getId()));
         tbUser.getThumbnailDirect(64, 64);
     }
 
@@ -403,9 +404,9 @@ public class RenderingSessionTest extends AbstractManagedContextTest {
         makeDefaultGroupReadWrite(e1);
         loginNewUserInOtherUsersGroup(e1);
         ThumbnailStore tbUser = sf.createThumbnailService();
-        assertFalse(tbUser.setPixelsId(pix.getId()));
+        Assert.assertFalse(tbUser.setPixelsId(pix.getId()));
         tbUser.resetDefaults();
-        assertTrue(tbUser.setPixelsId(pix.getId()));
+        Assert.assertTrue(tbUser.setPixelsId(pix.getId()));
         tbUser.getThumbnailByLongestSideDirect(64);
     }
 
@@ -421,11 +422,11 @@ public class RenderingSessionTest extends AbstractManagedContextTest {
         Set<Long> pixelsIds = Collections.singleton(pix.getId());
         Map<Long, byte[]> thumbnails = 
             tbUser.getThumbnailByLongestSideSet(96, pixelsIds);
-        assertNotNull(thumbnails);
-        assertEquals(pixelsIds.size(), thumbnails.size());
+        Assert.assertNotNull(thumbnails);
+        Assert.assertEquals(pixelsIds.size(), thumbnails.size());
         for (byte[] thumbnail : thumbnails.values())
         {
-            assertNotNull(thumbnail);
+            Assert.assertNotNull(thumbnail);
         }
     }
 
@@ -444,11 +445,11 @@ public class RenderingSessionTest extends AbstractManagedContextTest {
         pixelsIds.add(pix2.getId());
         Map<Long, byte[]> thumbnails = 
             tbUser.getThumbnailByLongestSideSet(96, pixelsIds);
-        assertNotNull(thumbnails);
-        assertEquals(pixelsIds.size(), thumbnails.size());
+        Assert.assertNotNull(thumbnails);
+        Assert.assertEquals(pixelsIds.size(), thumbnails.size());
         for (byte[] thumbnail : thumbnails.values())
         {
-            assertNotNull(thumbnail);
+            Assert.assertNotNull(thumbnail);
         }
     }
     
@@ -464,7 +465,7 @@ public class RenderingSessionTest extends AbstractManagedContextTest {
         loginNewUserInOtherUsersGroup(e1);
         RenderingEngine reUser = sf.createRenderingEngine();
         reUser.lookupPixels(pix.getId());
-        assertFalse(reUser.lookupRenderingDef(pix.getId()));
+        Assert.assertFalse(reUser.lookupRenderingDef(pix.getId()));
         reUser.resetDefaultSettings(true);
         reUser.load();
     }
@@ -480,7 +481,7 @@ public class RenderingSessionTest extends AbstractManagedContextTest {
         loginNewUserInOtherUsersGroup(e1);
         RenderingEngine reUser = sf.createRenderingEngine();
         reUser.lookupPixels(pix.getId());
-        assertFalse(reUser.lookupRenderingDef(pix.getId()));
+        Assert.assertFalse(reUser.lookupRenderingDef(pix.getId()));
         reUser.resetDefaultSettings(true);
         reUser.lookupRenderingDef(pix.getId());
         reUser.load();
@@ -498,7 +499,7 @@ public class RenderingSessionTest extends AbstractManagedContextTest {
         loginNewUserInOtherUsersGroup(e1);
         RenderingEngine reUser = sf.createRenderingEngine();
         reUser.lookupPixels(pix.getId());
-        assertFalse(reUser.lookupRenderingDef(pix.getId()));
+        Assert.assertFalse(reUser.lookupRenderingDef(pix.getId()));
         reUser.resetDefaultSettings(true);
         reUser.lookupRenderingDef(pix.getId());
         reUser.load();
@@ -517,9 +518,9 @@ public class RenderingSessionTest extends AbstractManagedContextTest {
           makeDefaultGroupReadOnly(e1);
           loginNewUserInOtherUsersGroup(e1);
           ThumbnailStore tbUser = sf.createThumbnailService();
-          assertFalse(tbUser.setPixelsId(pix.getId()));
+          Assert.assertFalse(tbUser.setPixelsId(pix.getId()));
           tbUser.resetDefaults();
-          assertFalse(tbUser.setPixelsId(pix.getId()));
+          Assert.assertFalse(tbUser.setPixelsId(pix.getId()));
       }
 
       @Test(groups = {"ticket:1929"})
@@ -531,7 +532,7 @@ public class RenderingSessionTest extends AbstractManagedContextTest {
           makeDefaultGroupReadOnly(e1);
           loginNewUserInOtherUsersGroup(e1);
           ThumbnailStore tbUser = sf.createThumbnailService();
-          assertTrue(tbUser.setPixelsId(pix.getId()));
+          Assert.assertTrue(tbUser.setPixelsId(pix.getId()));
           tbUser.getThumbnailDirect(96, 96);
       }
 
@@ -544,7 +545,7 @@ public class RenderingSessionTest extends AbstractManagedContextTest {
           makeDefaultGroupReadOnly(e1);
           loginNewUserInOtherUsersGroup(e1);
           ThumbnailStore tbUser = sf.createThumbnailService();
-          assertTrue(tbUser.setPixelsId(pix.getId()));
+          Assert.assertTrue(tbUser.setPixelsId(pix.getId()));
           tbUser.getThumbnailByLongestSideDirect(96);
       }
 
@@ -560,11 +561,11 @@ public class RenderingSessionTest extends AbstractManagedContextTest {
           Set<Long> pixelsIds = Collections.singleton(pix.getId());
           Map<Long, byte[]> thumbnails = 
               tbUser.getThumbnailByLongestSideSet(96, pixelsIds);
-          assertNotNull(thumbnails);
-          assertEquals(pixelsIds.size(), thumbnails.size());
+          Assert.assertNotNull(thumbnails);
+          Assert.assertEquals(pixelsIds.size(), thumbnails.size());
           for (byte[] thumbnail : thumbnails.values())
           {
-              assertNotNull(thumbnail);
+              Assert.assertNotNull(thumbnail);
           }
       }
 
@@ -583,11 +584,11 @@ public class RenderingSessionTest extends AbstractManagedContextTest {
           pixelsIds.add(pix2.getId());
           Map<Long, byte[]> thumbnails = 
               tbUser.getThumbnailByLongestSideSet(96, pixelsIds);
-          assertNotNull(thumbnails);
-          assertEquals(pixelsIds.size(), thumbnails.size());
+          Assert.assertNotNull(thumbnails);
+          Assert.assertEquals(pixelsIds.size(), thumbnails.size());
           for (byte[] thumbnail : thumbnails.values())
           {
-              assertNotNull(thumbnail);
+              Assert.assertNotNull(thumbnail);
           }
       }
 
@@ -603,7 +604,7 @@ public class RenderingSessionTest extends AbstractManagedContextTest {
           loginNewUserInOtherUsersGroup(e1);
           RenderingEngine reUser = sf.createRenderingEngine();
           reUser.lookupPixels(pix.getId());
-          assertFalse(reUser.lookupRenderingDef(pix.getId()));
+          Assert.assertFalse(reUser.lookupRenderingDef(pix.getId()));
           reUser.resetDefaultSettings(true);
       }
 
@@ -617,7 +618,7 @@ public class RenderingSessionTest extends AbstractManagedContextTest {
           loginNewUserInOtherUsersGroup(e1);
           RenderingEngine reUser = sf.createRenderingEngine();
           reUser.lookupPixels(pix.getId());
-          assertTrue(reUser.lookupRenderingDef(pix.getId()));
+          Assert.assertTrue(reUser.lookupRenderingDef(pix.getId()));
           reUser.load();
           // XXX: Slow and may crash the JVM
           //assertNotNull(reUser.renderAsPackedInt(new PlaneDef(PlaneDef.XY, 0)));
@@ -645,7 +646,7 @@ public class RenderingSessionTest extends AbstractManagedContextTest {
 
         loginRootKeepGroup();
         ThumbnailStore tbRoot = sf.createThumbnailService();
-        assertFalse(tbRoot.setPixelsId(pix.getId()));
+        Assert.assertFalse(tbRoot.setPixelsId(pix.getId()));
         tbRoot.resetDefaults();
     }
 
@@ -666,13 +667,13 @@ public class RenderingSessionTest extends AbstractManagedContextTest {
 
         loginRootKeepGroup();
         ThumbnailStore tbRoot = sf.createThumbnailService();
-        assertTrue(tbRoot.setPixelsId(pix.getId()));
+        Assert.assertTrue(tbRoot.setPixelsId(pix.getId()));
         tbRoot.setRenderingDefId(def.getId()); // Users rdef
         tbRoot.getThumbnail(64, 64);
 
         try {
             // tbRoot.resetDefaults();
-            // fail("group-sec-vio");
+            // Assert.fail("group-sec-vio");
         } catch (ReadOnlyGroupSecurityViolation roagsv) {
             // ok.
         }
@@ -694,7 +695,7 @@ public class RenderingSessionTest extends AbstractManagedContextTest {
 
         try {
             // tbRoot.resetDefaults();
-            // fail("group-sec-vio");
+            // Assert.fail("group-sec-vio");
         } catch (ReadOnlyGroupSecurityViolation roagsv) {
             // ok.
         }
@@ -712,12 +713,12 @@ public class RenderingSessionTest extends AbstractManagedContextTest {
     
         loginRootKeepGroup();
         ThumbnailStore tbRoot = sf.createThumbnailService();
-        assertTrue(tbRoot.setPixelsId(pix.getId()));
+        Assert.assertTrue(tbRoot.setPixelsId(pix.getId()));
         tbRoot.getThumbnail(64, 64);
     
         try {
             // tbRoot.resetDefaults();
-            // fail("group-sec-vio");
+            // Assert.fail("group-sec-vio");
         } catch (ReadOnlyGroupSecurityViolation roagsv) {
             // ok.
         }
@@ -733,7 +734,7 @@ public class RenderingSessionTest extends AbstractManagedContextTest {
         loginRootKeepGroup();
         RenderingEngine reUser = sf.createRenderingEngine();
         reUser.lookupPixels(pix.getId());
-        assertFalse(reUser.lookupRenderingDef(pix.getId()));
+        Assert.assertFalse(reUser.lookupRenderingDef(pix.getId()));
         reUser.resetDefaultSettings(true);
     }
 
@@ -745,7 +746,7 @@ public class RenderingSessionTest extends AbstractManagedContextTest {
         loginRootKeepGroup();
         RenderingEngine reUser = sf.createRenderingEngine();
         reUser.lookupPixels(pix.getId());
-        assertTrue(reUser.lookupRenderingDef(pix.getId()));
+        Assert.assertTrue(reUser.lookupRenderingDef(pix.getId()));
         reUser.load();
         // XXX: Slow and may crash the JVM
         //assertNotNull(reUser.renderAsPackedInt(new PlaneDef(PlaneDef.XY, 0)));

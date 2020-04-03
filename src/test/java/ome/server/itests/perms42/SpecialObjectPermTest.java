@@ -25,6 +25,7 @@ import ome.model.meta.Experimenter;
 import ome.model.meta.ExperimenterGroup;
 import ome.parameters.Parameters;
 
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
 /**
@@ -151,7 +152,7 @@ public class SpecialObjectPermTest extends PermissionsTest {
     }
 
     private void assertUserGroup(IObject obj) {
-        assertEquals(Long.valueOf(roles.getUserGroupId()), obj.getDetails().getGroup().getId());
+        Assert.assertEquals(Long.valueOf(roles.getUserGroupId()), obj.getDetails().getGroup().getId());
     }
 
     /**
@@ -173,7 +174,7 @@ public class SpecialObjectPermTest extends PermissionsTest {
         fa = iUpdate.saveAndReturnObject(fa);
 
         // Make sure it belongs to the "user" group
-        assertEquals(ugid, fa.getDetails().getGroup().getId());
+        Assert.assertEquals(ugid, fa.getDetails().getGroup().getId());
 
         // Make sure we can load it
         iQuery.get(FileAnnotation.class, fa.getId());
@@ -205,7 +206,7 @@ public class SpecialObjectPermTest extends PermissionsTest {
         fa = iUpdate.saveAndReturnObject(fa);
 
         // Make sure it belongs to the "user" group
-        assertEquals(ugid, fa.getDetails().getGroup().getId());
+        Assert.assertEquals(ugid, fa.getDetails().getGroup().getId());
 
         // Make sure we can load it
         iQuery.get(FileAnnotation.class, fa.getId());
@@ -232,7 +233,7 @@ public class SpecialObjectPermTest extends PermissionsTest {
                 Collections.singleton(FileAnnotation.class.getName()),
                 null, null);
         Set<Annotation> anns = map.get(fixture.user.getId());
-        assertEquals(size, anns.size());
+        Assert.assertEquals(size, anns.size());
     }
 
 
@@ -244,7 +245,7 @@ public class SpecialObjectPermTest extends PermissionsTest {
 
 
     private TagAnnotation assertTag(String uuid, long groupId, Permissions p) {
-        assertEquals(null, findTag(uuid));
+        Assert.assertEquals(null, findTag(uuid));
         TagAnnotation tag = new TagAnnotation();
         tag.setTextValue(uuid);
         tag.getDetails().setGroup(new ExperimenterGroup(groupId, false));
@@ -256,7 +257,7 @@ public class SpecialObjectPermTest extends PermissionsTest {
             iAdmin.getExperimenter(iAdmin.getEventContext().getCurrentUserId());
         loginNewUserInOtherUsersGroup(e);
         TagAnnotation t = findTag(uuid);
-        assertEquals(tag.getId(), t.getId()); // Not logged into user group
+        Assert.assertEquals(tag.getId(), t.getId()); // Not logged into user group
         return t;
     }
 

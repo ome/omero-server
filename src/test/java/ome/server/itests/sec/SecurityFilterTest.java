@@ -41,6 +41,8 @@ import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.transaction.annotation.Transactional;
+
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
 @Test(groups = { "ticket:117", "security", "filter" })
@@ -258,10 +260,10 @@ public class SecurityFilterTest extends AbstractManagedContextTest {
         T test;
         for (T t : ts) {
             test = getAsString(t);
-            assertNull(t + "==null", test);
+            Assert.assertNull(test, t + "==null");
 
             test = getByCriteria(t);
-            assertNull(t + "==null", test);
+            Assert.assertNull(test, t + "==null");
         }
 
     }
@@ -274,10 +276,10 @@ public class SecurityFilterTest extends AbstractManagedContextTest {
         T test;
         for (T t : ts) {
             test = getAsString(q, t);
-            assertNotNull(t + "!=null", test);
+            Assert.assertNotNull(test, t + "!=null");
 
             test = getByCriteria(q, t);
-            assertNotNull(t + "!=null", test);
+            Assert.assertNotNull(test, t + "!=null");
         }
 
     }

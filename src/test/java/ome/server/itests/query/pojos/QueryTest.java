@@ -11,7 +11,6 @@ import java.sql.Timestamp;
 import java.util.Arrays;
 import java.util.List;
 
-import junit.framework.AssertionFailedError;
 import ome.conditions.ApiUsageException;
 import ome.model.acquisition.Instrument;
 import ome.model.acquisition.Objective;
@@ -40,6 +39,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.hibernate.Session;
 import org.springframework.transaction.annotation.Transactional;
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
 /**
@@ -148,12 +148,12 @@ public class QueryTest extends AbstractManagedContextTest {
         // Previously with the default flag, the group
         // was automatically loaded. That's no longer the
         // case
-        assertTrue(e.sizeOfGroupExperimenterMap() < 0);
+        Assert.assertTrue(e.sizeOfGroupExperimenterMap() < 0);
         // Now to get the groups, we have to ask for them.
         e = iQuery.findByQuery("select e from Experimenter e"
                 + " join fetch e.groupExperimenterMap m where e.id = 0", null);
-        assertNotNull(e.getPrimaryGroupExperimenterMap());
-        assertNotNull(e.getPrimaryGroupExperimenterMap().parent());
+        Assert.assertNotNull(e.getPrimaryGroupExperimenterMap());
+        Assert.assertNotNull(e.getPrimaryGroupExperimenterMap().parent());
 
     }
 
@@ -169,7 +169,7 @@ public class QueryTest extends AbstractManagedContextTest {
         try {
             Experimenter e = iQuery.findByExample(ex);
         } catch (Exception e) {
-            assertTrue(e.getMessage().contains("unique result"));
+            Assert. assertTrue(e.getMessage().contains("unique result"));
         }
 
     }
@@ -201,29 +201,31 @@ public class QueryTest extends AbstractManagedContextTest {
         String jdbcQuery = "SELECT lensNa FROM Objective WHERE id = :id";
         Float lensNA = (Float) iQuery.projection(jdbcQuery,
             new Parameters().addId(t1.getId())).get(0)[0];
-        assertEquals(dbl, lensNA.floatValue(), 0.01);
+        Assert.assertEquals(dbl, lensNA.floatValue(), 0.01);
         try {
-            assertEquals(dbl, lensNA.floatValue(), Float.MIN_VALUE);
-        } catch (AssertionFailedError e) {
+            Assert.assertEquals(dbl, lensNA.floatValue(), Float.MIN_VALUE);
+        } catch (Exception e) {
             // This is what fails!!
+            Assert.fail("rounding failed", e);
+
         }
 
         // now test is with double which is our chosen solution
         Double lensNADoubled = (Double) iQuery.projection(jdbcQuery,
             new Parameters().addId(t1.getId())).get(0)[0];
-        assertEquals(dbl, lensNADoubled.doubleValue(), 0.01);
-        assertEquals(dbl, lensNADoubled.doubleValue(), Float.MIN_VALUE);
-        assertEquals(dbl, lensNADoubled.doubleValue(), Double.MIN_VALUE);
+        Assert.assertEquals(dbl, lensNADoubled.doubleValue(), 0.01);
+        Assert.assertEquals(dbl, lensNADoubled.doubleValue(), Float.MIN_VALUE);
+        Assert.assertEquals(dbl, lensNADoubled.doubleValue(), Double.MIN_VALUE);
 
         // Test value return by iUpdate
         // Now changing these to doubleValue() post #1150 fix.
-        assertEquals(dbl, t1.getLensNA().doubleValue(), 0.001);
-        assertEquals(dbl, t1.getLensNA().doubleValue(), Float.MIN_VALUE);
-        assertEquals(dbl, t1.getLensNA().doubleValue());
+        Assert.assertEquals(dbl, t1.getLensNA().doubleValue(), 0.001);
+        Assert.assertEquals(dbl, t1.getLensNA().doubleValue(), Float.MIN_VALUE);
+        Assert.assertEquals(dbl, t1.getLensNA().doubleValue());
 
         // Test via query
         Objective t2 = iQuery.find(Objective.class, o.getId());
-        assertEquals(dbl, t2.getLensNA().doubleValue());
+        Assert.assertEquals(dbl, t2.getLensNA().doubleValue());
     }
 
     @Test(groups = "ticket:1150")
@@ -232,18 +234,17 @@ public class QueryTest extends AbstractManagedContextTest {
         da.setDoubleValue(1.4);
 
         DoubleAnnotation t1 = iUpdate.saveAndReturnObject(da);
-        assertEquals(1.4, t1.getDoubleValue().doubleValue(), Double.MIN_VALUE);
-
+        Assert.assertEquals(1.4, t1.getDoubleValue().doubleValue(), Double.MIN_VALUE);
     }
 
     public void testNullFromGetPrimaryPixelsWithNoPixels() throws Exception {
         Image i = new Image("null from get primary pixels");
         i = iUpdate.saveAndReturnObject(i);
         i = iQuery.get(Image.class, i.getId());
-        assertEquals(-1, i.sizeOfPixels());
+        Assert.assertEquals(-1, i.sizeOfPixels());
         try {
             i.getPrimaryPixels();
-            fail("must throw");
+            Assert.fail("must throw");
         } catch (ApiUsageException aue) {
             // good
         }
@@ -255,10 +256,10 @@ public class QueryTest extends AbstractManagedContextTest {
                     @Transactional(readOnly = true)
                     public Object doWork(Session session, ServiceFactory sf) {
                         Image t = (Image) session.get(Image.class, id);
-                        assertEquals(0, t.sizeOfPixels());
+                        Assert.assertEquals(0, t.sizeOfPixels());
                         try {
                             t.getPrimaryPixels();
-                            fail("should throw");
+                            Assert.fail("should throw");
                         } catch (IndexOutOfBoundsException aiobe) {
                             // good;
                         }
@@ -268,7 +269,7 @@ public class QueryTest extends AbstractManagedContextTest {
 
         try {
             i.unmodifiablePixels();
-            fail("must throw");
+            Assert.fail("must throw");
         } catch (ApiUsageException aue) {
             // good
         }
@@ -280,10 +281,10 @@ public class QueryTest extends AbstractManagedContextTest {
         // p = iUpdate.saveAndReturnObject(p);
         Pixels p = iQuery.findAll(Pixels.class, new Filter().page(0, 1)).get(0);
         Image i = iQuery.get(Image.class, p.getImage().getId());
-        assertEquals(-1, i.sizeOfPixels());
+        Assert.assertEquals(-1, i.sizeOfPixels());
         try {
             i.getPrimaryPixels();
-            fail("must throw");
+            Assert.fail("must throw");
         } catch (ApiUsageException aue) {
             // good
         }
@@ -295,15 +296,15 @@ public class QueryTest extends AbstractManagedContextTest {
                     @Transactional(readOnly = true)
                     public Object doWork(Session session, ServiceFactory sf) {
                         Image t = (Image) session.get(Image.class, id);
-                        assertTrue(t.unmodifiablePixels().size() > 0 );
-                        assertNotNull(t.getPrimaryPixels());
+                        Assert.assertTrue(t.unmodifiablePixels().size() > 0 );
+                        Assert.assertNotNull(t.getPrimaryPixels());
                         return null;
                     }
                 });
 
         try {
             i.unmodifiablePixels();
-            fail("must throw");
+            Assert.fail("must throw");
         } catch (ApiUsageException aue) {
             // good
         }

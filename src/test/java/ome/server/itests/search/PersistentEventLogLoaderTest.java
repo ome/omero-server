@@ -14,6 +14,7 @@ import ome.system.ServiceFactory;
 
 import org.hibernate.Session;
 import org.springframework.transaction.annotation.Transactional;
+import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -42,8 +43,8 @@ public class PersistentEventLogLoaderTest extends AbstractManagedContextTest {
                     public Object doWork(Session session, ServiceFactory sf) {
                         ll.deleteCurrentId();
                         EventLog log = ll.next();
-                        assertTrue(log.getId() == null);
-                        assertTrue(-1 == ll.getCurrentId());
+                        Assert.assertTrue(log.getId() == null);
+                        Assert.assertTrue(-1 == ll.getCurrentId());
                         for (EventLog log2 : ll) {
                             if (log2.getId() != null) {
                                 break;
@@ -53,7 +54,7 @@ public class PersistentEventLogLoaderTest extends AbstractManagedContextTest {
                         return null;
                     }
                 });
-        assertTrue(result[0]);
+        Assert.assertTrue(result[0]);
     }
 
     public void testTestExcludes() throws Exception {

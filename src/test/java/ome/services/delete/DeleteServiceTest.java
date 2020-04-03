@@ -33,6 +33,7 @@ import ome.model.screen.WellSample;
 import ome.parameters.Parameters;
 import ome.server.itests.AbstractManagedContextTest;
 
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
 @Test(groups = { "integration" })
@@ -89,7 +90,7 @@ public class DeleteServiceTest extends AbstractManagedContextTest {
         link.link(d, i.proxy());
         this.factory.getUpdateService().saveObject(link);
         IDelete srv = this.factory.getServiceByClass(IDelete.class);
-        assertTrue(srv.previewImageDelete(i.getId(), false).size() > 1);
+        Assert.assertTrue(srv.previewImageDelete(i.getId(), false).size() > 1);
     }
 
     public void testDeleteByIds() throws Exception {
@@ -276,7 +277,7 @@ public class DeleteServiceTest extends AbstractManagedContextTest {
         Pixels p2 = i2.getPixels(0);
 
         p2.setRelatedTo(p1);
-        assertEquals(p1.getId(), iUpdate.saveAndReturnObject(p2).getRelatedTo()
+        Assert.assertEquals(p1.getId(), iUpdate.saveAndReturnObject(p2).getRelatedTo()
                 .getId());
 
         /*
@@ -333,7 +334,7 @@ public class DeleteServiceTest extends AbstractManagedContextTest {
         
         try {
             iQuery.get(Plate.class, p.getId());
-            fail("This should throw");
+            Assert.fail("This should throw");
         } catch (ApiUsageException aue) {
             // good, it's gone.
         }
@@ -371,7 +372,7 @@ public class DeleteServiceTest extends AbstractManagedContextTest {
         
         try {
             iQuery.get(Plate.class, p.getId());
-            fail("This should throw");
+            Assert.fail("This should throw");
         } catch (ApiUsageException aue) {
             // good, it's gone.
         }

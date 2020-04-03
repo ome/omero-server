@@ -16,6 +16,7 @@ import ome.model.meta.Experimenter;
 import ome.model.meta.ExperimenterGroup;
 import ome.model.meta.GroupExperimenterMap;
 
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
 /**
@@ -42,17 +43,17 @@ public class AdminPermsTest extends PermissionsTest {
         try {
             other.setEmail(uuid());
             iAdmin.updateExperimenter(other);
-            fail("sec-vio");
+            Assert.fail("sec-vio");
         } catch (SecurityViolation sv) {
-            // goood
+            // good
         }
 
         try {
             other.setEmail(uuid());
             iAdmin.updateExperimenterWithPassword(other, uuid());
-            fail("sec-vio");
+            Assert.fail("sec-vio");
         } catch (SecurityViolation sv) {
-            // goood
+            // good
         }
 
         fixture.make_leader();
@@ -88,13 +89,13 @@ public class AdminPermsTest extends PermissionsTest {
         Experimenter e = uuidUser();
         try {
             iAdmin.createUser(e, g2.getName());
-            fail("not in my group");
+            Assert.fail("not in my group");
         } catch (SecurityViolation sv) {
             // good;
         }
         try {
             iAdmin.createUser(e, fixture.groupName);
-            fail("my group, i'm not leader");
+            Assert.fail("my group, i'm not leader");
         } catch (SecurityViolation sv) {
             // good;
         }
@@ -103,7 +104,7 @@ public class AdminPermsTest extends PermissionsTest {
 
         try {
             iAdmin.createUser(e, g2.getName());
-            fail("still not in my group even thought i'm leader");
+            Assert.fail("still not in my group even thought i'm leader");
         } catch (SecurityViolation sv) {
             // good;
         }
@@ -124,13 +125,13 @@ public class AdminPermsTest extends PermissionsTest {
 
         try {
             iAdmin.createUser(e, g2.getName());
-            fail("not in my group");
+            Assert.fail("not in my group");
         } catch (SecurityViolation sv) {
             // good;
         }
         try {
             iAdmin.createUser(e, fixture.groupName);
-            fail("my group, i'm not leader");
+            Assert.fail("my group, i'm not leader");
         } catch (SecurityViolation sv) {
             // good;
         }
@@ -139,7 +140,7 @@ public class AdminPermsTest extends PermissionsTest {
 
         try {
             iAdmin.createUser(e, g2.getName());
-            fail("still not in my group even thought i'm leader");
+            Assert.fail("still not in my group even thought i'm leader");
         } catch (SecurityViolation sv) {
             // good;
         }
@@ -161,13 +162,13 @@ public class AdminPermsTest extends PermissionsTest {
         Experimenter e = uuidUser();
         try {
             iAdmin.createExperimenterWithPassword(e, "pass", g2);
-            fail("not in my group");
+            Assert.fail("not in my group");
         } catch (SecurityViolation sv) {
             // good;
         }
         try {
             iAdmin.createExperimenterWithPassword(e, "pass", fixture.group());
-            fail("my group, i'm not leader");
+            Assert.fail("my group, i'm not leader");
         } catch (SecurityViolation sv) {
             // good;
         }
@@ -176,7 +177,7 @@ public class AdminPermsTest extends PermissionsTest {
 
         try {
             iAdmin.createExperimenterWithPassword(e, "pass", g2);
-            fail("still not in my group even thought i'm leader");
+            Assert.fail("still not in my group even thought i'm leader");
         } catch (SecurityViolation sv) {
             // good;
         }
@@ -197,13 +198,13 @@ public class AdminPermsTest extends PermissionsTest {
         Experimenter e = uuidUser();
         try {
             iAdmin.createExperimenter(e, g2);
-            fail("not in my group");
+            Assert.fail("not in my group");
         } catch (SecurityViolation sv) {
             // good;
         }
         try {
             iAdmin.createExperimenter(e, fixture.group());
-            fail("my group, i'm not leader");
+            Assert.fail("my group, i'm not leader");
         } catch (SecurityViolation sv) {
             // good;
         }
@@ -212,7 +213,7 @@ public class AdminPermsTest extends PermissionsTest {
 
         try {
             iAdmin.createExperimenter(e, g2);
-            fail("still not in my group even thought i'm leader");
+            Assert.fail("still not in my group even thought i'm leader");
         } catch (SecurityViolation sv) {
             // good;
         }
@@ -229,7 +230,7 @@ public class AdminPermsTest extends PermissionsTest {
         fixture.log_in();
         try {
             iAdmin.deleteExperimenter(e2);
-            fail("secvio");
+            Assert.fail("secvio");
         } catch (SecurityViolation sv) {
             // good;
         }
@@ -242,7 +243,7 @@ public class AdminPermsTest extends PermissionsTest {
         setup(Permissions.PRIVATE);
         try {
             iAdmin.deleteGroup(fixture.group());
-            fail("secvio");
+            Assert.fail("secvio");
         } catch (SecurityViolation sv) {
             // good;
         }
@@ -258,7 +259,7 @@ public class AdminPermsTest extends PermissionsTest {
         fixture.log_in();
         try {
             iAdmin.changeUserPassword(member.getOmeName(), "PIChangesPass");
-            fail("secvio");
+            Assert.fail("secvio");
         } catch (SecurityViolation sv) {
             // good;
         }
@@ -298,7 +299,7 @@ public class AdminPermsTest extends PermissionsTest {
         assertLeaders(fixture.group());
         try { // Try to add self
             iAdmin.addGroupOwners(fixture.group(), fixture.user);
-            fail("sec-vio");
+            Assert.fail("sec-vio");
         } catch (SecurityViolation sv) {
             // good
         }
@@ -333,7 +334,7 @@ public class AdminPermsTest extends PermissionsTest {
         assertLeaders(fixture.group());
         try { // Try to add self
             iAdmin.setGroupOwner(fixture.group(), fixture.user);
-            fail("sec-vio");
+            Assert.fail("sec-vio");
         } catch (SecurityViolation sv) {
             // good
         }
@@ -401,20 +402,20 @@ public class AdminPermsTest extends PermissionsTest {
         loginRoot();
         Permissions sysPerms = iAdmin.getEventContext().getCurrentGroupPermissions();
         ExperimenterGroup g = newGroup(Permissions.COLLAB_READLINK);
-        assertFalse(sysPerms.identical(g.getDetails().getPermissions()));
+        Assert.assertFalse(sysPerms.identical(g.getDetails().getPermissions()));
 
         // Now login to that group and check permissions
         loginUser("root", g.getName());
         Permissions grpPerms = iAdmin.getEventContext().getCurrentGroupPermissions();
-        assertFalse(sysPerms.identical(grpPerms));
-        assertTrue(Permissions.COLLAB_READLINK.identical(grpPerms));
+        Assert.assertFalse(sysPerms.identical(grpPerms));
+        Assert.assertTrue(Permissions.COLLAB_READLINK.identical(grpPerms));
 
         // Now create a group via IUpdate and see what permissions it gets.
         ExperimenterGroup g2 = new ExperimenterGroup();
         g2.setName(uuid());
         g2.setLdap(false);
         g2 = iUpdate.saveAndReturnObject(g2);
-        assertTrue(grpPerms.identical(g.getDetails().getPermissions()));
+        Assert.assertTrue(grpPerms.identical(g.getDetails().getPermissions()));
         //
         // assertTrue(sysPerms.identical(g.getDetails().getPermissions()));
         //
@@ -428,16 +429,16 @@ public class AdminPermsTest extends PermissionsTest {
 
     private void assertNotOwner(ExperimenterGroup group, Experimenter user) {
         List<Long> leaderOf = iAdmin.getLeaderOfGroupIds(user);
-        assertFalse(leaderOf.contains(group.getId()));
+        Assert.assertFalse(leaderOf.contains(group.getId()));
     }
 
     private void assertOwner(ExperimenterGroup group, Experimenter user) {
         List<Long> leaderOf = iAdmin.getLeaderOfGroupIds(user);
-        assertTrue(leaderOf.contains(group.getId()));
+        Assert.assertTrue(leaderOf.contains(group.getId()));
     }
 
     private void assertPi(boolean isPi) {
-        assertEquals(isPi, iAdmin.getLeaderOfGroupIds(fixture.user)
+        Assert.assertEquals(isPi, iAdmin.getLeaderOfGroupIds(fixture.user)
                 .contains(fixture.group().getId()));
     }
 
@@ -472,9 +473,9 @@ public class AdminPermsTest extends PermissionsTest {
         Set<Long> extra = new HashSet<Long>();
         extra.addAll(thatHas);
         extra.removeAll(toCheck);
-        
-        assertTrue(String.format("Missing:%s Extra: %s", missing, extra),
-                missing.size() ==  0 && extra.size() == 0);
+
+        Assert.assertTrue(
+                missing.size() ==  0 && extra.size() == 0, String.format("Missing:%s Extra: %s", missing, extra));
     }
 
 

@@ -16,6 +16,7 @@ import ome.system.Roles;
 
 import org.jmock.Mock;
 import org.springframework.ldap.core.LdapOperations;
+import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -88,7 +89,7 @@ public class MockedLdapTest extends AbstractManagedContextTest {
         try {
             ldap.findDN("jsmith");
         } catch (Exception e) {
-            fail("Subtree should not contains two the same CNs");
+            Assert.fail("Subtree should not contains two the same CNs");
         }
     }
 
@@ -101,7 +102,7 @@ public class MockedLdapTest extends AbstractManagedContextTest {
         try {
             ldap.findDN("jsmith");
         } catch (Exception e) {
-            fail("Subtree should not contains two the same CNs");
+            Assert.fail("Subtree should not contains two the same CNs");
         }
     }
 

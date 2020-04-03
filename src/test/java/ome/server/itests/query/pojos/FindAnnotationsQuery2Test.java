@@ -23,6 +23,7 @@ import ome.server.itests.AbstractManagedContextTest;
 import ome.services.query.PojosFindAnnotationsQueryDefinition;
 import ome.testing.CreatePojosFixture;
 
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
 /**
@@ -103,11 +104,11 @@ public class FindAnnotationsQuery2Test extends AbstractManagedContextTest {
                         "annotatorIds", Collections.singleton(user)));
 
         Collection<IAnnotated> results = (Collection) iQuery.execute(q);
-        assertTrue(results.size() > 0);
+        Assert.assertTrue(results.size() > 0);
         for (IAnnotated annotated : results) {
-            assertNotNull(annotated.getDetails().getCreationEvent().getTime());
-            assertNotNull(annotated.getDetails().getUpdateEvent().getTime());
-            assertNotNull(annotated.linkedAnnotationList().get(0).getDetails()
+            Assert.assertNotNull(annotated.getDetails().getCreationEvent().getTime());
+            Assert.assertNotNull(annotated.getDetails().getUpdateEvent().getTime());
+            Assert.assertNotNull(annotated.linkedAnnotationList().get(0).getDetails()
                     .getCreationEvent().getTime());
             assertNotNullOrUnloaded(annotated.linkedAnnotationList().get(0)
                     .getDetails().getOwner());
@@ -120,8 +121,8 @@ public class FindAnnotationsQuery2Test extends AbstractManagedContextTest {
     // Helpers
 
     void assertNotNullOrUnloaded(IObject obj) {
-        assertNotNull(obj);
-        assertTrue(obj.isLoaded());
+        Assert.assertNotNull(obj);
+        Assert.assertTrue(obj.isLoaded());
     }
 
 }

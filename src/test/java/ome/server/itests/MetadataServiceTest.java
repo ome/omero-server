@@ -27,6 +27,7 @@ import ome.model.core.OriginalFile;
 import ome.model.meta.Experimenter;
 import ome.parameters.Parameters;
 
+import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -76,7 +77,7 @@ public class MetadataServiceTest
         p.linkAnnotation(tag);
         
         p = iUpdate.saveAndReturnObject(p);
-        assertEquals(2, p.sizeOfAnnotationLinks());
+        Assert.assertEquals(2, p.sizeOfAnnotationLinks());
         
         long self = this.iAdmin.getEventContext().getCurrentUserId();
         Parameters options = new Parameters();
@@ -90,10 +91,10 @@ public class MetadataServiceTest
                 new HashSet(), // Method is "NoTypesSet"!
                 //new HashSet(Arrays.asList(CommentAnnotation.class.getName())),
         		annotators, options);
-        assertEquals(1, result.size());
+        Assert.assertEquals(1, result.size());
         
         Set s = (Set) result.get(p.getId());
-        assertEquals(2, s.size()); // Just comments
+        Assert.assertEquals(2, s.size()); // Just comments
         Iterator i = s.iterator();
         Annotation annotation;
         int index = 0;
@@ -105,7 +106,7 @@ public class MetadataServiceTest
 				index++;
 			}
 		}
-        assertTrue(index == 2);
+        Assert.assertTrue(index == 2);
     }
     
     /**
@@ -143,10 +144,10 @@ public class MetadataServiceTest
         types.add(CommentAnnotation.class.getName());
         Map result = iMetadata.loadAnnotations(Project.class, ids, types, 
         		annotators, options);
-        assertTrue(result.size() == 1);
+        Assert.assertTrue(result.size() == 1);
         
         Set s = (Set) result.get(p.getId());
-        assertEquals(1, s.size() );
+        Assert.assertEquals(1, s.size() );
         Iterator i = s.iterator();
         Annotation annotation;
         int index = 0;
@@ -156,7 +157,7 @@ public class MetadataServiceTest
 				index++;
 			}
 		}
-        assertTrue(index == 1);
+        Assert.assertTrue(index == 1);
     }
     
     /** 
@@ -189,7 +190,7 @@ public class MetadataServiceTest
         Parameters options = new Parameters();
         Set result = iMetadata.loadSpecifiedAnnotations(
                 CommentAnnotation.class, null, null, options);
-        assertEquals(2, result.size());
+        Assert.assertEquals(2, result.size());
     }
     
     /** 
@@ -264,7 +265,7 @@ public class MetadataServiceTest
         Long id;
         while (k.hasNext()) {
 			id = (Long) k.next();
-			assertTrue(((Long) m.get(id) == 1));
+            Assert.assertTrue(((Long) m.get(id) == 1));
 		}
     }
     
@@ -290,12 +291,12 @@ public class MetadataServiceTest
         link = iUpdate.saveAndReturnObject(link);
         Parameters po = new Parameters();
         Set set = iMetadata.loadTagSets(po);
-        assertEquals(1, set.size());
+        Assert.assertEquals(1, set.size());
         Iterator i = set.iterator();
         IObject object;
         while (i.hasNext()) {
         	object = (IObject) i.next();
-        	assertTrue(object.getId().longValue() == t2.getId().longValue());
+            Assert.assertTrue(object.getId().longValue() == t2.getId().longValue());
 		}
     }
     
@@ -328,7 +329,7 @@ public class MetadataServiceTest
         Parameters po = new Parameters();
         po.orphan();
         Set set = iMetadata.loadTagSets(po);
-        assertEquals(2, set.size());
+        Assert.assertEquals(2, set.size());
         Iterator i = set.iterator();
         TagAnnotation object;
         String ns;
@@ -336,9 +337,9 @@ public class MetadataServiceTest
         	object = (TagAnnotation) i.next();
         	ns = object.getNs();
         	if (ns != null && IMetadata.NS_INSIGHT_TAG_SET.equals(ns)) {
-        		assertTrue(object.getId().longValue() == t2.getId().longValue());
+                Assert.assertTrue(object.getId().longValue() == t2.getId().longValue());
         	} else {
-        		assertTrue(object.getId().longValue() == t3.getId().longValue());
+                Assert.assertTrue(object.getId().longValue() == t3.getId().longValue());
         	}
 		}
     }
@@ -369,7 +370,7 @@ public class MetadataServiceTest
       	ids.add(t1.getId());
       	Map m = iMetadata.loadTagContent(ids, po);
       	Set set = (Set) m.get(t1.getId());
-      	assertTrue(set.size() == 3);
+        Assert.assertTrue(set.size() == 3);
       	Iterator k = set.iterator();
       	IObject object;
       	Long id;
@@ -377,11 +378,11 @@ public class MetadataServiceTest
       		object = (IObject) k.next();
       		id = object.getId();
 			if (object instanceof Project) {
-				assertTrue(p.getId().longValue() == id.longValue());
+                Assert.assertTrue(p.getId().longValue() == id.longValue());
 			} else if (object instanceof Dataset) {
-				assertTrue(d.getId().longValue() == id.longValue());
+                Assert.assertTrue(d.getId().longValue() == id.longValue());
 			} else if (object instanceof Image) {
-				assertTrue(i.getId().longValue() == id.longValue());
+                Assert.assertTrue(i.getId().longValue() == id.longValue());
 			} 
 		}
       	
@@ -409,7 +410,7 @@ public class MetadataServiceTest
                 Collections.singleton(p.getId()), Collections.<String>emptySet(),
                 Collections.<Long>emptySet(), null);
         Set<Annotation> anns = results.get(p.getId());
-        assertEquals(2, anns.size());
+        Assert.assertEquals(2, anns.size());
     }
     
     @Test(groups = "ticket:2232")

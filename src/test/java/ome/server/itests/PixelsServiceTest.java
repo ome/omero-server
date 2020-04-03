@@ -25,6 +25,7 @@ import omeis.providers.re.RenderingEngine;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -55,21 +56,21 @@ public class PixelsServiceTest extends AbstractManagedContextTest {
 
         Parameters param = new Parameters(new Filter().unique().page(0, 1));
         Pixels p = (Pixels) iQuery.findByQuery("select p from Pixels p", param);
-        assertNotNull(p);
+        Assert.assertNotNull(p);
 
         Pixels test = pix.retrievePixDescription(p.getId());
-        assertNotNull(test);
+        Assert.assertNotNull(test);
     }
 
     @Test(groups = { "broken", "ticket:119" })
     public void testLetsSaveADefinition() throws Exception {
         Pixels p = pix.retrievePixDescription(1L);
-        assertNotNull(p);
+        Assert.assertNotNull(p);
         RenderingDef r = makeRndDef(p);
         r = iUpdate.saveAndReturnObject(r);
 
         RenderingDef test = pix.retrieveRndSettings(1L);
-        assertNotNull(test);
+        Assert.assertNotNull(test);
     }
 
     // TODO to ObjectFactory
@@ -112,11 +113,11 @@ public class PixelsServiceTest extends AbstractManagedContextTest {
         // assertTrue( t.sizeOfPlaneInfo() >= 0 );
 
         Collection<Channel> c = t.unmodifiableChannels();
-        assertNotNull(c);
-        assertTrue(c.size() > 0);
+        Assert.assertNotNull(c);
+        Assert.assertTrue(c.size() > 0);
 
         for (Channel ch : c) {
-            assertNotNull(ch.getLogicalChannel());
+            Assert.assertNotNull(ch.getLogicalChannel());
         }
     }
 

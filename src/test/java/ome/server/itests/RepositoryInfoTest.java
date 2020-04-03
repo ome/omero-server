@@ -7,6 +7,7 @@ package ome.server.itests;
 import ome.api.IRepositoryInfo;
 import ome.conditions.InternalException;
 
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
 /**
@@ -29,7 +30,7 @@ public class RepositoryInfoTest extends AbstractManagedContextTest {
     public void testRepositoryFree() throws Exception {
 
         IRepositoryInfo iRepositoryInfo = factory.getRepositoryInfoService();
-        assertTrue(iRepositoryInfo.getFreeSpaceInKilobytes() > 0);
+        Assert.assertTrue(iRepositoryInfo.getFreeSpaceInKilobytes() > 0);
     }
 
     @Test(expectedExceptions={InternalException.class})
