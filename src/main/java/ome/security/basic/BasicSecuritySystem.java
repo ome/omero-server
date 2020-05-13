@@ -9,7 +9,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -22,8 +21,6 @@ import ome.conditions.InternalException;
 import ome.conditions.SecurityViolation;
 import ome.conditions.SessionTimeoutException;
 import ome.model.IObject;
-import ome.model.annotations.Annotation;
-import ome.model.annotations.CommentAnnotation;
 import ome.model.enums.AdminPrivilege;
 import ome.model.enums.EventType;
 import ome.model.internal.Details;
@@ -356,12 +353,12 @@ public class BasicSecuritySystem implements SecuritySystem,
     }
 
     /**
-     * Check the given group context using the database.
+     * Check the given group context.
      * @param sessionId a session ID
      * @param groupId a group ID
      * @return if the group context is permitted for the given session
      */
-    private boolean isGroupContextPermittedReadWrite(long sessionId, long groupId) {
+    protected boolean isGroupContextPermitted(long sessionId, long groupId) {
         final LocalQuery query = (LocalQuery) sf.getQueryService();
         return query.execute(new HibernateCallback<Boolean>() {
             public Boolean doInHibernate(Session session) {
@@ -383,32 +380,11 @@ public class BasicSecuritySystem implements SecuritySystem,
     }
 
     /**
-     * Check the given group context using the session provider.
-     * @param sessionId a session ID
-     * @param groupId a group ID
-     * @return if the group context is permitted for the given session
-     */
-    private boolean isGroupContextPermittedReadOnly(long sessionId, long groupId) {
-        final ome.model.meta.Session session = sessionProvider.findSessionById(sessionId, sf);
-        final Iterator<Annotation> sessionAnnotations = session.linkedAnnotationIterator();
-        while (sessionAnnotations.hasNext()) {
-            final Annotation sessionAnnotation = sessionAnnotations.next();
-            if (sessionAnnotation instanceof CommentAnnotation &&
-                    SessionManagerImpl.GROUP_SUDO_NS.equals(sessionAnnotation.getNs()) &&
-                    roles.isRootUser(sessionAnnotation.getDetails().getOwner()) &&
-                    !isGroupContextPermitted(groupId, ((CommentAnnotation) sessionAnnotation).getTextValue())) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    /**
      * @param groupId a group ID
      * @param permittedGroupIds a comma-separated string of group IDs
      * @return if the string of IDs contains the given group
      */
-    private boolean isGroupContextPermitted(long groupId, String permittedGroupIds) {
+    protected boolean isGroupContextPermitted(long groupId, String permittedGroupIds) {
         final String requiredGroupId = Long.toString(groupId);
         for (final String permittedGroupId : Splitter.on(',').split(permittedGroupIds)) {
             if (requiredGroupId.equals(permittedGroupId)) {
@@ -476,9 +452,7 @@ public class BasicSecuritySystem implements SecuritySystem,
         final long sessionId = ec.getCurrentSessionId();
 
         // Check that group context is consistent with any group sudo.
-        if (sessionProvider instanceof SessionProviderInMemory ?
-                !isGroupContextPermittedReadOnly(sessionId, groupId) :
-                !isGroupContextPermittedReadWrite(sessionId, groupId)) {
+        if (!isGroupContextPermitted(sessionId, groupId)) {
             throw new SecurityViolation("Group-sudo session cannot change context!");
         }
 

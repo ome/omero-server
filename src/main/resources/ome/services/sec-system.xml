@@ -55,6 +55,13 @@
     <constructor-arg ref="aclVoter"/>
   </bean>
 
+  <bean id="basicSecuritySystemSubstituter" class="ome.services.util.BeanInstantiationSubstituter">
+    <constructor-arg ref="readOnlyStatus"/>
+    <constructor-arg value="basicSecuritySystem"/>
+    <constructor-arg value="ome.security.basic.BasicSecuritySystemReadOnly"/>
+    <property name="isWriteDb" value="true"/>  <!-- see SessionProviderInDb.isReadOnly -->
+  </bean>
+
   <bean id="securityWiring" class="ome.security.basic.BasicSecurityWiring"
    lazy-init="true">
     <property name="principalHolder" ref="principalHolder"/>
