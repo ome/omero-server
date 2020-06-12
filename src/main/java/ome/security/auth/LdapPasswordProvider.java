@@ -149,6 +149,10 @@ public class LdapPasswordProvider extends ConfigurablePasswordProvider {
                 // Perhaps a hard-coded value in "password"."dn"
                 throw new ValidationException(msg);
             } else {
+                if (readOnly == true) {
+                    throw new IllegalStateException(
+                            "Cannot synchronize user!");
+                }
                 ldapUtil.synchronizeLdapUser(user);
                 return loginAttempt(user,
                         ldapUtil.validatePassword(dn1, password));
