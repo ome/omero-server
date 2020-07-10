@@ -1,3 +1,16 @@
+5.6.0 (July 2020)
+-----------------
+
+- Fail early if we are in read-only mode ([#101](https://github.com/ome/omero-server/pull/101))
+- Add note about binary access restrictions on groups ([#100](https://github.com/ome/omero-server/pull/100))
+- Restore exception handling in full-text indexer ([#99](https://github.com/ome/omero-server/pull/99))
+- Move check into helper of admin privileges from user config ([#92](https://github.com/ome/omero-server/pull/92))
+- More cleanly adapt basic security system for read-only mode ([#91](https://github.com/ome/omero-server/pull/91))
+- Remove junit dependency ([#90](https://github.com/ome/omero-server/pull/90))
+- Bump omero-renderer version to 5.5.6
+- Bump omero-common-test version to 5.5.7
+
+
 5.5.6 (March 2020)
 ------------------
 
