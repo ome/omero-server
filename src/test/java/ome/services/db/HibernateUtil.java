@@ -28,7 +28,10 @@ public class HibernateUtil {
             File mockFilter = ResourceUtils
                     .getFile("classpath:mock_filters.hbm.xml");
             Properties props = new Properties();
-            props.load(new FileInputStream(local));
+            try (FileInputStream stream = new FileInputStream(local)) {
+                props.load(stream);
+            }
+
             AnnotationConfiguration cfg = new AnnotationConfiguration();
             cfg.addFilterDefinition(new FilterDefinition("securityFilter",
                     "1=1", new HashMap()));
