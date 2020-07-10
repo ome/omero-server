@@ -67,7 +67,7 @@ public class PlaneWriteUnitTest extends AbstractManagedContextTest {
         byte[] testPlane = getTestPlane();
         pixbuf.setPlane(testPlane, 0, 0, 0);
 
-        pixbuf = service.getPixelBuffer(pixels);
+        pixbuf = service.getPixelBuffer(pixels, true);
         PixelData plane = pixbuf.getPlane(0, 0, 0);
         Assert.assertNotNull(plane);
         byte[] newMD = Helper.calculateMessageDigest(plane.getData());
@@ -85,7 +85,7 @@ public class PlaneWriteUnitTest extends AbstractManagedContextTest {
         byte[] testPlane = getTestPlane();
         pixbuf.setPlane(testPlane, z, c, t);
 
-        pixbuf = service.getPixelBuffer(pixels);
+        pixbuf = service.getPixelBuffer(pixels, true);
         PixelData plane = pixbuf.getPlane(z, c, t);
         Assert.assertNotNull(plane);
         byte[] newMD = Helper.calculateMessageDigest(plane.getData());
