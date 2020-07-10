@@ -14,7 +14,7 @@ import org.slf4j.LoggerFactory;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.cfg.AnnotationConfiguration;
+import org.hibernate.cfg.Configuration;
 import org.hibernate.engine.FilterDefinition;
 import org.springframework.util.ResourceUtils;
 
@@ -32,7 +32,7 @@ public class HibernateUtil {
                 props.load(stream);
             }
 
-            AnnotationConfiguration cfg = new AnnotationConfiguration();
+            Configuration cfg = new Configuration();
             cfg.addFilterDefinition(new FilterDefinition("securityFilter",
                     "1=1", new HashMap()));
             cfg.configure(testCfg);
