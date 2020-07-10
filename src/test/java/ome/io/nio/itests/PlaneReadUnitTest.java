@@ -81,12 +81,12 @@ public class PlaneReadUnitTest extends AbstractManagedContextTest {
         path = new PixelsService(ROOT).getPixelsPath(pixels.getId());
         originalDigests = new byte[planeCount][];
 
-        FileOutputStream stream = new FileOutputStream(path);
-
-        for (int i = 0; i < planeCount; i++) {
-            byte[] plane = createPlane(planeSize.intValue(), (byte) (i - 128));
-            originalDigests[i] = Helper.calculateMessageDigest(plane);
-            stream.write(plane);
+        try (FileOutputStream stream = new FileOutputStream(path)) {
+            for (int i = 0; i < planeCount; i++) {
+                byte[] plane = createPlane(planeSize.intValue(), (byte) (i - 128));
+                originalDigests[i] = Helper.calculateMessageDigest(plane);
+                stream.write(plane);
+            }
         }
     }
 
