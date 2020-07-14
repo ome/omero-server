@@ -43,7 +43,7 @@ import org.testng.annotations.Test;
 public class SVGRasterizerTest {
 
     @Test(groups = {"unit", "ticket:11438"})
-    public void testCreateJPEG() {
+    public void testCreateJPEG() throws IOException {
         String value = "<svg xmlns=\"http://www.w3.org/2000/svg\"" +
                 " xmlns:xlink=\"http://www.w3.org/1999/xlink\">" +
                 "<rect x=\"10\" y=\"10\" height=\"100\" width=\"100\"" +
@@ -56,7 +56,7 @@ public class SVGRasterizerTest {
             rasterizer.createJPEG(outputStream);
         } catch (TranscoderException te) {
             Assert.fail("JPEG encoding failed with exception.", te);
-        } catch (IOException e) {}
+        }
     }
 
 }
