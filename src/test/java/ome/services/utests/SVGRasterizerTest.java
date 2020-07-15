@@ -26,7 +26,6 @@ import java.io.OutputStream;
 
 import ome.services.SVGRasterizer;
 
-
 import org.apache.batik.transcoder.TranscoderException;
 import org.apache.commons.io.IOUtils;
 import org.testng.Assert;
