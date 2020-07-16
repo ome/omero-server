@@ -20,6 +20,7 @@
 package ome.services.utests;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
@@ -41,23 +42,19 @@ import org.testng.annotations.Test;
 public class SVGRasterizerTest {
 
     @Test(groups = {"unit", "ticket:11438"})
-    public void testCreateJPEG() {
-        InputStream input = IOUtils.toInputStream(
-                "<svg xmlns=\"http://www.w3.org/2000/svg\"" +
+    public void testCreateJPEG() throws IOException {
+        String value = "<svg xmlns=\"http://www.w3.org/2000/svg\"" +
                 " xmlns:xlink=\"http://www.w3.org/1999/xlink\">" +
-                    "<rect x=\"10\" y=\"10\" height=\"100\" width=\"100\"" +
-                    " style=\"stroke:#ff0000; fill: #0000ff\"/>" +
-                "</svg>");
-        SVGRasterizer rasterizer = new SVGRasterizer(input);
-        rasterizer.setQuality(1);
-        OutputStream outputStream = new ByteArrayOutputStream();
-        try {
+                "<rect x=\"10\" y=\"10\" height=\"100\" width=\"100\"" +
+                " style=\"stroke:#ff0000; fill: #0000ff\"/>" +
+                "</svg>";
+        try (InputStream input = IOUtils.toInputStream(value, "UTF-8");
+             OutputStream outputStream = new ByteArrayOutputStream()) {
+            SVGRasterizer rasterizer = new SVGRasterizer(input);
+            rasterizer.setQuality(1);
             rasterizer.createJPEG(outputStream);
         } catch (TranscoderException te) {
             Assert.fail("JPEG encoding failed with exception.", te);
-        } finally {
-           IOUtils.closeQuietly(outputStream);
-           IOUtils.closeQuietly(input);
         }
     }
 

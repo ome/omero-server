@@ -14,7 +14,7 @@ import org.slf4j.LoggerFactory;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.cfg.AnnotationConfiguration;
+import org.hibernate.cfg.Configuration;
 import org.hibernate.engine.FilterDefinition;
 import org.springframework.util.ResourceUtils;
 
@@ -28,8 +28,11 @@ public class HibernateUtil {
             File mockFilter = ResourceUtils
                     .getFile("classpath:mock_filters.hbm.xml");
             Properties props = new Properties();
-            props.load(new FileInputStream(local));
-            AnnotationConfiguration cfg = new AnnotationConfiguration();
+            try (FileInputStream stream = new FileInputStream(local)) {
+                props.load(stream);
+            }
+
+            Configuration cfg = new Configuration();
             cfg.addFilterDefinition(new FilterDefinition("securityFilter",
                     "1=1", new HashMap()));
             cfg.configure(testCfg);

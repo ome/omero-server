@@ -81,12 +81,12 @@ public class PlaneReadUnitTest extends AbstractManagedContextTest {
         path = new PixelsService(ROOT).getPixelsPath(pixels.getId());
         originalDigests = new byte[planeCount][];
 
-        FileOutputStream stream = new FileOutputStream(path);
-
-        for (int i = 0; i < planeCount; i++) {
-            byte[] plane = createPlane(planeSize.intValue(), (byte) (i - 128));
-            originalDigests[i] = Helper.calculateMessageDigest(plane);
-            stream.write(plane);
+        try (FileOutputStream stream = new FileOutputStream(path)) {
+            for (int i = 0; i < planeCount; i++) {
+                byte[] plane = createPlane(planeSize.intValue(), (byte) (i - 128));
+                originalDigests[i] = Helper.calculateMessageDigest(plane);
+                stream.write(plane);
+            }
         }
     }
 
@@ -107,7 +107,7 @@ public class PlaneReadUnitTest extends AbstractManagedContextTest {
     public void testInitialPlane() throws IOException,
             DimensionsOutOfBoundsException {
         PixelsService service = new PixelsService(ROOT);
-        PixelBuffer pixbuf = service.getPixelBuffer(pixels);
+        PixelBuffer pixbuf = service.getPixelBuffer(pixels, true);
         PixelData plane = pixbuf.getPlane(0, 0, 0);
 
         byte[] messageDigest = Helper.calculateMessageDigest(plane.getData());
@@ -120,7 +120,7 @@ public class PlaneReadUnitTest extends AbstractManagedContextTest {
     public void testLastPlane() throws IOException,
             DimensionsOutOfBoundsException {
         PixelsService service = new PixelsService(ROOT);
-        PixelBuffer pixbuf = service.getPixelBuffer(pixels);
+        PixelBuffer pixbuf = service.getPixelBuffer(pixels, true);
         PixelData plane = pixbuf.getPlane(pixels.getSizeZ() - 1, pixels
                 .getSizeC() - 1, pixels.getSizeT() - 1);
         int digestOffset = getDigestOffset(pixels.getSizeZ() - 1, pixels
@@ -136,7 +136,7 @@ public class PlaneReadUnitTest extends AbstractManagedContextTest {
     public void testAllPlanes() throws IOException,
             DimensionsOutOfBoundsException {
         PixelsService service = new PixelsService(ROOT);
-        PixelBuffer pixbuf = service.getPixelBuffer(pixels);
+        PixelBuffer pixbuf = service.getPixelBuffer(pixels, true);
 
         String newMessageDigest;
         String oldMessageDigest;

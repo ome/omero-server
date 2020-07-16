@@ -10,6 +10,7 @@ import java.nio.ByteBuffer;
 import java.util.List;
 import java.util.Random;
 
+import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 
 import ome.api.IPixels;
@@ -79,6 +80,12 @@ public class BaseRenderingTest
 		quantumFactory = createQuantumFactory();
 		renderer = new Renderer(quantumFactory, renderingModels,
 				                pixels, settings, pixelBuffer, lutProvider);
+	}
+
+	@AfterClass
+	protected void tearDown()
+	{
+		renderer.close();
 	}
 	
 	protected QuantumFactory createQuantumFactory()

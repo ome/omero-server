@@ -94,10 +94,10 @@ public class BlobShareStoreTest {
 
     byte[] loadFile(File file) throws Exception{
         int size = (int) file.length();
-        FileInputStream fis = new FileInputStream(file);
         byte[] buf = new byte[size];
-        fis.read(buf);
-        fis.close();
+        try (FileInputStream fis = new FileInputStream(file)) {
+            fis.read(buf);
+        }
         return buf;
     }
 
