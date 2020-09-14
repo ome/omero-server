@@ -147,7 +147,7 @@
     <property name="properties">
       <props>
         <prop key="driverClassName">${omero.db.driver}</prop>
-        <prop key="url">jdbc:postgresql://${omero.db.host}:${omero.db.port}/${omero.db.name}</prop>
+        <prop key="url">${omero.db.url}</prop>
         <prop key="user">${omero.db.user}</prop>
         <prop key="password">${omero.db.pass}</prop>
       </props>
