@@ -2,7 +2,7 @@
 <!--
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
-# Copyright 2006-2018 University of Dundee. All rights reserved.
+# Copyright 2006-2020 University of Dundee. All rights reserved.
 # Use is subject to license terms supplied in LICENSE.txt
 #
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -270,18 +270,10 @@
       class="org.springframework.mail.javamail.JavaMailSenderImpl">
       <property name="host" value="${omero.mail.host}" />
       <property name="port" value="${omero.mail.port}" />
+      <property name="username" value="${omero.mail.username}" />
+      <property name="password" value="${omero.mail.password}" />
       <property name="protocol" value="${omero.mail.transport.protocol}" />
-      <property name="session" ref="mailSession" />
       <property name="javaMailProperties">
-          <props>
-              <prop key="mail.smtp.sendpartial">true</prop>
-          </props>
-      </property>
-  </bean>
-
-  <!-- setup an authenticated session -->
-  <bean id="mailSession" class="javax.mail.Session" factory-method="getInstance">
-      <constructor-arg>
           <props>
               <prop key="mail.smtp.auth">${omero.mail.smtp.auth}</prop>
               <prop key="mail.smtp.debug">${omero.mail.smtp.debug}</prop>
@@ -293,14 +285,7 @@
               <prop key="mail.smtp.socketFactory.fallback">${omero.mail.smtp.socketFactory.fallback}</prop>
               <prop key="mail.smtp.timeout">${omero.mail.smtp.timeout}</prop>
           </props>
-      </constructor-arg>
-      <constructor-arg ref="smtpAuthenticator" />
-  </bean>
-
-  <!-- Authenticator implementation -->
-  <bean id="smtpAuthenticator" class="ome.security.SmtpAuthenticator">
-      <constructor-arg value="${omero.mail.username}" />
-      <constructor-arg value="${omero.mail.password}" />
+      </property>
   </bean>
 
   <!-- this is a template message that we can pre-load with default state -->
