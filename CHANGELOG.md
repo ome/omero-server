@@ -1,3 +1,13 @@
+5.6.1 (September 2020)
+----------------------
+
+- Fix secure mail configuration ([#110](https://github.com/ome/omero-server/pull/110))
+- New properties to configure JDBC ([#108](https://github.com/ome/omero-server/pull/108))
+- Document time units for durations ([#105](https://github.com/ome/omero-server/pull/105))
+- Minor test fixes ([#104](https://github.com/ome/omero-server/pull/104))
+- Bump omero-renderer version to 5.5.7
+- Bump omero-common-test version to 5.5.7
+
 5.6.0 (July 2020)
 -----------------
 
@@ -8,7 +18,7 @@
 - More cleanly adapt basic security system for read-only mode ([#91](https://github.com/ome/omero-server/pull/91))
 - Remove junit dependency ([#90](https://github.com/ome/omero-server/pull/90))
 - Bump omero-renderer version to 5.5.6
-- Bump omero-common-test version to 5.5.7
+- Bump omero-common-test version to 5.5.6
 
 
 5.5.6 (March 2020)
