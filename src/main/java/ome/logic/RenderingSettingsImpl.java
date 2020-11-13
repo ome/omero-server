@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import loci.formats.FormatTools;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.perf4j.StopWatch;
@@ -1659,5 +1660,50 @@ public class RenderingSettingsImpl extends AbstractLevel2Service implements
             Class<T> klass, Set<Long> nodeIds)
     {
     	return resetDefaultsInSet(klass, nodeIds, false);
+    }
+
+    /**
+     * Implemented as specified by the {@link IRenderingSettings} I/F.
+     * @see IRenderingSettings#getPixelMinMax(Long)
+     */
+    @RolesAllowed("user")
+    public double[] getPixelMinMax(long pixelId)
+    {
+        double[] minmax = new double[] {0d, 1d};
+
+        Set<Long> nodeIds = new HashSet<Long>();
+        nodeIds.add(pixelId);
+        List<Pixels> tmp = loadPixels(nodeIds);
+        if (tmp.isEmpty()) return minmax;
+        Pixels pixels = tmp.get(0);
+
+        PixelsType type = pixels.getPixelsType();
+
+        if (type == null) return minmax;
+        String typeAsString = type.getValue();
+        int bfPixelsType = FormatTools.pixelTypeFromString(typeAsString);
+
+        // Handle floating point types first
+        if (FormatTools.isFloatingPoint(bfPixelsType)) {
+            long[] values = FormatTools.defaultMinMax(bfPixelsType);
+            minmax[0] = (double) values[0];
+            minmax[1] = (double) values[1];
+            return minmax;
+        }
+
+        // Use significant bits if they are available for integral pixel types.
+        Integer significantBits = pixels.getSignificantBits();
+        if (significantBits == null) {
+            significantBits = type.getBitSize();
+        }
+        significantBits = Math.min(significantBits, type.getBitSize());
+        if (FormatTools.isSigned(bfPixelsType)) {
+            minmax[0] = -Math.pow(2, significantBits - 1);
+            minmax[1] = Math.pow(2,  significantBits - 1) - 1;
+        } else {
+            minmax[0] = 0d;
+            minmax[1] = Math.pow(2, significantBits) - 1;
+        }
+        return minmax;
     }
 }
