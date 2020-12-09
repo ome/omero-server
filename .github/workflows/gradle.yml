@@ -31,6 +31,7 @@ jobs:
           tar xf ice-3.6.5-0.2.0-ubuntu2004-amd64.tar.gz
           mv ice-3.6.5-0.2.0 ice-3.6.5
           mv ice-3.6.5 /opt
+          rm ice-3.6.5-0.2.0-ubuntu2004-amd64.tar.gz
           echo "${{ env.ICE_HOME }}/bin" >> $GITHUB_PATH
       - name: Cache Gradle packages
         uses: actions/cache@v2
