@@ -15,7 +15,7 @@ jobs:
         os: [ubuntu-20.04]
     runs-on: ${{ matrix.os }}
     env:
-      gradle_version: 5.2.1 # set to empty to build with most recent version of gradle
+      gradle_version:  # set to empty to build with most recent version of gradle
       gradle_commands: build # default is build
       ICE_HOME: /opt/ice-3.6.5 # location where Ice is installed
     steps:
