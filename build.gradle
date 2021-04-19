@@ -29,8 +29,6 @@ dependencies {
     testImplementation("org.apache.directory.server:apacheds-all:1.5.7")
     testImplementation('org.openmicroscopy:omero-common-test:5.5.7')
     testImplementation('org.slf4j:slf4j-log4j12:1.5.0')
-    configurations.testCompile.exclude(group: 'org.slf4j', module: 'jcl-over-slf4j')
-
 
     // https://mvnrepository.com/artifact/org.apache.directory.shared/shared-ldap
     // testCompile group: 'org.apache.directory.shared', name: 'shared-ldap-constants', version: '1.0.0-M1'
