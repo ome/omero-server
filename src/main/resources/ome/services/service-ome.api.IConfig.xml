@@ -69,6 +69,13 @@
     <constructor-arg ref="readOnlyStatus"/>
   </bean>
 
+  <bean class="ome.services.util.BioFormatsConfigInit" lazy-init="false">
+    <description>
+    Includes among the configuration keys Bio-Formats version metadata as determined at run-time during start-up.
+    </description>
+    <constructor-arg ref="internal-ome.api.IConfig"/>
+  </bean>
+
 <!--
   "Private" resources
   =======================================================================
