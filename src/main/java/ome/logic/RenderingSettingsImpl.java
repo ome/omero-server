@@ -1660,4 +1660,19 @@ public class RenderingSettingsImpl extends AbstractLevel2Service implements
     {
     	return resetDefaultsInSet(klass, nodeIds, false);
     }
+
+    /**
+     * Implemented as specified by the {@link IRenderingSettings} I/F.
+     * @see IRenderingSettings#getPixelMinMax(long)
+     */
+    @RolesAllowed("user")
+    public double[] getPixelMinMax(long pixelId)
+    {
+        Set<Long> nodeIds = new HashSet<Long>();
+        nodeIds.add(pixelId);
+        List<Pixels> tmp = loadPixels(nodeIds);
+        if (tmp.isEmpty()) return new double[] {0, 1};
+        Pixels pixels = tmp.get(0);
+        return initPixelsRange(pixels);
+    }
 }
