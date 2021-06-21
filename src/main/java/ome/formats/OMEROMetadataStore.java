@@ -619,6 +619,11 @@ public class OMEROMetadataStore
                                         (Reagent) referenceObject);
                         continue;
                     }
+                    if (referenceObject instanceof Annotation) {
+                            handleReference((Well) targetObject,
+                                            (Annotation) referenceObject);
+                            continue;
+                    }
                 }
                 else if (targetObject instanceof Reagent)
                 {
