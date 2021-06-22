@@ -619,6 +619,11 @@ public class OMEROMetadataStore
                                         (Reagent) referenceObject);
                         continue;
                     }
+                    if (referenceObject instanceof Annotation) {
+                            handleReference((Well) targetObject,
+                                            (Annotation) referenceObject);
+                            continue;
+                    }
                 }
                 else if (targetObject instanceof Reagent)
                 {
@@ -1720,6 +1725,17 @@ public class OMEROMetadataStore
     private void handleReference(Well target, Reagent reference)
     {
         target.linkReagent(reference);
+    }
+
+    /**
+     * Handles linking a specific reference object to a target object in our
+     * object graph.
+     * @param target Target model object.
+     * @param reference Reference model object.
+     */
+    private void handleReference(Well target, Annotation reference)
+    {
+        target.linkAnnotation(reference);
     }
 
     /**
