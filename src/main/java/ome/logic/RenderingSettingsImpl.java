@@ -27,6 +27,7 @@ import ome.api.IPixels;
 import ome.api.IRenderingSettings;
 import ome.api.RawPixelsStore;
 import ome.api.ServiceInterface;
+import ome.conditions.ApiUsageException;
 import ome.conditions.ConcurrencyException;
 import ome.conditions.ResourceError;
 import ome.conditions.ValidationException;
