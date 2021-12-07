@@ -6,7 +6,6 @@
 package ome.services.scripts;
 
 import java.io.File;
-import java.io.FileFilter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -77,7 +76,7 @@ public class ScriptRepoHelper extends OnContextRefreshedEventListener {
      * matching scripts in the given directory.
      */
     public final static IOFileFilter BASE_SCRIPT_FILTER = new AndFileFilter(Arrays
-            .asList(new FileFilter[] { EmptyFileFilter.NOT_EMPTY,
+            .asList(new IOFileFilter[] { EmptyFileFilter.NOT_EMPTY,
                     HiddenFileFilter.VISIBLE, CanReadFileFilter.CAN_READ }));
 
     private final Map<String, ScriptFileType> types =
@@ -191,8 +190,8 @@ public class ScriptRepoHelper extends OnContextRefreshedEventListener {
                 event.getApplicationContext()
                     .getBeansOfType(ScriptFileType.class));
 
-        final List<FileFilter> andFilters = new ArrayList<FileFilter>();
-        final List<FileFilter> orFilters= new ArrayList<FileFilter>();
+        final List<IOFileFilter> andFilters = new ArrayList<IOFileFilter>();
+        final List<IOFileFilter> orFilters= new ArrayList<IOFileFilter>();
         for (Map.Entry<String, ScriptFileType> entry : types.entrySet()) {
             IOFileFilter found = entry.getValue().getFileFilter();
             log.info("Registering {}: {}", entry.getKey(), found);
