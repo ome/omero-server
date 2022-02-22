@@ -97,7 +97,7 @@ if (slice.iceVersion.contains("3.7")) {
     slice.output = file("$generatedDir/ice37")
 } else if (slice.iceVersion.contains("3.6")) {
     dependencies {
-        api "com.zeroc:ice:3.6.4"
+        api "com.zeroc:ice:3.6.5"
     }
     sourceSets.main.java {
         srcDirs "src/main/ice36", "$generatedDir/ice36"
