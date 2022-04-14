@@ -1,3 +1,16 @@
+5.6.2 (April 2022)
+------------------
+
+- Unify ice version ([#138](https://github.com/ome/omero-server/pull/138))
+- Upgrade commons-io from 1.x to 2.6 ([#135](https://github.com/ome/omero-server/pull/135))
+- Handle Well Annotation references during import ([#127](https://github.com/ome/omero-server/pull/127))
+- Add Bio-Formats version metadata to configuration  ([#126](https://github.com/ome/omero-server/pull/126))
+- Use maven central ([#123](https://github.com/ome/omero-server/pull/123))
+- Use Gradle 6 ([#120](https://github.com/ome/omero-server/pull/120))
+- Use GitHub Actions ([#119](https://github.com/ome/omero-server/pull/119))
+- Bump omero-renderer version to 5.5.8
+- Bump omero-common-test version to 5.5.8
+
 5.6.1 (September 2020)
 ----------------------
 
