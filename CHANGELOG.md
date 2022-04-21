@@ -1,3 +1,9 @@
+5.6.3 (April 2022)
+------------------
+
+- Bump omero-renderer version to 5.5.9
+- Bump omero-common-test version to 5.5.9
+
 5.6.2 (April 2022)
 ------------------
 
