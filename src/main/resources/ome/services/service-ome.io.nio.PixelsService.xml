@@ -52,6 +52,7 @@
     <constructor-arg index="1" value="${omero.pixeldata.tile_height}"/>
     <constructor-arg index="2" value="${omero.pixeldata.max_plane_width}"/>
     <constructor-arg index="3" value="${omero.pixeldata.max_plane_height}"/>
+    <constructor-arg index="4" value="${omero.pixeldata.max_plane_float_override}"/>
   </bean>
 
   <alias name="${omero.pixeldata.tile_sizes_bean}" alias="tileSizes"/>
