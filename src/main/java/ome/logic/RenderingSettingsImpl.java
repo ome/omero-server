@@ -27,6 +27,7 @@ import ome.api.IPixels;
 import ome.api.IRenderingSettings;
 import ome.api.RawPixelsStore;
 import ome.api.ServiceInterface;
+import ome.conditions.ApiUsageException;
 import ome.conditions.ConcurrencyException;
 import ome.conditions.ResourceError;
 import ome.conditions.ValidationException;
@@ -895,6 +896,7 @@ public class RenderingSettingsImpl extends AbstractLevel2Service implements
      	    s1.stop();
         }
     }
+
     /**
      * Computes the location statistics for a set of rendering settings.
      * 
@@ -924,7 +926,15 @@ public class RenderingSettingsImpl extends AbstractLevel2Service implements
                 channels[i] = i;
             
             rawPixelsStore.setPixelsId(pixels.getId(), true);
-            realMinMax = rawPixelsStore.findMinMax(channels);
+            try {
+                realMinMax = rawPixelsStore.findMinMax(channels);
+            } catch (ApiUsageException e) {
+                log.warn(String.format(
+                        "Exception while running findMinMax for " +
+                                "%s", pixels), e);
+                realMinMax = null;
+            }
+
         }
         
         StatsFactory sf = new StatsFactory();
