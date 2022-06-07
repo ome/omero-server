@@ -1,3 +1,8 @@
+5.6.4 (June 2022)
+-----------------
+
+- Fix Gradle publication workflow for release artifacts
+
 5.6.3 (June 2022)
 -----------------
 
@@ -7,7 +12,6 @@
 - Bump omero-common-test version to 5.5.10
 - Bump org.openmicroscopy.project plugin to 5.5.4 ([#143](https://github.com/ome/omero-server/pull/143))
 - Add Gradle publication workflow ([#143](https://github.com/ome/omero-server/pull/143))
-
 
 5.6.2 (April 2022)
 ------------------
