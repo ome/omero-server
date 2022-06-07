@@ -9,13 +9,13 @@ on:
 
 jobs:
   build:
-    uses: jburel/action-workflows/.github/workflows/gradle_build.yml@5fd3131798a530e0455fd91fc51d6eef48693626
+    uses: ome/action-workflows/.github/workflows/gradle_build.yml@v1.2
     with:
       install-ice: true
   publish_snapshots:
     if: ${{ github.ref == 'refs/heads/master' && github.repository_owner == 'ome' }}
     needs: build
-    uses: jburel/action-workflows/.github/workflows/gradle_publish.yml@5fd3131798a530e0455fd91fc51d6eef48693626
+    uses: ome/action-workflows/.github/workflows/gradle_publish.yml@v1.2
     with:
       install-ice: true
       ARTIFACTORY_URL: "snapshots"
