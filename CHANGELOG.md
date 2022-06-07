@@ -1,5 +1,5 @@
-5.6.3 (April 2022)
-------------------
+5.6.3 (June 2022)
+-----------------
 
 - Add the max_plane_float_override config variable to ConfiguredTileSizes ([#141](https://github.com/ome/omero-server/pull/141))
 - Handle overflow error when calculating stats on large planes ([#128](https://github.com/ome/omero-server/pull/128))
