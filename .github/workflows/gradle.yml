@@ -25,8 +25,9 @@ jobs:
   publish:
     needs: build
     if: startsWith(github.ref, 'refs/tags') && github.repository_owner == 'ome'
-    uses: ome/action-workflows/.github/workflows/gradle_publish.yml@v1
+    uses: ome/action-workflows/.github/workflows/gradle_publish.yml@v1.2
     with:
+      install-ice: true
       ARTIFACTORY_URL: "staging"
     secrets:
       ARTIFACTORY_USER: ${{ secrets.ARTIFACTORY_USER }}
