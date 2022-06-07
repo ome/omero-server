@@ -10,11 +10,14 @@ on:
 jobs:
   build:
     uses: jburel/action-workflows/.github/workflows/gradle_build.yml@d673bc75ec9185c679c1e89c174f6f86c10985d2
+    with:
+      install-ice: true
   publish_snapshots:
     if: ${{ github.ref == 'refs/heads/master' && github.repository_owner == 'ome' }}
     needs: build
     uses: jburel/action-workflows/.github/workflows/gradle_publish.yml@d673bc75ec9185c679c1e89c174f6f86c10985d2
     with:
+      install-ice: true
       ARTIFACTORY_URL: "snapshots"
     secrets:
       ARTIFACTORY_USER: ${{ secrets.ARTIFACTORY_USER }}
