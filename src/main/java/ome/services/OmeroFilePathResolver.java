@@ -28,7 +28,7 @@ import ome.util.SqlAction;
 public class OmeroFilePathResolver implements FilePathResolver
 {
     /** The logger for this particular class */
-    private static Logger log = LoggerFactory.getLogger(FilePathResolver.class);
+    private static Logger log = LoggerFactory.getLogger(OmeroFilePathResolver.class);
 
     /** SQL action instance for this class. */
     protected final SqlAction sql;
