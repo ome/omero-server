@@ -25,6 +25,7 @@ ext {
 
 dependencies {
     testImplementation("org.testng:testng:7.5") {
+        //exclude to pass compilation step due to conflicting versions in the path
         exclude group: "org.slf4j", module: "slf4j-log4j12"
     }
     testImplementation("jmock:jmock:1.+")
