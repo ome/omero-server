@@ -34,6 +34,11 @@ public class UpdateFilterMockTest extends AbstractLoginMockTest {
         filter.filter(null, (Collection) null);
     }
 
+    protected void tearDown() throws Exception {
+        super.verify();
+        super.tearDown();
+    }
+
     // ~ GRAPHS (multiple levels)
     // =========================================================================
 
