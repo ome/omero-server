@@ -1,3 +1,11 @@
+5.6.5 (December 2022)
+---------------------
+
+- Bump to TestNG 7.5 ([#148](https://github.com/ome/omero-server/pull/148))
+- Fix logging for OmeroFilePathResolver ([#145](https://github.com/ome/omero-server/pull/145))
+- Bump omero-renderer version to 5.5.11
+- Bump omero-common-test version to 5.6.0
+
 5.6.4 (June 2022)
 -----------------
 
