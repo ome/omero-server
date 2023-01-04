@@ -16,7 +16,7 @@ public interface LocalSession extends ome.api.ISession {
     /**
      * Lookups a Session without updating the last access time.
      *
-     * Otherwise, behaves identically to {@link #getSession()}.
+     * Otherwise, behaves identically to {@link ome.services.sessions.SessionContext#getSession()}.
      */
     Session getSessionQuietly(String uuid);
 }
