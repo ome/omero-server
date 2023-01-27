@@ -346,6 +346,10 @@ public class PixelDataThread extends ExecutionThread implements ApplicationListe
         if (null == ec.getCurrentUserId()) {
             throw new InternalException("No user! Must be wrapped by call to Executor?");
         }
+        /* Because other tasks depend on these completing, we submit these at
+         * SYSTEM priority so that a new thread is always created to handle them
+         * and we prevent the possibility of deadlock
+         */
         Future<EventLog> future = this.executor.submit(Priority.SYSTEM,
                 cd.getContext(),
                 new Callable<EventLog>(){
