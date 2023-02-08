@@ -425,9 +425,11 @@ public class FullTextBridge extends BridgeHelper {
             if (fileset == null) {
                 return;
             }
-            // Skip indexing of filesets with multiple files
-            // This is particularly important for HCS file formats where the indexing time
-            // as well as the size of the FullText can grow exponentially with plate sizes
+            // Skip fileset indexing above a cut-off
+            // As the fileset indexing scales with the number of fileset entries for each
+            // images, this operation can quickly lead to performance degradation notable
+            // in domains like high-content screening where each of 1K-10K images in a plate
+            // can be associated with 10-100K files
             if (fileset.sizeOfUsedFiles() > maxFilesetSize) {
               return;
             }
