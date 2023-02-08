@@ -55,9 +55,9 @@ import java.util.Map;
  *
  * @author Josh Moore, josh at glencoesoftware.com
  * @since 3.0-Beta3
- * @see <a href="https://trac.openmicroscopy.org.uk/ome/FileParsers">Parsers</a
+ * @see <a href="https://omero.readthedocs.io/en/stable/developers/Search/FileParsers.html">Parsers</a
  *      href>
- * @see <a href="https://trac.openmicroscopy.org.uk/ome/SearchBridges">Bridges</a
+ * @see <a href="https://omero.readthedocs.io/en/stable/developers/Modules/Search/Bridges.html">Bridges</a
  *      href>
  */
 @Deprecated
@@ -101,7 +101,7 @@ public class FullTextBridge extends BridgeHelper {
      *            set of {@link FieldBridge bridge classes} which will be
      *            instantiated via a no-arg constructor.
      * @see <a
-     *      href="https://trac.openmicroscopy.org.uk/ome/SearchBridges">Bridges</a
+     *      href="https://omero.readthedocs.io/en/stable/developers/Modules/Search/Bridges.html">Bridges</a
      *      href>
      */
     @SuppressWarnings("unchecked")
@@ -124,7 +124,7 @@ public class FullTextBridge extends BridgeHelper {
      * @param maxFilesetSize
      *            maximum size of the fileset to be considered for indexing
      * @see <a
-     *      href="https://trac.openmicroscopy.org.uk/ome/SearchBridges">Bridges</a
+     *      href="https://omero.readthedocs.io/en/stable/developers/Modules/Search/Bridges.html">Bridges</a
      *      href>
      */
     @SuppressWarnings("unchecked")
