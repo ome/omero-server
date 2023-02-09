@@ -433,6 +433,7 @@ public class FullTextBridge extends BridgeHelper {
             if (fileset.sizeOfUsedFiles() > maxFilesetSize) {
               return;
             }
+            add(document, "fileset.templatePrefix", fileset.getTemplatePrefix(), opts);
             final Iterator<FilesetEntry> entryIterator = fileset.iterateUsedFiles();
             while (entryIterator.hasNext()) {
                 final FilesetEntry entry = entryIterator.next();
@@ -441,7 +442,6 @@ public class FullTextBridge extends BridgeHelper {
                 }
                 add(document, "fileset.entry.clientPath", entry.getClientPath(), opts);
                 add(document, "fileset.entry.name", entry.getOriginalFile().getName(), opts);
-                add(document, "fileset.templatePrefix", fileset.getTemplatePrefix(), opts);
             }
         }
     }
