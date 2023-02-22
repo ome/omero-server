@@ -55,10 +55,8 @@ import java.util.Map;
  *
  * @author Josh Moore, josh at glencoesoftware.com
  * @since 3.0-Beta3
- * @see <a href="https://omero.readthedocs.io/en/stable/developers/Search/FileParsers.html">Parsers</a
- *      href>
- * @see <a href="https://omero.readthedocs.io/en/stable/developers/Modules/Search/Bridges.html">Bridges</a
- *      href>
+ * @see <a href="https://omero.readthedocs.io/en/stable/developers/Search/FileParsers.html">Parsers</a>
+ * @see <a href="https://omero.readthedocs.io/en/stable/developers/Modules/Search/Bridges.html">Bridges</a>
  */
 @Deprecated
 public class FullTextBridge extends BridgeHelper {
@@ -101,8 +99,7 @@ public class FullTextBridge extends BridgeHelper {
      *            set of {@link FieldBridge bridge classes} which will be
      *            instantiated via a no-arg constructor.
      * @see <a
-     *      href="https://omero.readthedocs.io/en/stable/developers/Modules/Search/Bridges.html">Bridges</a
-     *      href>
+     *      href="https://omero.readthedocs.io/en/stable/developers/Modules/Search/Bridges.html">Bridges</a>
      */
     @SuppressWarnings("unchecked")
     public FullTextBridge(OriginalFilesService files,
@@ -124,8 +121,7 @@ public class FullTextBridge extends BridgeHelper {
      * @param maxFilesetSize
      *            maximum size of the fileset to be considered for indexing
      * @see <a
-     *      href="https://omero.readthedocs.io/en/stable/developers/Modules/Search/Bridges.html">Bridges</a
-     *      href>
+     *      href="https://omero.readthedocs.io/en/stable/developers/Modules/Search/Bridges.html">Bridges</a>
      */
     @SuppressWarnings("unchecked")
     public FullTextBridge(OriginalFilesService files,
