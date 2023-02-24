@@ -423,7 +423,7 @@ public class FullTextBridge extends BridgeHelper {
             }
             // Skip fileset indexing above a cut-off
             // As the fileset indexing scales with the number of fileset entries for each
-            // images, this operation can quickly lead to performance degradation notable
+            // image, this operation can quickly lead to performance degradation notable
             // in domains like high-content screening where each of 1K-10K images in a plate
             // can be associated with 10-100K files
             if (fileset.sizeOfUsedFiles() > maxFilesetSize) {
