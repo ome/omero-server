@@ -28,7 +28,7 @@ jobs:
     uses: ome/action-workflows/.github/workflows/gradle_publish.yml@v2
     with:
       install-ice: true
-      ARTIFACTORY_URL: "staging"
+      ARTIFACTORY_URL: "releases"
     secrets:
       ARTIFACTORY_USER: ${{ secrets.ARTIFACTORY_USER }}
       ARTIFACTORY_PASSWORD: ${{ secrets.ARTIFACTORY_PASSWORD }}
