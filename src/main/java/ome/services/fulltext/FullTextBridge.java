@@ -114,7 +114,7 @@ public class FullTextBridge extends BridgeHelper {
      * @param maxFilesetSize the maximume fileset size
      */
     public void setMaxFilesetSize(int maxFilesetSize) {
-        logger().info("Setting maximum fileset size: {}", maxFilesetSize);
+        logger().info("Setting maximum fileset size to {}", maxFilesetSize);
         this.maxFilesetSize = maxFilesetSize;
     }
 
@@ -405,21 +405,29 @@ public class FullTextBridge extends BridgeHelper {
             if (fileset == null) {
                 return;
             }
-            // Skip fileset indexing above a cut-off
-            // As the fileset indexing scales with the number of fileset entries for each
-            // image, this operation can quickly lead to performance degradation notable
-            // in domains like high-content screening where each of 1K-10K images in a plate
-            // can be associated with 10-100K files
-            if (fileset.sizeOfUsedFiles() > maxFilesetSize) {
-              return;
+
+            if (maxFilesetSize > 0) {
+              add(document, "fileset.templatePrefix", fileset.getTemplatePrefix(), opts);
             }
-            add(document, "fileset.templatePrefix", fileset.getTemplatePrefix(), opts);
+
             final Iterator<FilesetEntry> entryIterator = fileset.iterateUsedFiles();
+            int index = 0;
             while (entryIterator.hasNext()) {
                 final FilesetEntry entry = entryIterator.next();
                 if (entry == null) {
                     continue;
                 }
+
+                // Skip fileset indexing above a cut-off
+                // As the fileset indexing scales with the number of fileset entries for each
+                // image, this operation can quickly lead to performance degradation notable
+                // in domains like high-content screening where each of 1K-10K images in a plate
+                // can be associated with 10-100K files
+                index++;
+                if (index > maxFilesetSize) {
+                  return;
+                }
+
                 add(document, "fileset.entry.clientPath", entry.getClientPath(), opts);
                 add(document, "fileset.entry.name", entry.getOriginalFile().getName(), opts);
             }
