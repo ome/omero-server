@@ -402,13 +402,11 @@ public class FullTextBridge extends BridgeHelper {
         if (object instanceof Image) {
             final Image image = (Image) object;
             final Fileset fileset = image.getFileset();
-            if (fileset == null) {
+            if (fileset == null || maxFilesetSize < 1) {
                 return;
             }
 
-            if (maxFilesetSize > 0) {
-              add(document, "fileset.templatePrefix", fileset.getTemplatePrefix(), opts);
-            }
+            add(document, "fileset.templatePrefix", fileset.getTemplatePrefix(), opts);
 
             final Iterator<FilesetEntry> entryIterator = fileset.iterateUsedFiles();
             int index = 0;
@@ -425,7 +423,7 @@ public class FullTextBridge extends BridgeHelper {
                 // can be associated with 10-100K files
                 index++;
                 if (index > maxFilesetSize) {
-                  return;
+                    return;
                 }
 
                 add(document, "fileset.entry.clientPath", entry.getClientPath(), opts);
