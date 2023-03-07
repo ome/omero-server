@@ -47,6 +47,12 @@ public class ThreadPool extends ThreadPoolExecutor {
      */
     private final long backgroundTimeout;
 
+    /**
+     * Default constructor. Unlike the argument constructor, it effectively
+     * has no queue for tasks and will always create a new thread to
+     * accommodate new tasks.
+     * Background tasks are limited to 10.
+     */
     public ThreadPool() {
         // Values from Executors.newCachedThreadPool
         super(0, Integer.MAX_VALUE, 60L, TimeUnit.SECONDS,
@@ -56,6 +62,28 @@ public class ThreadPool extends ThreadPoolExecutor {
 
     }
 
+    /**
+     * This constructor creates a thread pool with an unbounded queue.
+     * This means that {@code minThreads} will set the number of core threads,
+     * which is the maximum number of threads active at one time when an
+     * unbounded queue is used. This also means that {@code maxThreads} does
+     * nothing, since threads are created beyond the core pool size only when the
+     * queue is full. Additionally, by default core threads never time out,
+     * so {@code msTimeout} also does nothing.
+     * See the {@link ThreadPoolExecutor} docs for more information.
+     * @param minThreads Sets the core pool size which is also the MAX pool size
+     * @param maxThreads This does NOTHING
+     * @param msTimeout This does NOTHING
+     * @param backgroundThreads Parameter name is a bit misleading. It is
+     * the maximum number of background tasks that can be submitted
+     * (queued or running) at once. The background threads come from the same
+     * pool, which is limited to {@code minThreads} in size, so if
+     * {@code minThreads} is lower, that will control the maximum number
+     * of threads capable of running background tasks.
+     * @param backgroundTimeout If more than {@code backgroundThreads}
+     * tasks are queued or processing, this is how long a task will wait
+     * to be submitted before being dropped
+     */
     public ThreadPool(int minThreads, int maxThreads, long msTimeout,
             int backgroundThreads, long backgroundTimeout) {
         super(minThreads, maxThreads, msTimeout, TimeUnit.MILLISECONDS,
