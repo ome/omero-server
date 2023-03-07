@@ -37,7 +37,7 @@ dependencies {
     // testCompile group: 'org.apache.directory.shared', name: 'shared-ldap-constants', version: '1.0.0-M1'
     // testCompile group: 'org.apache.directory.shared', name: 'shared-ldap', version: '0.9.15'
 
-    api('org.openmicroscopy:omero-renderer:5.5.11')
+    api('org.openmicroscopy:omero-renderer:5.5.12')
 
     // Spring framework stuff
     implementation("org.springframework:spring-context-support:4.3.14.RELEASE")
