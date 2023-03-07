@@ -65,7 +65,7 @@ public class FullTextBridge extends BridgeHelper {
     final protected OriginalFilesService files;
     final protected Map<String, FileParser> parsers;
     final protected Class<FieldBridge>[] classes;
-    final protected int maxFilesetSize;
+    protected int maxFilesetSize;
 
     /**
      * Since this constructor provides the instance with no way of parsing
@@ -104,34 +104,18 @@ public class FullTextBridge extends BridgeHelper {
     @SuppressWarnings("unchecked")
     public FullTextBridge(OriginalFilesService files,
             Map<String, FileParser> parsers, Class<FieldBridge>[] bridgeClasses) {
-        this(files, parsers, bridgeClasses, 1);
-    }
-
-    /**
-     * Main constructor.
-     *
-     * @param files
-     *            {@link OriginalFilesService} for getting access to binary files.
-     * @param parsers
-     *            List of {@link FileParser} instances which are currently
-     *            configured.
-     * @param bridgeClasses
-     *            set of {@link FieldBridge bridge classes} which will be
-     *            instantiated via a no-arg constructor.
-     * @param maxFilesetSize
-     *            maximum size of the fileset to be considered for indexing
-     * @see <a
-     *      href="https://omero.readthedocs.io/en/stable/developers/Modules/Search/Bridges.html">Bridges</a>
-     */
-    @SuppressWarnings("unchecked")
-    public FullTextBridge(OriginalFilesService files,
-            Map<String, FileParser> parsers, Class<FieldBridge>[] bridgeClasses,
-            int maxFilesetSize) {
         this.files = files;
         this.parsers = parsers;
         this.classes = bridgeClasses == null ? new Class[] {} : bridgeClasses;
+    }
+
+    /**
+     * Sets the cut-off for indexing filesets
+     * @param maxFilesetSize the maximume fileset size
+     */
+    public void setMaxFilesetSize(int maxFilesetSize) {
+        logger().info("Setting maximum fileset size: {}", maxFilesetSize);
         this.maxFilesetSize = maxFilesetSize;
-        logger().info("Maximum fileset size: {}", maxFilesetSize);
     }
 
     /**
