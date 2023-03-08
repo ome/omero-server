@@ -46,7 +46,6 @@
         <value>classpath:ome/services/messaging.xml</value>
         <value>classpath:ome/services/checksum.xml</value>
         <value>classpath:ome/services/datalayer.xml</value>
-        <value>classpath*:ome/services/db-*.xml</value>
         <value>classpath:ome/services/sec-primitives.xml</value>
         <value>classpath:ome/services/hibernate.xml</value>
         <value>classpath:ome/services/services.xml</value>
@@ -54,6 +53,7 @@
         <value>classpath:ome/services/sec-system.xml</value>
         <value>classpath:ome/services/startup.xml</value>
         <!-- Allow user added files -->
+        <value>classpath*:ome/services/db-*.xml</value>
         <value>classpath*:blitz/*.xml</value>
       </list>
     </constructor-arg>
