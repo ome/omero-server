@@ -52,6 +52,7 @@
     <constructor-arg ref="fileParsers"/>
     <constructor-arg ref="/OMERO/Files"/>
     <constructor-arg value="${omero.search.bridges}"/>
+    <property name="maxFilesetSize" value="${omero.search.max_fileset_size}"/>
   </bean>
   
   <!-- Use "*" as a wildcard parser -->

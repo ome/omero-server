@@ -55,10 +55,8 @@ import java.util.Map;
  *
  * @author Josh Moore, josh at glencoesoftware.com
  * @since 3.0-Beta3
- * @see <a href="https://trac.openmicroscopy.org.uk/ome/FileParsers">Parsers</a
- *      href>
- * @see <a href="https://trac.openmicroscopy.org.uk/ome/SearchBridges">Bridges</a
- *      href>
+ * @see <a href="https://omero.readthedocs.io/en/stable/developers/Search/FileParsers.html">Parsers</a>
+ * @see <a href="https://omero.readthedocs.io/en/stable/developers/Modules/Search/Bridges.html">Bridges</a>
  */
 @Deprecated
 public class FullTextBridge extends BridgeHelper {
@@ -67,6 +65,7 @@ public class FullTextBridge extends BridgeHelper {
     final protected OriginalFilesService files;
     final protected Map<String, FileParser> parsers;
     final protected Class<FieldBridge>[] classes;
+    protected int maxFilesetSize;
 
     /**
      * Since this constructor provides the instance with no way of parsing
@@ -100,8 +99,7 @@ public class FullTextBridge extends BridgeHelper {
      *            set of {@link FieldBridge bridge classes} which will be
      *            instantiated via a no-arg constructor.
      * @see <a
-     *      href="https://trac.openmicroscopy.org.uk/ome/SearchBridges">Bridges</a
-     *      href>
+     *      href="https://omero.readthedocs.io/en/stable/developers/Modules/Search/Bridges.html">Bridges</a>
      */
     @SuppressWarnings("unchecked")
     public FullTextBridge(OriginalFilesService files,
@@ -109,6 +107,15 @@ public class FullTextBridge extends BridgeHelper {
         this.files = files;
         this.parsers = parsers;
         this.classes = bridgeClasses == null ? new Class[] {} : bridgeClasses;
+    }
+
+    /**
+     * Sets the cut-off for indexing filesets
+     * @param maxFilesetSize the maximume fileset size
+     */
+    public void setMaxFilesetSize(int maxFilesetSize) {
+        logger().info("Setting maximum fileset size to {}", maxFilesetSize);
+        this.maxFilesetSize = maxFilesetSize;
     }
 
     /**
@@ -388,24 +395,39 @@ public class FullTextBridge extends BridgeHelper {
      *
      * - fileset.entry.clientPath
      * - fileset.entry.name
+     * - fileset.templatePrefix
      */
     public void set_fileset(final String name, final IObject object,
                             final Document document, final LuceneOptions opts) {
         if (object instanceof Image) {
             final Image image = (Image) object;
             final Fileset fileset = image.getFileset();
-            if (fileset == null) {
+            if (fileset == null || maxFilesetSize < 1) {
                 return;
             }
+
+            add(document, "fileset.templatePrefix", fileset.getTemplatePrefix(), opts);
+
             final Iterator<FilesetEntry> entryIterator = fileset.iterateUsedFiles();
+            int index = 0;
             while (entryIterator.hasNext()) {
                 final FilesetEntry entry = entryIterator.next();
                 if (entry == null) {
                     continue;
                 }
+
+                // Skip fileset indexing above a cut-off
+                // As the fileset indexing scales with the number of fileset entries for each
+                // image, this operation can quickly lead to performance degradation notable
+                // in domains like high-content screening where each of 1K-10K images in a plate
+                // can be associated with 10-100K files
+                index++;
+                if (index > maxFilesetSize) {
+                    return;
+                }
+
                 add(document, "fileset.entry.clientPath", entry.getClientPath(), opts);
                 add(document, "fileset.entry.name", entry.getOriginalFile().getName(), opts);
-                add(document, "fileset.templatePrefix", fileset.getTemplatePrefix(), opts);
             }
         }
     }
