@@ -1,10 +1,14 @@
+5.6.7 (March 2023)
+------------------
+
+- Remove dependencies no longer needed ([#149](https://github.com/ome/omero-server/pull/149))
+
 5.6.6 (March 2023)
 ------------------
 
 - Fileset indexing: address performance issues and add configurability ([#156](https://github.com/ome/omero-server/pull/156))
 - Run PixelDataThread Application Events in SYSTEM Thread Pool ([#155](https://github.com/ome/omero-server/pull/155))
 - Push to releases folder on artifactory ([#158](https://github.com/ome/omero-server/pull/158))
-- Remove dependencies no longer needed ([#149](https://github.com/ome/omero-server/pull/149))
 - Bump omero-renderer version to 5.5.12
 - Bump omero-common-test version to 5.6.1
 
