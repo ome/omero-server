@@ -22,7 +22,7 @@
         id="internal-ome.api.RawPixelsStore"
         class="ome.services.RawPixelsBean" scope="prototype">
      <constructor-arg><value>true</value></constructor-arg>
-     <constructor-arg value="${omero.data.dir}"/>
+     <constructor-arg ref="configuredTileSizes"/>
     <!--  
       Copied from id="binary" parent (no multiple inheritance). This is needed
       so long there isn't a wrapper instance around the RawPixelsStore as in

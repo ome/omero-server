@@ -31,6 +31,7 @@ import ome.io.nio.DimensionsOutOfBoundsException;
 import ome.io.nio.PixelBuffer;
 import ome.io.nio.PixelsService;
 import ome.io.nio.RomioPixelBuffer;
+import ome.io.nio.TileSizes;
 import ome.model.core.Channel;
 import ome.model.core.Pixels;
 import ome.parameters.Parameters;
@@ -95,8 +96,8 @@ public class RawPixelsBean extends AbstractStatefulBean implements
     /** SQL action instance for this class. */
     private transient SqlAction sql;
 
-    /** The server's OMERO data directory. */
-    private transient String omeroDataDir;
+    /** TileSizes */
+    private transient TileSizes tileSizes;
 
     /**
      * default constructor
@@ -109,9 +110,9 @@ public class RawPixelsBean extends AbstractStatefulBean implements
      * 
      * @param checking
      */
-    public RawPixelsBean(boolean checking, String omeroDataDir) {
+    public RawPixelsBean(boolean checking, TileSizes tileSizes) {
         this.diskSpaceChecking = checking;
-        this.omeroDataDir = omeroDataDir;
+        this.tileSizes = tileSizes;
     }
 
     public synchronized Class<? extends ServiceInterface> getServiceInterface() {
@@ -682,9 +683,18 @@ public class RawPixelsBean extends AbstractStatefulBean implements
             int binCount, boolean globalRange, PlaneDef plane) {
         errorIfNotLoaded();
 
-        if (requiresPixelsPyramid())
-            throw new ApiUsageException(
-                    "This method can not handle tiled images yet.");
+        //Find resolution level closest to max plane size without
+        //exceeding it
+        int resolutionLevel = 0;
+        for (int i = 1; i < buffer.getResolutionLevels(); i++) {
+            buffer.setResolutionLevel(i);
+            if (buffer.getSizeX() > tileSizes.getMaxPlaneWidth() ||
+                    buffer.getSizeY() > tileSizes.getMaxPlaneHeight()) {
+                break;
+            }
+            resolutionLevel = i;
+        }
+        buffer.setResolutionLevel(resolutionLevel);
 
         if (binCount <= 0)
             binCount = DEFAULT_HISTOGRAM_BINSIZE;

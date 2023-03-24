@@ -6,6 +6,7 @@
 package ome.services;
 
 import ome.annotations.RolesAllowed;
+import ome.io.nio.TileSizes;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,8 +37,8 @@ public class RawPixelsBeanReadOnly extends RawPixelsBean {
     /**
      * overridden to allow Spring to set boolean
      */
-    public RawPixelsBeanReadOnly(boolean checking, String omeroDataDir) {
-        super(checking, omeroDataDir);
+    public RawPixelsBeanReadOnly(boolean checking, TileSizes tileSizes) {
+        super(checking, tileSizes);
     }
 
     @RolesAllowed("user")
