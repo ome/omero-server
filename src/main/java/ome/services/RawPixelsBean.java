@@ -97,7 +97,7 @@ public class RawPixelsBean extends AbstractStatefulBean implements
     private transient SqlAction sql;
 
     /** TileSizes */
-    private transient TileSizes tileSizes;
+    private TileSizes tileSizes;
 
     /**
      * default constructor
@@ -110,9 +110,17 @@ public class RawPixelsBean extends AbstractStatefulBean implements
      * 
      * @param checking
      */
-    public RawPixelsBean(boolean checking, TileSizes tileSizes) {
+    public RawPixelsBean(boolean checking, String omeroDataDir) {
         this.diskSpaceChecking = checking;
+        //omeroDataDir is no longer used by this class
+    }
+
+    public void setTileSizes(TileSizes tileSizes) {
         this.tileSizes = tileSizes;
+    }
+
+    public TileSizes getTileSizes() {
+        return tileSizes;
     }
 
     public synchronized Class<? extends ServiceInterface> getServiceInterface() {

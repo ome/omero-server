@@ -22,7 +22,6 @@
         id="internal-ome.api.RawFileStore"
         class="ome.services.RawFileBean" scope="prototype">
     <constructor-arg><value>true</value></constructor-arg>
-    <constructor-arg ref="configuredTileSizes"/>
     <property name="originalFilesService" ref="/OMERO/Files"/>
     <property name="IRepositoryInfo" ref="internal-ome.api.IRepositoryInfo"/>
     <property name="adminService" ref="internal-ome.api.IAdmin"/>
