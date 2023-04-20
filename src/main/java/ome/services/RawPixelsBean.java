@@ -119,10 +119,6 @@ public class RawPixelsBean extends AbstractStatefulBean implements
         this.tileSizes = tileSizes;
     }
 
-    public TileSizes getTileSizes() {
-        return tileSizes;
-    }
-
     public synchronized Class<? extends ServiceInterface> getServiceInterface() {
         return RawPixelsStore.class;
     }
