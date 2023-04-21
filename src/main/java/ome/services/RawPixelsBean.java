@@ -689,14 +689,19 @@ public class RawPixelsBean extends AbstractStatefulBean implements
 
         //Find resolution level closest to max plane size without
         //exceeding it
-        int resolutionLevel = 0;
-        for (int i = 1; i < buffer.getResolutionLevels(); i++) {
+        int resolutionLevel = -1;
+        for (int i = 0; i < buffer.getResolutionLevels(); i++) {
             buffer.setResolutionLevel(i);
             if (buffer.getSizeX() > tileSizes.getMaxPlaneWidth() ||
                     buffer.getSizeY() > tileSizes.getMaxPlaneHeight()) {
                 break;
             }
             resolutionLevel = i;
+        }
+        if (resolutionLevel < 0) {
+            //No resolution levels exist smaller than max plane size
+            throw new IllegalArgumentException("All resolution levels larger "
+                    + "than max plane size");
         }
         buffer.setResolutionLevel(resolutionLevel);
 
