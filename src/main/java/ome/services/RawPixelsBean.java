@@ -691,7 +691,13 @@ public class RawPixelsBean extends AbstractStatefulBean implements
         //exceeding it
         int resolutionLevel = -1;
         for (int i = 0; i < buffer.getResolutionLevels(); i++) {
-            buffer.setResolutionLevel(i);
+            //If there's only 1 resolution level, we may have a
+            //RomioPixelBuffer, which doesn't support setResolutionLevel,
+            //so just check the size of the buffer
+            //and use it if it's small enough
+            if (buffer.getResolutionLevels() > 1) {
+                buffer.setResolutionLevel(i);
+            }
             if (buffer.getSizeX() > tileSizes.getMaxPlaneWidth() ||
                     buffer.getSizeY() > tileSizes.getMaxPlaneHeight()) {
                 break;
@@ -703,7 +709,9 @@ public class RawPixelsBean extends AbstractStatefulBean implements
             throw new IllegalArgumentException("All resolution levels larger "
                     + "than max plane size");
         }
-        buffer.setResolutionLevel(resolutionLevel);
+        if (buffer.getResolutionLevels() > 1) {
+            buffer.setResolutionLevel(resolutionLevel);
+        }
 
         if (binCount <= 0)
             binCount = DEFAULT_HISTOGRAM_BINSIZE;
