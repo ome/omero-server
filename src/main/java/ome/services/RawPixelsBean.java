@@ -706,7 +706,7 @@ public class RawPixelsBean extends AbstractStatefulBean implements
         }
         if (resolutionLevel < 0) {
             //No resolution levels exist smaller than max plane size
-            throw new IllegalArgumentException("All resolution levels larger "
+            throw new ApiUsageException("All resolution levels larger "
                     + "than max plane size");
         }
         if (buffer.getResolutionLevels() > 1) {
