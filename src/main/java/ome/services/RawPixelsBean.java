@@ -31,6 +31,7 @@ import ome.io.nio.DimensionsOutOfBoundsException;
 import ome.io.nio.PixelBuffer;
 import ome.io.nio.PixelsService;
 import ome.io.nio.RomioPixelBuffer;
+import ome.io.nio.TileSizes;
 import ome.model.core.Channel;
 import ome.model.core.Pixels;
 import ome.parameters.Parameters;
@@ -95,8 +96,8 @@ public class RawPixelsBean extends AbstractStatefulBean implements
     /** SQL action instance for this class. */
     private transient SqlAction sql;
 
-    /** The server's OMERO data directory. */
-    private transient String omeroDataDir;
+    /** TileSizes */
+    private TileSizes tileSizes;
 
     /**
      * default constructor
@@ -111,7 +112,11 @@ public class RawPixelsBean extends AbstractStatefulBean implements
      */
     public RawPixelsBean(boolean checking, String omeroDataDir) {
         this.diskSpaceChecking = checking;
-        this.omeroDataDir = omeroDataDir;
+        //omeroDataDir is no longer used by this class
+    }
+
+    public void setTileSizes(TileSizes tileSizes) {
+        this.tileSizes = tileSizes;
     }
 
     public synchronized Class<? extends ServiceInterface> getServiceInterface() {
@@ -682,9 +687,31 @@ public class RawPixelsBean extends AbstractStatefulBean implements
             int binCount, boolean globalRange, PlaneDef plane) {
         errorIfNotLoaded();
 
-        if (requiresPixelsPyramid())
-            throw new ApiUsageException(
-                    "This method can not handle tiled images yet.");
+        //Find resolution level closest to max plane size without
+        //exceeding it
+        int resolutionLevel = -1;
+        for (int i = 0; i < buffer.getResolutionLevels(); i++) {
+            //If there's only 1 resolution level, we may have a
+            //RomioPixelBuffer, which doesn't support setResolutionLevel,
+            //so just check the size of the buffer
+            //and use it if it's small enough
+            if (buffer.getResolutionLevels() > 1) {
+                buffer.setResolutionLevel(i);
+            }
+            if (buffer.getSizeX() > tileSizes.getMaxPlaneWidth() ||
+                    buffer.getSizeY() > tileSizes.getMaxPlaneHeight()) {
+                break;
+            }
+            resolutionLevel = i;
+        }
+        if (resolutionLevel < 0) {
+            //No resolution levels exist smaller than max plane size
+            throw new ApiUsageException("All resolution levels larger "
+                    + "than max plane size");
+        }
+        if (buffer.getResolutionLevels() > 1) {
+            buffer.setResolutionLevel(resolutionLevel);
+        }
 
         if (binCount <= 0)
             binCount = DEFAULT_HISTOGRAM_BINSIZE;
