@@ -1,3 +1,13 @@
+5.6.8 (July 2023)
+------------------
+
+- Histogram: fix bin assigment computation ([#164](https://github.com/ome/omero-server/pull/164))
+- Fix generation of Histogram for tiled image ([#162](https://github.com/ome/omero-server/pull/162))
+- Bump to action-workflows 2.1 ([#161](https://github.com/ome/omero-server/pull/161))
+- Bump omero-renderer version to 5.5.13
+- Bump omero-common-test version to 5.6.2
+
+
 5.6.7 (March 2023)
 ------------------
 
