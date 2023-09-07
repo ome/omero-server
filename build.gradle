@@ -1,4 +1,4 @@
-plugins {
+gplugins {
     id "java-library"
     id "org.openmicroscopy.project" version "5.5.4"
     id "org.openmicroscopy.gradle.ice-builder.slice" version "1.5.0"
@@ -26,7 +26,7 @@ ext {
 dependencies {
     testImplementation("org.testng:testng:7.5")
     testImplementation("jmock:jmock:1.+")
-    testImplementation('org.openmicroscopy:omero-common-test:5.6.2')
+    testImplementation('org.openmicroscopy:omero-common-test:5.6.3')
 
     api('org.openmicroscopy:omero-renderer:5.5.13')
 
