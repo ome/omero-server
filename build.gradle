@@ -1,11 +1,11 @@
-gplugins {
+plugins {
     id "java-library"
     id "org.openmicroscopy.project" version "5.5.4"
     id "org.openmicroscopy.gradle.ice-builder.slice" version "1.5.0"
 }
 
 group = "org.openmicroscopy"
-version = "5.6.9-SNAPSHOT"
+version = "5.6.9"
 
 repositories {
     mavenLocal()
