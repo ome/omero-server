@@ -5,7 +5,7 @@ plugins {
 }
 
 group = "org.openmicroscopy"
-version = "5.6.9"
+version = "5.6.10-SNAPSHOT"
 
 repositories {
     mavenLocal()
