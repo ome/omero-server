@@ -1,3 +1,10 @@
+5.6.9 (September 2023)
+----------------------
+
+- Bump omero-renderer version to 5.5.14
+- Bump omero-common-test version to 5.6.3
+- Add top-level Git mailmap
+
 5.6.8 (July 2023)
 ------------------
 
