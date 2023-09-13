@@ -11,14 +11,6 @@ import java.util.Map;
 
 import javax.sql.DataSource;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.hibernate.event.PostDeleteEvent;
-import org.hibernate.event.PostDeleteEventListener;
-import org.hibernate.event.PostInsertEvent;
-import org.hibernate.event.PostInsertEventListener;
-import org.hibernate.event.PostUpdateEvent;
-import org.hibernate.event.PostUpdateEventListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,14 +25,12 @@ public class InMemoryExperimenterGroupCache implements ExperimenterGroupCache {
     public InMemoryExperimenterGroupCache(DataSource dataSource) throws SQLException {
         this.dataSource = dataSource;
         updateCache();
-        log.info(Integer.toString(groupMembership.size()));
-        log.info(Integer.toString(groupPermissions.size()));
     }
 
     @Override
     public synchronized boolean isRelatedUser(long experimenterId, long currentUserId,
             long userGroupId) {
-        log.info("In isRelatedUser in cache!!!");
+        log.debug("Using cache for isRelatedUser");
         List<Long> experimenterGroups = groupMembership.get(experimenterId);
         List<Long> currentUserGroups = groupMembership.get(currentUserId);
         if (experimenterGroups == null || currentUserGroups == null) {

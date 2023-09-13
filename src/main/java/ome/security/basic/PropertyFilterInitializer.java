@@ -85,9 +85,6 @@ public class PropertyFilterInitializer {
      * @return if property values may be read
      */
     private boolean isRelatedUser(long experimenterId) {
-        /* Determine the currently effective user ID. */
-        final EventContext ec = currentDetails.getCurrentEventContext();
-        final Long currentUserId = ec.getCurrentUserId();
         if (currentDetails.size() == 0) {
             /* This cannot be an external user request so permit it. */
             return true;
@@ -96,6 +93,9 @@ public class PropertyFilterInitializer {
         if (experimenterId == roles.getRootId() || experimenterId == roles.getGuestId()) {
             return true;
         }
+        /* Determine the currently effective user ID. */
+        final EventContext ec = currentDetails.getCurrentEventContext();
+        final Long currentUserId = ec.getCurrentUserId();
         if (currentUserId == null) {
             /* This cannot be an external user request so permit it. */
             return true;
