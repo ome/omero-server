@@ -44,7 +44,10 @@ public class InMemoryExperimenterGroupCache implements ExperimenterGroupCache {
                 continue;
             }
             if (currentUserGroups.contains(groupId)) {
-                isRelated = true;
+                Long permissions = groupPermissions.get(groupId);
+                if ((permissions & 64) == 64) {
+                    isRelated = true;
+                }
                 break;
             }
         }
