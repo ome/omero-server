@@ -89,6 +89,7 @@
     <constructor-arg ref="currentDetails"/>
     <constructor-arg ref="tokenHolder"/>
     <constructor-arg ref="omeroInterceptor"/>
+    <constructor-arg ref="experimenterGroupCache"/>
     <property name="debugAll" value="false"/>
   </bean>
 

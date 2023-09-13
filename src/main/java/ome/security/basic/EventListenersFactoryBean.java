@@ -46,15 +46,18 @@ public class EventListenersFactoryBean extends AbstractFactoryBean {
 
     private final OmeroInterceptor interceptor;
 
+    private final ExperimenterGroupCache cache;
+
     // ~ FactoryBean
     // =========================================================================
 
     public EventListenersFactoryBean(CurrentDetails cd, TokenHolder th,
-            ACLVoter voter, OmeroInterceptor interceptor) {
+            ACLVoter voter, OmeroInterceptor interceptor, ExperimenterGroupCache cache) {
         this.cd = cd;
         this.th = th;
         this.voter = voter;
         this.interceptor = interceptor;
+        this.cache = cache;
     }
 
     /**
@@ -163,6 +166,12 @@ public class EventListenersFactoryBean extends AbstractFactoryBean {
         append("post-insert", ell);
         append("post-update", ell);
         append("post-delete", ell);
+
+        PermissionsCacheEventListener pcel =
+                new ome.security.basic.PermissionsCacheEventListener(cache);
+        append("post-insert", pcel);
+        append("post-update", pcel);
+        append("post-delete", pcel);
 
         UpdateEventListener uel = new UpdateEventListener(cd);
         append("pre-update", uel);

@@ -25,6 +25,9 @@ import java.sql.SQLException;
 
 import javax.sql.DataSource;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import ome.model.enums.AdminPrivilege;
 import ome.system.EventContext;
 import ome.system.Roles;
@@ -41,6 +44,8 @@ public class PropertyFilterInitializer {
     private final DataSource dataSource;
     private final AdminPrivilege privilegeReadSession;
     private final Roles roles;
+    private final ExperimenterGroupCache experimenterGroupCache;
+    protected final Log logger = LogFactory.getLog(getClass());
 
     /**
      * The filter for {@link PrivilegedStringTypeDescriptor.Filter#FULL_ADMIN}.
@@ -80,6 +85,9 @@ public class PropertyFilterInitializer {
      * @return if property values may be read
      */
     private boolean isRelatedUser(long experimenterId) {
+        /* Determine the currently effective user ID. */
+        final EventContext ec = currentDetails.getCurrentEventContext();
+        final Long currentUserId = ec.getCurrentUserId();
         if (currentDetails.size() == 0) {
             /* This cannot be an external user request so permit it. */
             return true;
@@ -88,9 +96,6 @@ public class PropertyFilterInitializer {
         if (experimenterId == roles.getRootId() || experimenterId == roles.getGuestId()) {
             return true;
         }
-        /* Determine the currently effective user ID. */
-        final EventContext ec = currentDetails.getCurrentEventContext();
-        final Long currentUserId = ec.getCurrentUserId();
         if (currentUserId == null) {
             /* This cannot be an external user request so permit it. */
             return true;
@@ -105,6 +110,15 @@ public class PropertyFilterInitializer {
             return true;
         }
         /* The only remaining option is for the user to be a fellow group member of a non-private group. */
+        if (experimenterGroupCache != null && experimenterGroupCache.cacheIsValid()) {
+            logger.debug("ExperimenterGroupCache is not null and valid");
+            return experimenterGroupCache.isRelatedUser(experimenterId, currentUserId, roles.getUserGroupId());
+        } else if (experimenterGroupCache == null) {
+            logger.debug("ExperimenterGroupCache is null");
+        } else {
+            logger.warn("ExperimenterGroupCache is not valid");
+        }
+        logger.debug("ExperimenterGroupCache was null or invalid");
         boolean isFellowMember = false;
         try (final Connection connection = dataSource.getConnection()) {
             // note: The "64" in the SQL corresponds to: Permissions.Right.READ.mask() << Permissions.Role.GROUP.shift().
@@ -138,10 +152,24 @@ public class PropertyFilterInitializer {
      */
     public PropertyFilterInitializer(LightAdminPrivileges adminPrivileges, CurrentDetails currentDetails, DataSource dataSource,
             Roles roles) {
+        this(adminPrivileges, currentDetails, dataSource, roles, null);
+    }
+
+    /**
+     * Provide the property filter implementations for {@link ome.util.PrivilegedStringType}.
+     * @param adminPrivileges the light administrator privileges helper
+     * @param currentDetails the details of the current thread's security context
+     * @param dataSource the data source to be used for JDBC access to the database
+     * @param roles the users and groups that are special to OMERO
+     * @param experimenterGroupCache a cache of experimenter group mappings for determining related users
+     */
+    public PropertyFilterInitializer(LightAdminPrivileges adminPrivileges, CurrentDetails currentDetails, DataSource dataSource,
+            Roles roles, ExperimenterGroupCache experimenterGroupCache) {
         this.currentDetails = currentDetails;
         this.dataSource = dataSource;
         this.privilegeReadSession = adminPrivileges.getPrivilege(AdminPrivilege.VALUE_READ_SESSION);
         this.roles = roles;
+        this.experimenterGroupCache = experimenterGroupCache;
 
         PrivilegedStringTypeDescriptor.setFilter(PrivilegedStringTypeDescriptor.Filter.FULL_ADMIN, this::isFullAdmin);
         PrivilegedStringTypeDescriptor.setFilter(PrivilegedStringTypeDescriptor.Filter.RELATED_USER, this::isRelatedUser);
