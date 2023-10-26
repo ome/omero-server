@@ -23,8 +23,20 @@ import java.sql.SQLException;
 public interface ExperimenterGroupCache {
     
     public void updateCache() throws SQLException;
-    
+
+    public void updateGroupPermissions(Long groupId) throws SQLException;
+
+    public void addGroup(Long groupId, Long permissions);
+
+    public void addExperimenter(Long experimenterId);
+
+    public void changeGroupPermissions(Long groupId, Long permissions);
+
+    public void addExperimenterToGroup(Long experimenterId, Long groupId);
+
+    public void removeExperimenterFromGroup(Long experimenterId, Long groupId);
+
     public boolean cacheIsValid();
 
-    public boolean isRelatedUser(long experimenterId, long currentUserId, long userGroupId);
+    public boolean isRelatedUser(Long experimenterId, Long currentUserId, Long userGroupId);
 }
