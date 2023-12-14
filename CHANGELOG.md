@@ -1,3 +1,9 @@
+5.6.10 (December 2023)
+----------------------
+
+- Bump omero-renderer version to 5.5.15
+- Bump omero-common-test version to 5.6.4
+
 5.6.9 (September 2023)
 ----------------------
 
