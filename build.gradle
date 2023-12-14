@@ -28,7 +28,7 @@ dependencies {
     testImplementation("jmock:jmock:1.+")
     testImplementation('org.openmicroscopy:omero-common-test:5.6.4')
 
-    api('org.openmicroscopy:omero-renderer:5.5.14')
+    api('org.openmicroscopy:omero-renderer:5.5.15')
 
     // Spring framework stuff
     implementation("org.springframework:spring-context-support:4.3.14.RELEASE")
