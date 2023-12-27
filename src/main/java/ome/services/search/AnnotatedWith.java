@@ -211,7 +211,7 @@ public class AnnotatedWith extends SearchAction {
         for (int j = 0; j < annotation.length; j++) {
             // Main criteria
             if (useNamespace) {
-                notNullOrLikeOrEqual(qb, ann + ".ns", type[j], annotation[j]
+                notNullOrLikeOrEqual(qb, ann[j] + ".ns", type[j], annotation[j]
                         .getNs(), useLike, values.caseSensitive);
             }
 
