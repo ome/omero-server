@@ -29,6 +29,7 @@ import ome.security.basic.CurrentDetails;
 import ome.security.basic.LightAdminPrivileges;
 import ome.services.sessions.SessionManager.CreationRequest;
 import ome.services.util.Executor;
+import ome.services.util.Executor.Priority;
 import ome.system.Principal;
 
 import org.slf4j.Logger;
@@ -94,7 +95,7 @@ public class SessionBean implements LocalSession {
             cd.size() > 0 ? cd.getContext().get("omero.agent") : null;
         try {
             final Principal principal = principal(defaultGroup, user);
-            Future<Session> future = ex.submit(new Callable<Session>(){
+            Future<Session> future = ex.submit(Priority.SYSTEM, new Callable<Session>(){
                 public Session call() throws Exception {
                     final CreationRequest req = new CreationRequest();
                     req.principal = principal;
@@ -153,7 +154,7 @@ public class SessionBean implements LocalSession {
         final String agent =
             cd.size() > 0 ? cd.getContext().get("omero.agent") : null;
         try {
-            Future<Session> future = ex.submit(new Callable<Session>(){
+            Future<Session> future = ex.submit(Priority.SYSTEM, new Callable<Session>(){
                 public Session call() throws Exception {
                     SessionManager.CreationRequest req = new SessionManager.CreationRequest();
                     req.principal = principal;
@@ -213,7 +214,7 @@ public class SessionBean implements LocalSession {
 
     @RolesAllowed( { "user", "guest" })
     public Session updateSession(@NotNull final Session session) {
-        Future<Session> future = ex.submit(new Callable<Session>(){
+        Future<Session> future = ex.submit(Priority.SYSTEM, new Callable<Session>(){
             public Session call() throws Exception {
                 return mgr.update(session);
             }});
@@ -222,7 +223,7 @@ public class SessionBean implements LocalSession {
 
     @RolesAllowed( { "user", "guest" })
     public int closeSession(@NotNull final Session session) {
-        Future<Integer> future = ex.submit(new Callable<Integer>(){
+        Future<Integer> future = ex.submit(Priority.SYSTEM, new Callable<Integer>(){
             public Integer call() throws Exception {
                 return mgr.close(session.getUuid());
             }});
@@ -232,7 +233,7 @@ public class SessionBean implements LocalSession {
     @RolesAllowed("user")
     public java.util.List<Session> getMyOpenSessions() {
         final String uuid = currentContext().getCurrentSessionUuid();
-        Future<List<Session>> future = ex.submit(new Callable<List<Session>>(){
+        Future<List<Session>> future = ex.submit(Priority.SYSTEM, new Callable<List<Session>>(){
             public List<Session> call() throws Exception {
                 return mgr.findSameUser(uuid);
             }});
@@ -242,7 +243,7 @@ public class SessionBean implements LocalSession {
     @RolesAllowed("user")
     public java.util.List<Session> getMyOpenAgentSessions(final String agent) {
         final String uuid = currentContext().getCurrentSessionUuid();
-        Future<List<Session>> future = ex.submit(new Callable<List<Session>>(){
+        Future<List<Session>> future = ex.submit(Priority.SYSTEM, new Callable<List<Session>>(){
             public List<Session> call() throws Exception {
                 return mgr.findSameUser(uuid, agent);
             }});
@@ -252,7 +253,7 @@ public class SessionBean implements LocalSession {
     @RolesAllowed("user")
     public java.util.List<Session> getMyOpenClientSessions() {
         final String uuid = currentContext().getCurrentSessionUuid();
-        Future<List<Session>> future = ex.submit(new Callable<List<Session>>(){
+        Future<List<Session>> future = ex.submit(Priority.SYSTEM, new Callable<List<Session>>(){
             public List<Session> call() throws Exception {
                 return mgr.findSameUser(uuid, "OMERO.insight",
                         "OMERO.web", "OMERO.importer");
