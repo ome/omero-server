@@ -111,7 +111,7 @@ public class SessionBeanUnitTest extends MockObjectTestCase {
         exMock.expects(once()).method("submit").will(new Stub(){
 
             public Object invoke(Invocation arg0) throws Throwable {
-                Callable callable = (Callable) arg0.parameterValues.get(0);
+                Callable callable = (Callable) arg0.parameterValues.get(1);
                 final Object rv = callable.call();
                 return new Future() {
 
