@@ -1138,7 +1138,7 @@ public class ThumbnailBean extends AbstractLevel2Service
     private byte[] retrieveThumbnailAndUpdateMetadata(boolean rewriteMetadata)
     {
         byte[] thumbnail = retrieveThumbnail(rewriteMetadata);
-        if (inProgress && !PROGRESS_VERSION.equals(thumbnailMetadata)) {
+        if (inProgress && !PROGRESS_VERSION.equals(thumbnailMetadata.getVersion())) {
             thumbnailMetadata.setVersion(PROGRESS_VERSION);
             dirtyMetadata = true;
         }
