@@ -37,7 +37,7 @@ dependencies {
 
     if (databaseType.equals("psql")) {
         // Postgres connect driver for java
-        implementation 'org.postgresql:postgresql:42.2.1'
+        implementation 'org.postgresql:postgresql:42.2.29'
     }
     // Used by hibernate, see: https://stackoverflow.com/a/14365438
     implementation("org.javassist:javassist:3.25.0-GA")
