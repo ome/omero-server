@@ -1,3 +1,14 @@
+5.6.11 (May 2024)
+-----------------
+
+- Swap default min and background thread limits ([#177](https://github.com/ome/omero-server/pull/177))
+- Session bean actions should happen at SYSTEM priority ([#176](https://github.com/ome/omero-server/pull/176))
+- Bump org.postgresql:postgresql to version 42.2.28 ([#175](https://github.com/ome/omero-server/pull/175))
+- Fix Invocation of toString on an array ([#171](https://github.com/ome/omero-server/pull/171))
+- Fx equals() comparing objects of different types ([#168](https://github.com/ome/omero-server/pull/168))
+- Bump omero-renderer version to 5.5.16
+- Bump omero-common-test version to 5.6.5
+
 5.6.10 (December 2023)
 ----------------------
 
