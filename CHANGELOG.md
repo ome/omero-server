@@ -1,3 +1,9 @@
+5.6.12 (July 2024)
+------------------
+
+- Bump omero-renderer version to 5.5.17
+- Bump omero-common-test version to 5.6.7
+
 5.6.11 (May 2024)
 -----------------
 
