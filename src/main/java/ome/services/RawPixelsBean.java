@@ -925,6 +925,16 @@ public class RawPixelsBean extends AbstractStatefulBean implements
     }
 
     /* (non-Javadoc)
+     * @see ome.api.RawPixelsStore#isRGB()
+     */
+    @RolesAllowed("user")
+    public synchronized boolean isRGB()
+    {
+        errorIfNotLoaded();
+        return dataService.isRGB(pixelsInstance);
+    }
+
+    /* (non-Javadoc)
      * @see ome.api.RawPixelsStore#getResolutionLevel()
      */
     @RolesAllowed("user")
