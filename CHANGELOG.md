@@ -1,3 +1,10 @@
+5.7.0 (November 2024)
+---------------------
+
+- Build with Java 11 ([#184](https://github.com/ome/omero-model/pull/184))
+- Bump omero-renderer version to 5.6.0
+- Bump omero-common-test version to 5.7.0
+
 5.6.12 (July 2024)
 ------------------
 
