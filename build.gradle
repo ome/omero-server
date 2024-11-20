@@ -5,7 +5,7 @@ plugins {
 }
 
 group = "org.openmicroscopy"
-version = "5.6.13-SNAPSHOT"
+version = "5.7.0"
 
 repositories {
     mavenLocal()
@@ -28,7 +28,7 @@ dependencies {
     testImplementation("jmock:jmock:1.+")
     testImplementation('org.openmicroscopy:omero-common-test:5.7.0')
 
-    api('org.openmicroscopy:omero-renderer:5.5.17')
+    api('org.openmicroscopy:omero-renderer:5.6.0')
 
     // Spring framework stuff
     implementation("org.springframework:spring-context-support:4.3.14.RELEASE")
