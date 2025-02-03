@@ -28,8 +28,8 @@ import java.lang.management.ManagementFactory;
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Joiner;
 
@@ -42,7 +42,7 @@ import com.google.common.base.Joiner;
  */
 public class JvmSettingsCheck {
 
-    public final static Log log = LogFactory.getLog(JvmSettingsCheck.class);
+    public final static Logger log = LoggerFactory.getLogger(JvmSettingsCheck.class);
 
     /**
      * TotalPhysicalMemorySize value from the OperatingSystem JMX bean
