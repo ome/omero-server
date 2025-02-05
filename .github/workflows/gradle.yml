@@ -9,7 +9,7 @@ on:
 
 jobs:
   build:
-    uses: jburel/action-workflows/.github/workflows/gradle_build.yml@update
+    uses: ome/action-workflows/.github/workflows/gradle_build.yml@main
     with:
       install-ice: true
   publish_snapshots:
