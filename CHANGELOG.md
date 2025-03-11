@@ -1,3 +1,10 @@
+5.7.1 (March 2025)
+------------------
+
+- Bump omero-renderer to 5.6.1 
+- Bump omero-common-test to 5.7.1
+- Replace usage of Apache Commons Library by SL4J ([#185](https://github.com/ome/omero-server/pull/185))
+
 5.7.0 (November 2024)
 ---------------------
 
