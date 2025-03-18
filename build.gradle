@@ -1,6 +1,6 @@
 plugins {
     id "java-library"
-    id "org.openmicroscopy.project" version "5.7.1"
+    id "org.openmicroscopy.project" version "5.7.2"
     id "org.openmicroscopy.gradle.ice-builder.slice" version "1.5.3"
 }
 
