@@ -1,3 +1,10 @@
+5.7.2 (March 2025)
+------------------
+
+- Bump omero-renderer to 5.6.2
+- Bump omero-common-test to 5.7.2
+- Bump internal dependencies ((#189)[https://github.com/ome/omero-server/pull/189])
+
 5.7.1 (March 2025)
 ------------------
 
