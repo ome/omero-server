@@ -31,9 +31,10 @@ dependencies {
     api('org.openmicroscopy:omero-renderer:5.6.2')
 
     // Spring framework stuff
-    implementation("org.springframework:spring-context-support:4.3.14.RELEASE")
-    implementation("org.springframework:spring-jms:4.3.14.RELEASE")
-    implementation("org.springframework.security:spring-security-ldap:4.2.4.RELEASE")
+    implementation("org.springframework:spring-context-support:4.3.30.RELEASE")
+    implementation("org.springframework:spring-jms:4.3.30.RELEASE")
+    implementation("org.springframework.security:spring-security-ldap:4.2.20.RELEASE")
+    implementation("org.springframework.ldap:spring-ldap-core:2.3.8.RELEASE")
 
     if (databaseType.equals("psql")) {
         // Postgres connect driver for java
