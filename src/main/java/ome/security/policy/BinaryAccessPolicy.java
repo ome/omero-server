@@ -165,8 +165,9 @@ public class BinaryAccessPolicy extends BasePolicy {
                     if (rv == null) {
                         rv = new HashSet<String>();
                     }
-                    String setting = nv.getValue();
-                    rv.add(setting);
+                    for (String setting : nv.getValue().split(",")) {
+                        rv.add(setting);
+                    }
                 }
             }
             if (rv != null) {
