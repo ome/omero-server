@@ -43,7 +43,7 @@ dependencies {
     implementation("org.javassist:javassist:3.25.0-GA")
 
     // API monitoring thing: http://jamonapi.sourceforge.net
-    implementation("com.jamonapi:jamon:2.81")
+    testImplementation("com.jamonapi:jamon:2.82")
 
     implementation("com.github.marcus-nl.btm:btm:3.0.0-mk1")
 
