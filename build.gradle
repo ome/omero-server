@@ -65,7 +65,7 @@ dependencies {
         exclude group: 'javax.mail'
     }
 
-    implementation("net.sf.ehcache:ehcache:2.10.4")
+    implementation("net.sf.ehcache:ehcache:2.10.9.2")
 
     implementation("commons-io:commons-io:2.6")
 }
