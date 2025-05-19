@@ -51,7 +51,7 @@ dependencies {
     implementation("org.apache.calcite:calcite-core:1.20.0")
     implementation("org.apache.commons:commons-collections4:4.1")
     implementation("org.apache.pdfbox:pdfbox:2.0.8")
-    implementation("org.apache.xmlgraphics:batik-all:1.9.1")
+    implementation("org.apache.xmlgraphics:batik-codec:1.19")
 
     implementation("commons-beanutils:commons-beanutils:1.9.3")
 
