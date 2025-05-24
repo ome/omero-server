@@ -48,7 +48,7 @@ dependencies {
 
     implementation("com.github.marcus-nl.btm:btm:3.0.0-mk1")
 
-    implementation("org.apache.calcite:calcite-core:1.20.0")
+    implementation("org.apache.calcite:calcite-core:1.39.0")
     implementation("org.apache.commons:commons-collections4:4.1")
     implementation("org.apache.pdfbox:pdfbox:2.0.8")
     implementation("org.apache.xmlgraphics:batik-all:1.9.1")
