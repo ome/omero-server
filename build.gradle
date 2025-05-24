@@ -70,6 +70,18 @@ dependencies {
     implementation("commons-io:commons-io:2.6")
 }
 
+// This workaround can be dropped when the build is upgraded to Gradle 7+
+// See https://github.com/google/guava/releases/tag/v32.1.0 and
+// https://github.com/google/guava/issues/6612#issuecomment-1614897285 for
+// more information
+sourceSets.all {
+  configurations.getByName(runtimeClasspathConfigurationName) {
+    attributes.attribute(Attribute.of("org.gradle.jvm.environment", String), "standard-jvm")
+  }
+  configurations.getByName(compileClasspathConfigurationName) {
+    attributes.attribute(Attribute.of("org.gradle.jvm.environment", String), "standard-jvm")
+  }
+}
 
 test {
     testLogging {
