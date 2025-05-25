@@ -48,7 +48,7 @@ dependencies {
 
     implementation("com.github.marcus-nl.btm:btm:3.0.0-mk1")
 
-    implementation("org.apache.calcite:calcite-core:1.39.0")
+    implementation("org.apache.calcite:calcite-core:1.35.0")
     implementation("org.apache.commons:commons-collections4:4.1")
     implementation("org.apache.pdfbox:pdfbox:2.0.8")
     implementation("org.apache.xmlgraphics:batik-all:1.9.1")
@@ -68,19 +68,6 @@ dependencies {
     implementation("net.sf.ehcache:ehcache:2.10.9.2")
 
     implementation("commons-io:commons-io:2.6")
-}
-
-// This workaround can be dropped when the build is upgraded to Gradle 7+
-// See https://github.com/google/guava/releases/tag/v32.1.0 and
-// https://github.com/google/guava/issues/6612#issuecomment-1614897285 for
-// more information
-sourceSets.all {
-  configurations.getByName(runtimeClasspathConfigurationName) {
-    attributes.attribute(Attribute.of("org.gradle.jvm.environment", String), "standard-jvm")
-  }
-  configurations.getByName(compileClasspathConfigurationName) {
-    attributes.attribute(Attribute.of("org.gradle.jvm.environment", String), "standard-jvm")
-  }
 }
 
 test {
