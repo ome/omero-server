@@ -91,9 +91,6 @@
 		<constructor-arg index="2" value="${omero.throttling.method_time.error}"/>
 	</bean>
 
-	<bean id="profile"
-		class="org.springframework.aop.interceptor.JamonPerformanceMonitorInterceptor"/>
-
 <!--
   Service Levels
   =======================================================================
