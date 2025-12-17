@@ -111,8 +111,8 @@ public class TestStandardFloatRenderer extends BaseRenderingTest
             Assert.assertEquals(0.0, data.getPixelValue(i));
         }
         for (int i = 0; i < n/2; i++) {
-            Assert.assertEquals(Double.valueOf(qs.getPixelsTypeMax()),
-                    Double.valueOf(data.getPixelValue(i+n/2)));
+            Assert.assertEquals(Float.valueOf((float) qs.getPixelsTypeMax()),
+                    Float.valueOf((float) data.getPixelValue(i+n/2)));
         }
 
         try
