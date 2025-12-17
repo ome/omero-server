@@ -211,34 +211,34 @@ public class SharingTest extends AbstractManagedContextTest {
         loginRoot();
         Map<Long, Long> counts = share.getCommentCount(new HashSet<Long>(Arrays
                 .asList(id0, id1, id2)));
-        Assert.assertEquals(new Long(0), counts.get(id0));
-        Assert.assertEquals(new Long(1), counts.get(id1));
-        Assert.assertEquals(new Long(2), counts.get(id2));
+        Assert.assertEquals(Long.valueOf(0), counts.get(id0));
+        Assert.assertEquals(Long.valueOf(1), counts.get(id1));
+        Assert.assertEquals(Long.valueOf(2), counts.get(id2));
 
         // as owner
         loginUser(owner.getOmeName());
         counts = share.getCommentCount(new HashSet<Long>(Arrays
                 .asList(id0, id1, id2)));
-        Assert.assertEquals(new Long(0), counts.get(id0));
-        Assert.assertEquals(new Long(1), counts.get(id1));
-        Assert.assertEquals(new Long(2), counts.get(id2));
+        Assert.assertEquals(Long.valueOf(0), counts.get(id0));
+        Assert.assertEquals(Long.valueOf(1), counts.get(id1));
+        Assert.assertEquals(Long.valueOf(2), counts.get(id2));
 
         // as member
         loginUser(member.getOmeName());
         counts = share.getCommentCount(new HashSet<Long>(Arrays
                 .asList(id0, id1, id2)));
-        Assert.assertEquals(new Long(0), counts.get(id0));
-        Assert.assertEquals(new Long(1), counts.get(id1));
-        Assert.assertEquals(new Long(2), counts.get(id2));
+        Assert.assertEquals(Long.valueOf(0), counts.get(id0));
+        Assert.assertEquals(Long.valueOf(1), counts.get(id1));
+        Assert.assertEquals(Long.valueOf(2), counts.get(id2));
         
         // as non-member
         loginUser(nonMember.getOmeName());
         // before ticket:1227, this method should have thrown
         counts = share.getCommentCount(new HashSet<Long>(Arrays
                 .asList(id0, id1, id2)));
-        Assert.assertEquals(new Long(0), counts.get(id0));
-        Assert.assertEquals(new Long(0), counts.get(id1));
-        Assert.assertEquals(new Long(0), counts.get(id2));
+        Assert.assertEquals(Long.valueOf(0), counts.get(id0));
+        Assert.assertEquals(Long.valueOf(0), counts.get(id1));
+        Assert.assertEquals(Long.valueOf(0), counts.get(id2));
     }
 
     @Test
@@ -482,11 +482,11 @@ public class SharingTest extends AbstractManagedContextTest {
         Assert.assertTrue(names.contains(secondMember.getOmeName()));
 
         // Counts as different people
-        Assert.assertEquals(new Long(3), share.getMemberCount(Collections.singleton(id)).get(id));
+        Assert.assertEquals(Long.valueOf(3), share.getMemberCount(Collections.singleton(id)).get(id));
         loginRoot(); // ticket:1239
-        Assert.assertEquals(new Long(3), share.getMemberCount(Collections.singleton(id)).get(id));
+        Assert.assertEquals(Long.valueOf(3), share.getMemberCount(Collections.singleton(id)).get(id));
         loginUser(firstMember.getOmeName());
-        Assert.assertEquals(new Long(3), share.getMemberCount(Collections.singleton(id)).get(id));
+        Assert.assertEquals(Long.valueOf(3), share.getMemberCount(Collections.singleton(id)).get(id));
         loginUser(nonMember.getOmeName());
         try {
             share.getMemberCount(Collections.singleton(id)).get(id);

@@ -164,16 +164,16 @@ public class DetachedPixelsGraphTest extends AbstractUpdateTest {
         Time deltaT = new Time(-1, UnitsTime.SECOND);
         Time deltaTB = new Time(-193, UnitsTime.SECOND);
 
-        pi1.setTheC(new Integer(1));
-        pi1.setTheT(new Integer(1));
-        pi1.setTheZ(new Integer(1));
+        pi1.setTheC(Integer.valueOf(1));
+        pi1.setTheT(Integer.valueOf(1));
+        pi1.setTheZ(Integer.valueOf(1));
         pi1.setPixels(p);
         pi1.setExposureTime(exposureTime);
         pi1.setDeltaT(deltaT);
 
-        pi2.setTheC(new Integer(1));
-        pi2.setTheT(new Integer(1));
-        pi2.setTheZ(new Integer(1));
+        pi2.setTheC(Integer.valueOf(1));
+        pi2.setTheT(Integer.valueOf(1));
+        pi2.setTheZ(Integer.valueOf(1));
         pi2.setPixels(p);
         pi2.setExposureTime(exposureTime);
         pi2.setDeltaT(deltaTB);

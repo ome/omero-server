@@ -31,11 +31,11 @@ public class PixbufIOFixture {
 
     private void createPixels() {
         Pixels p = ObjectFactory.createPixelGraph(null);
-        p.setSizeX(new Integer(64));
-        p.setSizeY(new Integer(64));
-        p.setSizeZ(new Integer(16));
-        p.setSizeC(new Integer(2));
-        p.setSizeT(new Integer(10));
+        p.setSizeX(Integer.valueOf(64));
+        p.setSizeY(Integer.valueOf(64));
+        p.setSizeZ(Integer.valueOf(16));
+        p.setSizeC(Integer.valueOf(2));
+        p.setSizeT(Integer.valueOf(10));
         // FIXME: Bit of a hack until the model is updated, the following
         // is a SHA1 of "pixels"
         p.setSha1("09bc7b2dcc9a510f4ab3a40c47f7a4cb77954356");

@@ -258,7 +258,7 @@ public class RawPixelsBean extends AbstractStatefulBean implements
     @RolesAllowed("user")
     public synchronized void setPixelsId(long pixelsId, boolean bypassOriginalFile) {
         if (id == null || id.longValue() != pixelsId) {
-            id = new Long(pixelsId);
+            id = Long.valueOf(pixelsId);
             pixelsInstance = null;
             closePixelBuffer();
             buffer = null;

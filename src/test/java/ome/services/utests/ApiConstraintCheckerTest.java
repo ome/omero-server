@@ -93,7 +93,7 @@ public class ApiConstraintCheckerTest {
     public void testIntegersInSet() throws Exception {
         loadContainerHierarchy();
         args = new Object[] { Project.class,
-                Collections.singleton(new Integer(1)), null };
+                Collections.singleton(Integer.valueOf(1)), null };
         ApiConstraintChecker.errorOnViolation(c, m, args);
     }
 
@@ -121,7 +121,7 @@ public class ApiConstraintCheckerTest {
     public void testIntegersInSet_find() throws Exception {
         findContainerHierarchies();
         args = new Object[] { Project.class,
-                Collections.singleton(new Integer(1)), null };
+                Collections.singleton(Integer.valueOf(1)), null };
         ApiConstraintChecker.errorOnViolation(c, m, args);
     }
 
@@ -129,7 +129,7 @@ public class ApiConstraintCheckerTest {
     public void testGood_find() throws Exception {
         findContainerHierarchies();
         args = new Object[] { Project.class,
-                Collections.singleton(new Long(1)), null };
+                Collections.singleton(Long.valueOf(1)), null };
         ApiConstraintChecker.errorOnViolation(c, m, args);
     }
 

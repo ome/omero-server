@@ -68,7 +68,7 @@ public class TestStandardDoubleRenderer extends BaseRenderingTest
         int n = 16;
         Double[] output = new Double[16];
         for (int i = 0; i < n/2; i++) {
-            output[i+n/2] = new Double(Integer.MAX_VALUE);
+            output[i+n/2] = Double.valueOf(Integer.MAX_VALUE);
         }
         for (int i = 0; i < n/2; i++) {
             output[i] = 0.0;
@@ -116,10 +116,10 @@ public class TestStandardDoubleRenderer extends BaseRenderingTest
     {
         QuantumStrategy qs = quantumFactory.getStrategy(
                 settings.getQuantization(), pixels);
-        Assert.assertEquals(new Double(Integer.MIN_VALUE),
-                new Double(qs.getPixelsTypeMin()));
-        Assert.assertEquals(new Double(Integer.MAX_VALUE),
-                new Double(qs.getPixelsTypeMax()));
+        Assert.assertEquals(Double.valueOf(Integer.MIN_VALUE),
+                Double.valueOf(qs.getPixelsTypeMin()));
+        Assert.assertEquals(Double.valueOf(Integer.MAX_VALUE),
+                Double.valueOf(qs.getPixelsTypeMax()));
     }
 
     @Test(timeOut=30000)
