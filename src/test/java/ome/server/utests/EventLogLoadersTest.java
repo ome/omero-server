@@ -243,15 +243,15 @@ public class EventLogLoadersTest extends MockObjectTestCase {
         //
         assertTrue(ell.hasNext());
         current = ell.next();
-        assertEquals(new Long(1L), current.getEntityId());
+        assertEquals(Long.valueOf(1L), current.getEntityId());
         current = ell.next();
-        assertEquals(new Long(2L), current.getEntityId());
+        assertEquals(Long.valueOf(2L), current.getEntityId());
         current = ell.next();
-        assertEquals(new Long(3L), current.getEntityId());
+        assertEquals(Long.valueOf(3L), current.getEntityId());
         current = ell.next();
-        assertEquals(new Long(4L), current.getEntityId());
+        assertEquals(Long.valueOf(4L), current.getEntityId());
         current = ell.next();
-        assertEquals(new Long(5L), current.getEntityId());
+        assertEquals(Long.valueOf(5L), current.getEntityId());
         // end loop
         assertFalse(ell.hasNext());
 
@@ -274,15 +274,15 @@ public class EventLogLoadersTest extends MockObjectTestCase {
         //
         assertTrue(ell.hasNext());
         current = ell.next();
-        assertEquals(new Long(1L), current.getEntityId());
+        assertEquals(Long.valueOf(1L), current.getEntityId());
         current = ell.next();
-        assertEquals(new Long(2L), current.getEntityId());
+        assertEquals(Long.valueOf(2L), current.getEntityId());
         current = ell.next();
-        assertEquals(new Long(3L), current.getEntityId());
+        assertEquals(Long.valueOf(3L), current.getEntityId());
         current = ell.next();
-        assertEquals(new Long(4L), current.getEntityId());
+        assertEquals(Long.valueOf(4L), current.getEntityId());
         current = ell.next();
-        assertEquals(new Long(5L), current.getEntityId());
+        assertEquals(Long.valueOf(5L), current.getEntityId());
         // end loop
         assertFalse(ell.hasNext());
 

@@ -54,7 +54,7 @@ public class TestDefaultGroup implements Modification {
             throw new RuntimeException("Not 2 groups!");
         }
         
-        Long userGrp = new Long(new Roles().getUserGroupId());
+        Long userGrp = Long.valueOf(new Roles().getUserGroupId());
         Long firstGrp = after.getMemberOfGroupsList().get(0);
         if (firstGrp.equals(userGrp)) {
             throw new RuntimeException("User group is still first!");

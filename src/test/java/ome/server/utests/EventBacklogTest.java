@@ -36,8 +36,8 @@ public class EventBacklogTest extends MockObjectTestCase {
         EventLog log2 = new EventLog(2L, "Image", "INSERT", null);
         assertTrue(b.add(log1));
         assertTrue(b.add(log2));
-        assertEquals(new Long(1L), b.remove().getEntityId());
-        assertEquals(new Long(2L), b.remove().getEntityId());
+        assertEquals(Long.valueOf(1L), b.remove().getEntityId());
+        assertEquals(Long.valueOf(2L), b.remove().getEntityId());
         assertNull(b.remove());
     }
 

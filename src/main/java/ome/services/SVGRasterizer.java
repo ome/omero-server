@@ -123,7 +123,7 @@ public class SVGRasterizer {
      * @param quality the percentage quality
      */
     public void setQuality(float quality) {
-        hints.put(JPEGTranscoder.KEY_QUALITY, new Float(quality));
+        hints.put(JPEGTranscoder.KEY_QUALITY, Float.valueOf(quality));
     }
 
     /**
@@ -132,7 +132,7 @@ public class SVGRasterizer {
      * @param width the image width
      */
     public void setImageWidth(float width) {
-        hints.put(ImageTranscoder.KEY_WIDTH, new Float(width));
+        hints.put(ImageTranscoder.KEY_WIDTH, Float.valueOf(width));
     }
 
     /**
@@ -141,7 +141,7 @@ public class SVGRasterizer {
      * @param height the image height
      */
     public void setImageHeight(float height) {
-        hints.put(ImageTranscoder.KEY_HEIGHT, new Float(height));
+        hints.put(ImageTranscoder.KEY_HEIGHT, Float.valueOf(height));
     }
 
     /**
@@ -164,7 +164,7 @@ public class SVGRasterizer {
      */
     public void setPixelToMMFactor(float px2mm) {
         hints.put(ImageTranscoder.KEY_PIXEL_UNIT_TO_MILLIMETER,
-                  new Float(px2mm));
+                  Float.valueOf(px2mm));
     }
 
     /**

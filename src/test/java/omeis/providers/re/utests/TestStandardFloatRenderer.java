@@ -79,7 +79,7 @@ public class TestStandardFloatRenderer extends BaseRenderingTest
         int n = 16;
         Float[] output = new Float[16];
         for (int i = 0; i < n/2; i++) {
-            output[i+n/2] = new Float(Integer.MAX_VALUE);
+            output[i+n/2] = Float.valueOf(Integer.MAX_VALUE);
         }
         for (int i = 0; i < n/2; i++) {
             output[i] = 0.0f;
@@ -111,8 +111,8 @@ public class TestStandardFloatRenderer extends BaseRenderingTest
             Assert.assertEquals(0.0, data.getPixelValue(i));
         }
         for (int i = 0; i < n/2; i++) {
-            Assert.assertEquals(new Float(qs.getPixelsTypeMax()),
-                    new Float(data.getPixelValue(i+n/2)));
+            Assert.assertEquals(Float.valueOf((float) qs.getPixelsTypeMax()),
+                    Float.valueOf((float) data.getPixelValue(i+n/2)));
         }
 
         try
@@ -179,7 +179,7 @@ public class TestStandardFloatRenderer extends BaseRenderingTest
         int n = 100000000;
         Float[] output = new Float[n];
         for (int i = 0; i < output.length; i++) {
-            output[i] = new Float(Integer.MIN_VALUE+i);
+            output[i] = Float.valueOf(Integer.MIN_VALUE+i);
         }
         ByteBuffer buffer = ByteBuffer.allocate(4 * output.length);
 

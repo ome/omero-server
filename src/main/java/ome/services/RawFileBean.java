@@ -349,7 +349,7 @@ public class RawFileBean extends AbstractStatefulBean implements RawFileStore {
             final FileBuffer buffer) {
 
         if (id == null || id.longValue() != fileId) {
-            id = new Long(fileId);
+            id = Long.valueOf(fileId);
             file = null;
             closeFileBuffer();
             this.buffer = null;

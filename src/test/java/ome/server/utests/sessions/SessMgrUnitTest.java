@@ -484,16 +484,16 @@ public class SessMgrUnitTest extends MockObjectTestCase {
         s.setTimeToIdle(100L);
         s = mgr.update(s);
 
-        assertEquals(new Long(300L), s.getTimeToLive());
-        assertEquals(new Long(100L), s.getTimeToIdle());
+        assertEquals(Long.valueOf(300L), s.getTimeToLive());
+        assertEquals(Long.valueOf(100L), s.getTimeToIdle());
 
         // For this first test we want to also verify that
         // the values in the session context are the same as the
         // returned values
 
         ctx = cache.getSessionContext(session.getUuid());
-        assertEquals(new Long(300L), ctx.getSession().getTimeToLive());
-        assertEquals(new Long(100L), ctx.getSession().getTimeToIdle());
+        assertEquals(Long.valueOf(300L), ctx.getSession().getTimeToLive());
+        assertEquals(Long.valueOf(100L), ctx.getSession().getTimeToIdle());
     }
 
     @Test(expectedExceptions = SecurityViolation.class)

@@ -140,13 +140,13 @@ public class UpdateTest extends AbstractUpdateTest {
         RenderingDef def = ObjectFactory.createRenderingDef();
 
         ChannelBinding binding1 = ObjectFactory.createChannelBinding();
-        binding1.setInputStart(new Double(1.0));
+        binding1.setInputStart(Double.valueOf(1.0));
 
         ChannelBinding binding2 = ObjectFactory.createChannelBinding();
-        binding2.setInputStart(new Double(2.0));
+        binding2.setInputStart(Double.valueOf(2.0));
 
         ChannelBinding binding3 = ObjectFactory.createChannelBinding();
-        binding3.setInputStart(new Double(3.0));
+        binding3.setInputStart(Double.valueOf(3.0));
 
         def.addChannelBinding(binding1);
         def.addChannelBinding(binding2);
@@ -242,7 +242,7 @@ public class UpdateTest extends AbstractUpdateTest {
         List<Experimenter> es = iQuery.findAll(Experimenter.class, null);
         for (Experimenter experimenter : es) {
             Long l = experimenter.getId();
-            if (!l.equals(new Long(0L))) {
+            if (!l.equals(Long.valueOf(0L))) {
                 e = l;
             }
         }

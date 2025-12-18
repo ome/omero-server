@@ -165,7 +165,7 @@ public class QueryTest extends AbstractManagedContextTest {
      */
     @Test(groups = "ticket:711")
     public void test_examplById() throws Exception {
-        Experimenter ex = new Experimenter(new Long(0), false);
+        Experimenter ex = new Experimenter(Long.valueOf(0), false);
         try {
             Experimenter e = iQuery.findByExample(ex);
         } catch (Exception e) {

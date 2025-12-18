@@ -13,7 +13,7 @@ public class TestUtils {
     public static Set getSetFromInt(int[] ids) {
         Set set = new HashSet();
         for (int i = 0; i < ids.length; i++) {
-            set.add(new Integer(ids[i]));
+            set.add(Integer.valueOf(ids[i]));
         }
         return set;
     }

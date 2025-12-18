@@ -176,7 +176,7 @@ public class SecuritySystemTest extends AbstractBasicSecuritySystemTest {
         EventLog onlyLog = sec.getLogs().get(0);
         assertEquals(onlyLog.getAction(), "SHOULD BE ADDED");
         assertEquals(onlyLog.getEntityType(), Image.class.getName());
-        assertEquals(onlyLog.getEntityId(), new Long(2L));
+        assertEquals(onlyLog.getEntityId(), Long.valueOf(2L));
         sec.invalidateEventContext();
     }
 

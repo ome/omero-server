@@ -694,7 +694,7 @@ public class MetadataImpl
     		 Parameters options)
     {
     	List list = getAnnotation(type, include, exclude, options);
-    	if (list != null) return new Long(list.size());
+    	if (list != null) return Long.valueOf(list.size());
     	return -1L;
     }
 
@@ -964,7 +964,7 @@ public class MetadataImpl
     		long userID)
     {
     	Set s = loadAnnotationsUsedNotOwned(annotationType, userID);
-    	if (s != null) return new Long(s.size());
+    	if (s != null) return Long.valueOf(s.size());
     	return -1L;
     }
 
