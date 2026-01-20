@@ -80,6 +80,11 @@
     <constructor-arg ref="currentDetails"/>
     <constructor-arg ref="dataSource"/>
     <constructor-arg ref="roles"/>
+    <constructor-arg ref="experimenterGroupCache"/>
+  </bean>
+
+  <bean id="experimenterGroupCache" class="ome.security.basic.InMemoryExperimenterGroupCache">
+	  <constructor-arg ref="dataSource"/>
   </bean>
 
   <bean id="sqlQueryTransformer" class="ome.tools.hibernate.SqlQueryTransformer" depends-on="initPropertyFilters">
