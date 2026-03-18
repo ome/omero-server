@@ -1996,19 +1996,19 @@ public class OMEROMetadataStore
      * @param a First OMERO model object.
      * @param b Second OMERO model object.
      * @return <code>true</code> if <code>a == null && b == null</code>, 
-     * <code>a == b</code> or <code>a.getId() == b.getId()</code>.
+     * or <code>a.getId().equals(b.getId())</code>.
      */
     private static boolean compare(IEnum a, IEnum b)
     {
-    	if (a == null && b == null)
-    	{
-    		return true;
-    	}
-    	if (a == null || b == null)
-    	{
-    		return false;
-    	}
-    	return a.getId() == b.getId();
+      if (a == null && b == null)
+      {
+        return true;
+      }
+      if (a == null || b == null)
+      {
+        return false;
+      }
+      return a.getId().equals(b.getId());
     }
     
     /**
