@@ -2000,15 +2000,15 @@ public class OMEROMetadataStore
      */
     private static boolean compare(IEnum a, IEnum b)
     {
-      if (a == null && b == null)
-      {
-        return true;
-      }
-      if (a == null || b == null)
-      {
-        return false;
-      }
-      return a.getId().equals(b.getId());
+        if (a == null && b == null)
+        {
+            return true;
+        }
+        if (a == null || b == null)
+        {
+            return false;
+        }
+        return a.getId().equals(b.getId());
     }
     
     /**
