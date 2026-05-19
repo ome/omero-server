@@ -55,6 +55,11 @@
     <constructor-arg ref="aclVoter"/>
   </bean>
 
+  <bean id="permissionsCacheEventListener"
+    class="ome.security.basic.PermissionsCacheEventListener">
+    <constructor-arg ref="experimenterGroupCache"/>
+  </bean>
+
   <bean id="basicSecuritySystemSubstituter" class="ome.services.util.BeanInstantiationSubstituter">
     <constructor-arg ref="readOnlyStatus"/>
     <constructor-arg value="basicSecuritySystem"/>
@@ -89,6 +94,7 @@
     <constructor-arg ref="currentDetails"/>
     <constructor-arg ref="tokenHolder"/>
     <constructor-arg ref="omeroInterceptor"/>
+    <constructor-arg ref="permissionsCacheEventListener"/>
     <property name="debugAll" value="false"/>
   </bean>
 
